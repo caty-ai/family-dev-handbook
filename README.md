@@ -357,3 +357,13 @@ The documents under `docs/` are written in Japanese, and this English README is 
 **Docs only** ｜ **No runtime** ｜ **Runs on git and Issues / PRs alone**
 
 </div>
+
+<!-- family:generated:family-footer:start -->
+
+---
+
+Part of the **Caty AI family** — open tools for running a family of AI agents. The full map, including modules still being prepared for release, lives in [Family OS](https://github.com/caty-ai/family-os).
+
+Siblings: [Caty Agent Harness](https://github.com/caty-ai/caty-agent-harness) · [Persona Engine](https://github.com/caty-ai/persona-engine) · [Sitter](https://github.com/caty-ai/sitter) · [X Collector](https://github.com/caty-ai/x-collector)
+
+<!-- family:generated:family-footer:end -->
