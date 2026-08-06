@@ -95,4 +95,6 @@ Issue-first は AI のために生まれた考え方ではありません。ソ�
 | 完了条件をマージでどう突き合わせるか | [`L1-7`](02-issue-loop.md) |
 | Issue コメントの様式（WIP / HOLD / 完了記録など） | [templates/issue-template.md](../templates/issue-template.md) |
 
+もう2つの前提: [なぜモジュールを小さく切るのか](why-small-modules.md) / [なぜシンプルに作るのか](why-simple-systems.md)
+
 玄関へ戻る: [README](../README.ja.md)

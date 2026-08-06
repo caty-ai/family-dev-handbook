@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.3.0-blue)
+![version](https://img.shields.io/badge/version-v0.5.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -65,7 +65,7 @@
 
 ## 前提
 
-开始阅读之前，有两个出发点想先共享。后面所有的说明都建立在这两点之上。
+开始阅读之前，有三个出发点想先共享。后面所有的说明都以这三点为出发点。三者没有先后顺序——从哪一个进入，都是为了站上同一个立足点的前提。
 
 ### 从 Issue 开始
 
@@ -88,6 +88,14 @@
 这些你不需要自己设计。**把这本手册交给你的智能体，该拆的地方会以 Issue 的形式主动找上门来。**
 
 详见 [为什么要把模块切小](docs/why-small-modules.md)。
+
+### 复杂度在需求处消除，而不是在设计里
+
+**设计卡住时，先怀疑需求，而不是去找更聪明的设计。**
+
+大部分难度不是设计带来的，而是需求带来的。消掉一个前提，设计的难点就连同实现、测试和日后的维护一起整个消失。怀疑对智能体来说永远是自由的；**删掉需求的决定属于提出需求的人**。经过怀疑仍然接受的复杂度，在 Issue 里留一行理由。
+
+详见 [为什么要构建得简单](docs/why-simple-systems.md)。
 
 ---
 
@@ -181,7 +189,7 @@ handbook-revision 的值请不要改动。
 3. 把第一行的 `owner` 和 `last-verified` 改成你自己和今天的日期。`handbook-revision` 原样保留
 4. 把第二行的 `正本:` 改成本仓库的 URL（如果你 fork 了，就填你 fork 的地址）
 
-要粘贴的就这些。里面只有五套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
+要粘贴的就这些。里面只有六套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
 
 想停用的话，把粘进去的那 30 行删掉就回到原样。其他文件一概不碰。
 
@@ -237,7 +245,7 @@ flowchart TD
 
 ## 规则全景
 
-规则分为五套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
+规则分为六套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
 
 | 体系 | 决定什么 | rule ID | 正文 |
 |---|---|---|---|
@@ -246,6 +254,7 @@ flowchart TD
 | **L0** git 纪律 | 如何防止物理冲突 | `L0-1`–`L0-9` | [docs/03](docs/03-git-protocol.md) |
 | **FP** 失败时姿态 | 无法验证时倒向哪一边 | `FP-1`–`FP-9` | [docs/05](docs/05-fail-posture.md) |
 | **E** Epic 车道 | 一束 Issue 如何推进 | `E-1`–`E-10` | [docs/06](docs/06-epic-lane.md) |
+| **B** 委派简报 | 一次委派如何成为契约 | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 
 其中有两条特别左右成效。一条是 **FP** 的口号“无法验证就串行。fail-open 不等于‘通过’”——它宣告的是：即便你有意选择在无法确认时放行，那也绝不能被读成“已确认”。另一条是**高风险领域的单一定义**，碰到这里的工作一定要停下来等人确认，评审席位也会增加（对外发布、计费、不可逆操作、权限边界之类都算。准确的界线请看正本）。为了不让同一个定义存在于两个地方，正本只放在 [docs/06](docs/06-epic-lane.md) 这一处。
 
@@ -278,14 +287,17 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 |---|---|
 | [docs/why-issue-first.md](docs/why-issue-first.md) | 什么是 Issue-first — 前提的说明（**不是条文**。为什么从 Issue 而不是对话开始、Issue 里写什么、什么时候不需要） |
 | [docs/why-small-modules.md](docs/why-small-modules.md) | 为什么要把模块切小 — 前提的说明（**不是条文**。为什么拆分是对并行可能性的投资、“小”指的是什么、这本手册自己是怎么切的） |
+| [docs/why-simple-systems.md](docs/why-simple-systems.md) | 为什么要构建得简单 — 前提的说明（**不是条文**。为什么复杂度要在需求处消除而不是在设计里、该问哪些问题、以及“怀疑是自由的，删需求的决定属于委托人”） |
 | [docs/01-milestone-loop.md](docs/01-milestone-loop.md) | L2 里程碑循环 — 决定能否并行的一层（`L2-1`–`L2-6`） |
 | [docs/02-issue-loop.md](docs/02-issue-loop.md) | L1 Issue 循环 — 完成、车道状态、完成证据关卡、上游异构评审（`L1-1`–`L1-11`） |
 | [docs/03-git-protocol.md](docs/03-git-protocol.md) | L0 git 纪律 — WIP 锁、worktree、合并流程、恢复检查（`L0-1`–`L0-9`） |
 | [docs/04-adoption.md](docs/04-adoption.md) | 采用方法 — 装到哪里、分发用摘要块、摘要的纪律 |
 | [docs/05-fail-posture.md](docs/05-fail-posture.md) | 失败时姿态 — 无法验证时倒向哪一边（`FP-1`–`FP-9`） |
 | [docs/06-epic-lane.md](docs/06-epic-lane.md) | Epic 车道 — 把人的确认按 Epic 打包的一层、高风险领域的单一定义（`E-1`–`E-10`） |
+| [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委派简报 — 每次把工作交给子智能体时，提示词所承载的契约（`B-1`–`B-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue 模板与全部车道评论格式（WIP / HOLD / 终结 / TAKEOVER / 恢复检查 / 完成记录） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
+| [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献的流程（Issue-first / WIP 声明 / 完成记录的摘要） |
 
@@ -339,8 +351,10 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.3.0**（2026-07-31）。它加入了 Epic 车道（`E-1`–`E-10`），以及在实现动工之前的上游异构评审（`L1-9`–`L1-11`）。
+当前版本是 **v0.5.0**（2026-08-06）。它加入了委派简报层（`B-1`–`B-5`，[docs/07](docs/07-delegation-brief.md)）——把工作交给子智能体的提示词，成为“实现规格、自我检查、评审标准”三层的契约（样式见 [templates/brief-template.md](templates/brief-template.md)）。
 
+- **v0.4.0**（2026-08-05） — 第三个前提“构建得简单——复杂度在需求处消除”（[docs/why-simple-systems.md](docs/why-simple-systems.md)），以及 L2-1 的怀疑需求钩子（删需求的决定属于委托人）
+- **v0.3.0**（2026-07-31） — Epic 车道（`E-1`–`E-10`），以及在实现动工之前的上游异构评审（`L1-9`–`L1-11`）
 - **v0.2.1 / v0.2.0**（2026-07-22） — 整备 MIT 许可证与 community health files，去掉家族特有描述的通用化
 - **v0.1.0 / v0.1.1**（2026-07-21） — 把规则从散文变成契约。稳定的 rule ID、封闭的五状态词汇、带证据的合并关卡、事先声明的失败时姿态
 

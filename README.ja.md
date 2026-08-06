@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.3.0-blue)
+![version](https://img.shields.io/badge/version-v0.5.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -65,7 +65,7 @@ AI エージェントに任せる仕事が増えると、コードそのもの�
 
 ## 前提
 
-読み始める前に共有しておきたい出発点が2つあります。以降の説明は、すべてこの2つの上に立っています。
+読み始める前に共有しておきたい出発点が3つあります。以降の説明は、この3つを出発点にしています。3つは順序ではなく、どれから入っても同じ土俵に立つための前提です。
 
 ### Issue から始める
 
@@ -88,6 +88,14 @@ AI エージェントに任せる仕事が増えると、コードそのもの�
 これを自分で設計する必要はありません。**このハンドブックをエージェントに渡しておけば、分割すべき場所は向こうから Issue として上がってきます。**
 
 詳しくは [なぜモジュールを小さく切るのか](docs/why-small-modules.md) へ。
+
+### 複雑さは要件で消す
+
+**設計でハマったら、より賢い設計ではなく、まず要件を疑います。**
+
+難しさの多くは設計ではなく要件が連れてきます。前提を1つ消せると、設計の難所が実装ごと・保守ごと、まるごと消えます。ただし疑うのはエージェントの自由、**消す決定は依頼した人のもの**です。受け入れた複雑さは理由を Issue に1行残します。
+
+詳しくは [なぜシンプルに作るのか](docs/why-simple-systems.md) へ。
 
 ---
 
@@ -179,7 +187,7 @@ handbook-revision の値は書き換えないでください。
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は5系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は6系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
 やめたくなったら、貼った30行を消すだけで元に戻ります。ほかのファイルには触りません。
 
@@ -235,7 +243,7 @@ flowchart TD
 
 ## ルールの全体像
 
-ルールは5系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
+ルールは6系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
 
 | 系統 | 決めること | rule ID | 本文 |
 |---|---|---|---|
@@ -244,6 +252,7 @@ flowchart TD
 | **L0** git 規律 | 物理衝突をどう防ぐか | `L0-1`〜`L0-9` | [docs/03](docs/03-git-protocol.md) |
 | **FP** 失敗時姿勢 | 検証できない時どちらへ倒すか | `FP-1`〜`FP-9` | [docs/05](docs/05-fail-posture.md) |
 | **E** Epic レーン | 複数 Issue の束をどう運ぶか | `E-1`〜`E-10` | [docs/06](docs/06-epic-lane.md) |
+| **B** 委譲ブリーフ | 1回の委譲をどう契約にするか | `B-1`〜`B-5` | [docs/07](docs/07-delegation-brief.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -276,14 +285,17 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 |---|---|
 | [docs/why-issue-first.md](docs/why-issue-first.md) | Issue-first とは — 前提の解説（**条文ではありません**。会話でなく Issue から始める理由・Issue に何を書くか・要らない場合） |
 | [docs/why-small-modules.md](docs/why-small-modules.md) | なぜモジュールを小さく切るのか — 前提の解説（**条文ではありません**。分割が並行可能性への投資である理由・「小さい」の意味・このハンドブック自身の切り方） |
+| [docs/why-simple-systems.md](docs/why-simple-systems.md) | なぜシンプルに作るのか — 前提の解説（**条文ではありません**。複雑さを設計でなく要件で消す理由・疑うときの質問・「疑うのは自由、消す決定は依頼者のもの」） |
 | [docs/01-milestone-loop.md](docs/01-milestone-loop.md) | L2 マイルストーンループ — 並行の可否を決める層（`L2-1`〜`L2-6`） |
 | [docs/02-issue-loop.md](docs/02-issue-loop.md) | L1 Issue ループ — 完遂・レーン状態・完了証拠ゲート・上流異種レビュー（`L1-1`〜`L1-11`） |
 | [docs/03-git-protocol.md](docs/03-git-protocol.md) | L0 git 規律 — WIP ロック・worktree・マージ手順・再開チェック（`L0-1`〜`L0-9`） |
 | [docs/04-adoption.md](docs/04-adoption.md) | 導入方法 — 組み込み先・配布用の要約ブロック・要約の規律 |
 | [docs/05-fail-posture.md](docs/05-fail-posture.md) | 失敗時姿勢 — 検証できない時にどちらへ倒すか（`FP-1`〜`FP-9`） |
 | [docs/06-epic-lane.md](docs/06-epic-lane.md) | Epic レーン — 人間の確認を Epic 単位に束ねる層・高リスク領域の単一定義（`E-1`〜`E-10`） |
+| [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委譲ブリーフ — サブエージェントへ仕事を1回渡すときの依頼文の契約（`B-1`〜`B-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
+| [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
@@ -337,8 +349,10 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 ## 開発ステータス
 
-現行バージョンは **v0.3.0**（2026-07-31）。Epic レーン（`E-1`〜`E-10`）と、実装着手前の上流異種レビュー（`L1-9`〜`L1-11`）が加わりました。
+現行バージョンは **v0.5.0**（2026-08-06）。委譲ブリーフ層（`B-1`〜`B-5`・[docs/07](docs/07-delegation-brief.md)）が加わりました — サブエージェントへ仕事を1回渡すときの依頼文を、実装仕様・実装チェック・レビュー基準の3層で契約にします（様式は [templates/brief-template.md](templates/brief-template.md)）。
 
+- **v0.4.0**（2026-08-05） — 第3の前提「シンプルに作る — 複雑さは要件で消す」（[docs/why-simple-systems.md](docs/why-simple-systems.md)）と、L2-1 への要件疑いフック（消す決定は依頼者）
+- **v0.3.0**（2026-07-31） — Epic レーン（`E-1`〜`E-10`）と、実装着手前の上流異種レビュー（`L1-9`〜`L1-11`）
 - **v0.2.1 / v0.2.0**（2026-07-22） — MIT ライセンスと community health files の整備、家族固有の記述を外した汎用化
 - **v0.1.0 / v0.1.1**（2026-07-21） — ルールを散文から契約へ。安定 rule ID・閉じた5状態語彙・証拠つきマージゲート・失敗時姿勢の宣言
 
