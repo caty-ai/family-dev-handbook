@@ -307,6 +307,8 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 <a id="ecosystem"></a>
 
+## Caty AI 家族
+
 <!-- family:generated:family-footer:start -->
 
 ---
@@ -327,19 +329,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 <!-- family:generated:family-footer:end -->
 
-## Caty AI 家族
-
-这本手册本身是自洽的。不需要外部服务，不需要姊妹仓库，也不需要特定的记忆基础设施。需要的只有 git、Issue / PR，以及愿意守规则的主体。
-
-同时它也是「Caty AI 家族」的一员——一套把多个 AI 智能体当作一个团队来运作的工具集。**全局地图在 [family-os](https://github.com/caty-ai/family-os)** — 各仓库的角色、连接与现状，那里才是正本。
-
-- 规矩 — **family-dev-handbook**（本仓库）
-- 学习 — [caty-agent-harness](https://github.com/caty-ai/caty-agent-harness)
-- 看守 — [sitter](https://github.com/caty-ai/sitter)
-- 从外部世界学习 — [x-collector](https://github.com/caty-ai/x-collector)
-- 人格模式 — [persona-engine](https://github.com/caty-ai/persona-engine)
-
-每个仓库都能单独使用。组合是可选的，只用其中一个也完全成立。
+这本手册本身是自洽的。不需要外部服务，不需要姊妹仓库，也不需要特定的记忆基础设施。需要的只有 git、Issue / PR，以及愿意守规则的主体。表中的每个仓库也一样，都能单独使用——组合是可选的，只用其中一个也完全成立。
 
 跨智能体的一般规范（例如 fail-posture 适用到哪里）归 family-os 那一侧所有，**只有人与智能体协作协议的措辞属于这本手册**。一般规范不会在这里新设。
 
