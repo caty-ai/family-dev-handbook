@@ -353,3 +353,13 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 **ドキュメントのみ** ｜ **ランタイム不要** ｜ **git と Issue / PR だけで動く**
 
 </div>
+
+<!-- family:generated:family-footer:start -->
+
+---
+
+このリポジトリは **Caty AI ファミリー** の一員です — AI エージェントの家族を運用するためのオープンなツール群。公開準備中のモジュールを含む全体の地図は [Family OS](https://github.com/caty-ai/family-os) にあります。
+
+兄弟モジュール: [Caty Agent Harness](https://github.com/caty-ai/caty-agent-harness) · [Persona Engine](https://github.com/caty-ai/persona-engine) · [Sitter](https://github.com/caty-ai/sitter) · [X Collector](https://github.com/caty-ai/x-collector)
+
+<!-- family:generated:family-footer:end -->

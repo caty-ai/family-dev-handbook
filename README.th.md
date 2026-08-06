@@ -357,3 +357,13 @@ flowchart TD
 **เอกสารล้วน** ｜ **ไม่ต้องมีรันไทม์** ｜ **ทำงานได้ด้วย git กับ Issue / PR เท่านั้น**
 
 </div>
+
+<!-- family:generated:family-footer:start -->
+
+---
+
+รีโพนี้เป็นส่วนหนึ่งของ **ครอบครัว Caty AI** — ชุดเครื่องมือโอเพนซอร์สสำหรับดูแลครอบครัวเอเจนต์ AI แผนที่ฉบับเต็ม (รวมโมดูลที่กำลังเตรียมเปิด) อยู่ที่ [Family OS](https://github.com/caty-ai/family-os)
+
+โมดูลพี่น้อง: [Caty Agent Harness](https://github.com/caty-ai/caty-agent-harness) · [Persona Engine](https://github.com/caty-ai/persona-engine) · [Sitter](https://github.com/caty-ai/sitter) · [X Collector](https://github.com/caty-ai/x-collector)
+
+<!-- family:generated:family-footer:end -->
