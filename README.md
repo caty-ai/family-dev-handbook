@@ -295,6 +295,26 @@ One last note on where this handbook comes from and where it is used.
 
 <a id="ecosystem"></a>
 
+<!-- family:generated:family-footer:start -->
+
+---
+
+Part of the **Caty AI family** — open tools for running a family of AI agents. The full map, including modules still being prepared for release, lives in [Family OS](https://github.com/caty-ai/family-os).
+
+| Axis | Module | What it does | State |
+| --- | --- | --- | --- |
+| Map | [Family OS](https://github.com/caty-ai/family-os) | The map of the whole family — every module, its state, and how they fit | published, MIT |
+| Rules | **Family Dev Handbook** | The rules of the road — issues, PRs, worktrees, handoffs, parallel development | published, MIT |
+| Vertical · foundation | [Caty Agent Harness](https://github.com/caty-ai/caty-agent-harness) | Task backbone for AI agents — retries, checkpoints, and honest completion | published, MIT |
+| Vertical | [Persona Engine](https://github.com/caty-ai/persona-engine) | Gives an agent a persona — layered personality and graded emotion | published, MIT |
+| Vertical | **Persona Growth Loop** | Grows the persona itself — minimal, idempotent proposals | publication in preparation |
+| Vertical | [X Collector](https://github.com/caty-ai/x-collector) | Turns X and the web into one daily digest — for people and agents | published, MIT |
+| Vertical | **Self Growth Loop** | Lets an agent grow its own abilities — proposals, governance, adoption records | publication in preparation |
+| Horizontal · foundation | **Family Memory Architecture** | The memory bus — how the family shares what it knows | publication in preparation |
+| Horizontal | [Sitter](https://github.com/caty-ai/sitter) | Babysits delegated agent runs — watches, keeps evidence, restarts | published, MIT |
+
+<!-- family:generated:family-footer:end -->
+
 ## The Caty AI family
 
 This handbook is complete on its own. No external service, no sibling repository, and no particular memory infrastructure is required. All you need is git, Issues / PRs, and parties that follow the rules.
@@ -357,23 +377,3 @@ The documents under `docs/` are written in Japanese, and this English README is 
 **Docs only** ｜ **No runtime** ｜ **Runs on git and Issues / PRs alone**
 
 </div>
-
-<!-- family:generated:family-footer:start -->
-
----
-
-Part of the **Caty AI family** — open tools for running a family of AI agents. The full map, including modules still being prepared for release, lives in [Family OS](https://github.com/caty-ai/family-os).
-
-| Axis | Module | What it does | State |
-| --- | --- | --- | --- |
-| Map | [Family OS](https://github.com/caty-ai/family-os) | The map of the whole family — every module, its state, and how they fit | published, MIT |
-| Rules | **Family Dev Handbook** | The rules of the road — issues, PRs, worktrees, handoffs, parallel development | published, MIT |
-| Vertical · foundation | [Caty Agent Harness](https://github.com/caty-ai/caty-agent-harness) | Task backbone for AI agents — retries, checkpoints, and honest completion | published, MIT |
-| Vertical | [Persona Engine](https://github.com/caty-ai/persona-engine) | Gives an agent a persona — layered personality and graded emotion | published, MIT |
-| Vertical | **Persona Growth Loop** | Grows the persona itself — minimal, idempotent proposals | publication in preparation |
-| Vertical | [X Collector](https://github.com/caty-ai/x-collector) | Turns X and the web into one daily digest — for people and agents | published, MIT |
-| Vertical | **Self Growth Loop** | Lets an agent grow its own abilities — proposals, governance, adoption records | publication in preparation |
-| Horizontal · foundation | **Family Memory Architecture** | The memory bus — how the family shares what it knows | publication in preparation |
-| Horizontal | [Sitter](https://github.com/caty-ai/sitter) | Babysits delegated agent runs — watches, keeps evidence, restarts | published, MIT |
-
-<!-- family:generated:family-footer:end -->
