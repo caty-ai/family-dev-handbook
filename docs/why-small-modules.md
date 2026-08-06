@@ -120,6 +120,6 @@
 | Epic では1子 Issue = 1モジュール | [`E-2`](06-epic-lane.md) |
 | 並行安全マップの様式 | [templates/architecture-parallel-map.md](../templates/architecture-parallel-map.md) |
 
-もう1つの前提: [Issue-first とは](why-issue-first.md)
+もう2つの前提: [Issue-first とは](why-issue-first.md) / [なぜシンプルに作るのか](why-simple-systems.md)
 
 玄関へ戻る: [README](../README.ja.md)
