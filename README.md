@@ -307,6 +307,8 @@ One last note on where this handbook comes from and where it is used.
 
 <a id="ecosystem"></a>
 
+## The Caty AI family
+
 <!-- family:generated:family-footer:start -->
 
 ---
@@ -327,19 +329,7 @@ Part of the **Caty AI family** — open tools for running a family of AI agents.
 
 <!-- family:generated:family-footer:end -->
 
-## The Caty AI family
-
-This handbook is complete on its own. No external service, no sibling repository, and no particular memory infrastructure is required. All you need is git, Issues / PRs, and parties that follow the rules.
-
-At the same time it is a member of the Caty AI family, a set of tools for running several AI agents as one team. **The map of the whole thing lives in [family-os](https://github.com/caty-ai/family-os)** — that is the canonical source for each repository's role, its connections, and its current state.
-
-- The rules — **family-dev-handbook** (this repository)
-- Learning — [caty-agent-harness](https://github.com/caty-ai/caty-agent-harness)
-- Watching — [sitter](https://github.com/caty-ai/sitter)
-- Learning from the outside world — [x-collector](https://github.com/caty-ai/x-collector)
-- Personality modes — [persona-engine](https://github.com/caty-ai/persona-engine)
-
-Every repository stands alone. Combining them is optional, and using exactly one of them is a valid way to use them.
+This handbook is complete on its own. No external service, no sibling repository, and no particular memory infrastructure is required. All you need is git, Issues / PRs, and parties that follow the rules. The same goes for every repository in the table — each stands alone, combining them is optional, and using exactly one of them is a valid way to use them.
 
 Cross-agent general norms (such as how far fail-posture reaches) are owned on the family-os side; **only the wording of the human-to-agent collaboration protocol belongs to this handbook**. General norms are never newly created here.
 

@@ -305,6 +305,8 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 <a id="ecosystem"></a>
 
+## Caty AI ファミリー
+
 <!-- family:generated:family-footer:start -->
 
 ---
@@ -325,19 +327,7 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 <!-- family:generated:family-footer:end -->
 
-## Caty AI ファミリー
-
-このハンドブックは単体で完結します。外部サービスも、姉妹リポジトリも、特定の記憶基盤も必要ありません。必要なのは git と Issue / PR、そしてルールを守る主体だけです。
-
-同時にこれは、複数の AI エージェントを1つのチームとして運用するための道具立て「Caty AI ファミリー」の一員でもあります。**全体の地図は [family-os](https://github.com/caty-ai/family-os) にあります** — 各リポジトリの役割・接続・現在地は、そこが正本です。
-
-- 掟 — **family-dev-handbook**（このリポジトリ）
-- 学習 — [caty-agent-harness](https://github.com/caty-ai/caty-agent-harness)
-- 見張り — [sitter](https://github.com/caty-ai/sitter)
-- 外界からの学習 — [x-collector](https://github.com/caty-ai/x-collector)
-- 人格モード — [persona-engine](https://github.com/caty-ai/persona-engine)
-
-各リポジトリは単独で使えます。組み合わせは任意で、どれか1つだけを使っても成立します。
+このハンドブックは単体で完結します。外部サービスも、姉妹リポジトリも、特定の記憶基盤も必要ありません。必要なのは git と Issue / PR、そしてルールを守る主体だけです。表の各リポジトリも同じように単独で使えます — 組み合わせは任意で、どれか1つだけを使っても成立します。
 
 エージェント横断の一般規範（fail-posture の適用範囲など）のオーナーは family-os 側にあり、**人間とエージェントの協働プロトコルの文言だけがこのハンドブックの担当**です。一般規範をここに新設することはしません。
 
