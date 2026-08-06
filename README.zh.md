@@ -283,6 +283,8 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 更深入的文档
 
+下列文件为日文（正本）。docs/ 与 templates/ 的简体中文机器翻译镜像在 [i18n/zh/](i18n/zh/) — 与日文不一致时，以日文为准。
+
 | 文件 | 内容 |
 |---|---|
 | [docs/why-issue-first.md](docs/why-issue-first.md) | 什么是 Issue-first — 前提的说明（**不是条文**。为什么从 Issue 而不是对话开始、Issue 里写什么、什么时候不需要） |

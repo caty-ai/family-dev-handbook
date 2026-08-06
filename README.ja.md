@@ -281,6 +281,8 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 ## もっと詳しく
 
+docs と templates の機械翻訳版（English / 简体中文 / ไทย）は [i18n/](i18n/) にあります — 正本は日本語で、食い違えば日本語が正です。
+
 | ファイル | 内容 |
 |---|---|
 | [docs/why-issue-first.md](docs/why-issue-first.md) | Issue-first とは — 前提の解説（**条文ではありません**。会話でなく Issue から始める理由・Issue に何を書くか・要らない場合） |
