@@ -1,73 +1,73 @@
 > **机器翻译。**日文原文（[04-adoption.md](../../../docs/04-adoption.md)）是正本 — 本页与原文不一致时，以日文为准。
 
-# 导入方法 — 集成到各 Agent 环境
+# 接入方法 — 集成到各 Agent 环境
 
 ## 原则
 
-- **正本是这个仓库**。各 Agent 在自己"始终加载的上下文位置"放置**摘要**，详细内容参照本仓库
-- 摘要与本仓库内容不一致时，**以本仓库为准**。摘要一方应跟进修改
-- 为了在模型变更后依然有效，应放在"始终会被读取的配置文件"中（不依赖特定模型的记忆或临时状态）
+- **正本是这个仓库**。每个 Agent 在自己"始终加载的上下文位置"放置**摘要**，详细内容参照本仓库
+- 摘要与本仓库不一致时，**以本仓库为准**。摘要一侧需要跟进修改
+- 为了在模型变化后依然有效，要放在"始终会被加载的配置文件"里（不要依赖特定模型的记忆或体贴）
 
 ## 摘要块的规范
 
-- **带版本刻印的紧凑摘要，其 owner 唯一是本页面（docs/04）**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）采用 owner-applies 方式——由干事 Agent 提出建议，由各运行时的 owner 自行贴入
-- 下游本地摘要的修改，只能比正本**更严格，不允许放宽**（tighten only）。这一原则的跨 Agent 通用规范的 owner 是 family-os 的 operations-policy（config trust 一节 — 参见 [README](../../../README.zh.md) 的"Caty AI ファミリー"一节）。本页面是该协作协议的具体应用。若在没有 sister projects 的情况下导入，直接套用 tighten-only 原则即可
-- 摘要不誊抄正文，仅用 **rule ID + 一行 posture** 来引用。ID 的定义正文在 docs/01〜03・05〜07，注释样式的字段 schema 在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- **带版本刻印的精简摘要，唯一的 owner 是本页面（docs/04）**。下游副本（各个 CLAUDE.md / AGENTS.md / system prompt）是 owner-applies——由干事 Agent 提出建议，各运行时的 owner 自行贴上
+- 下游本地摘要、覆盖内容，相对正本**只能收紧、不能放松**（tighten only）。这一原则的跨 Agent 通用规范 owner 是 family-os 的 operations-policy（config trust 节 —— 参见 [README](../../../README.zh.md) 的「Caty AI 家族」节）。本页面是该协作协议的应用。若在没有 sister projects 的情况下引入本协议，直接套用 tighten-only 原则即可
+- 摘要不誊抄正文，而是用 **rule ID + 一行 posture** 来引用。ID 的定义正文在 docs/01〜03、05〜07，注释样式的字段 schema 在 templates/issue-template.md、templates/epic-template.md、templates/brief-template.md
 
-## 各 Agent 的集成位置
+## 各 Agent 的接入位置
 
-不同运行时"始终会被读取的配置文件"各不相同。导入台账按以下形式维护：
+不同运行时的"始终加载的配置文件"各不相同。用这种形式维护接入台账：
 
-| Agent | 始终加载的上下文 | 状态 |
+| Agent | 始终上下文 | 状态 |
 |---|---|---|
-| `<agent-a>`（例如：Claude Code 系） | `~/.claude/CLAUDE.md` 等用户全局配置（permanent 处理的章节） | 例如：✅ 已导入（YYYY-MM-DD） |
-| `<agent-b>`（例如：常驻 agent 运行时） | 各 Agent 的 system prompt / 工作区的 `AGENTS.md` | 例如：✅ 已导入 — rule-ID 版通过 owner-applies 方式分发 |
-| `<agent-c>`（例如：运维笔记驱动的 agent） | 运维笔记 / 技能集的参考文档 | 例如：⬜ 未导入 — 待分发摘要块 |
+| `<agent-a>`（例: Claude Code 系） | `~/.claude/CLAUDE.md` 等用户全局配置（视为 permanent 的部分） | 例: ✅ 已接入（YYYY-MM-DD） |
+| `<agent-b>`（例: 常驻 agent 运行时） | 各 Agent 的 system prompt / 工作区的 `AGENTS.md` | 例: ✅ 已接入 — rule-ID 版通过 owner-applies 分发 |
+| `<agent-c>`（例: 运维笔记驱动的 agent） | 运维笔记 / 技能组的参照文档 | 例: ⬜ 未接入 — 待分发摘要块 |
 
-> 实际导入的活台账由各团队自行管理。导入对象增多后，请在自己的仓库中维护此表（也可以用 Issue 评论作为台账）。
+> 实际接入情况的活台账由各团队自行管理。接入对象增多后，请在自己的仓库中维护此表（也可以用 Issue 评论作为台账）。
 
-## 用于分发的摘要块（可直接复制粘贴）
+## 供分发使用的摘要块（可直接复制粘贴）
 
-请将以下内容原样粘贴到各 Agent 始终加载的上下文中：
+将以下内容原样贴到各 Agent 的始终上下文中：
 
 ```markdown
-## 并行开发协议摘要（handbook-revision: 2026-08-06 / owner: 贴入者本人姓名 / last-verified: 贴入日期）
-正本: <本手册正本仓库 URL（如已 fork，则为 fork 目标）> — 不一致时以正本为准。
-本摘要可以更严格，但不允许放宽。ID 的正文在正本 docs/01〜03・05〜07，样式见 templates/issue-template.md・epic-template.md・brief-template.md。
+## 並行開発プロトコル要約（handbook-revision: 2026-08-06 / owner: 貼った本人名 / last-verified: 貼った日付）
+正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜07、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
-L2 并行可否: L2-1 目标一致・权重判断（迷茫时选偏重的一侧）・让设计变复杂的需求要重新质疑一次（删除的决定权在委托方） / L2-2 边界变更先行一个边界PR /
-  L2-3 Issue 中必须预测将触碰的文件 / L2-4 并行GO=声明的文件集合互不相交 /
-  L2-5 大范围Issue单独执行 / L2-6 热点区域需要并行安全地图+拆分投入
-L1 Issue完成: L1-1 Issue-first / L1-2 Why・Done when・触碰文件预测 /
-  L1-3 merge review=不同模型或不同Agent・禁止 self-approve /
-  L1-4 lane 状态用 WIP/HOLD/MERGED/SUPERSEDED/ABANDONED 这5个词汇・状态不明=按非活动处理 /
-  L1-5 HOLD 必须包含 owner/reason/review-by/lock disposition/剩余工作或后继方案 /
-  L1-6 重试次数有限・用尽后需带证据转为 HOLD/ABANDONED / L1-7 merge 必须有完成记录（Done when→PASS/FAIL/附理由的N/A・
-  证据・候选SHA・diff核对） / L1-8 更正需以替换记录方式进行（禁止悄悄修改） /
-  L1-9 Epic・架构・需求在实施前需要异构 review（单个Issue不强制要求） /
-  L1-10 席位需相互异构+writer异构・设计者/实现者不计入席位・合格模型名单为本地配置・记录 requested/actual /
-  L1-11 席位数 S/M=异构2・L/H=异构3・高风险领域=5（优先级高于规模）・Epic上游=实施着手前需L/H・无法确保席位时需owner批准的降级或SEAT-WAIT
-L0 git: L0-1 确认无冲突+WIP 4个字段（agent/date/Files to touch/Branch）=软锁 /
-  L0-2 不触碰声明之外的内容・UNKNOWN=串行 / L0-3 stale=72小时・接手需TAKEOVER+复核清单+重新声明WIP /
-  L0-4 1个session=1个Issue=1个branch=1个worktree / L0-5 main 只用于merge /
-  L0-6 PR 需附文件清单+diff核对 / L0-7 merge一次一个 / L0-8 branch保持短命・明示HOLD /
-  L0-9 恢复・交接需先在Issue中发布4点检查清单再撰写
-B 委托简报: B-1 实质性委托（实施・修复・生成）必须包含3层（实施规格/实施检查/review标准・样式见brief-template.md） /
-  B-2 一次性调查・简短提问可豁免・迷茫时应附上 / B-3 Issue为正本・简报为衍生物（不一致时先修正Issue） /
-  B-4 上下文需前置提供・不让受托方自行探索・review委托需指明最坏的失败形态・独立席位间不得混入结论 /
-  B-5 标题需保持可机器判定的固定字符串形式・即使没有检查环境该契约依然有效
-E Epic lane: E-1 Epic经owner的kickoff批准后成立（批准前按普通Issue运作） /
-  E-2 功能轴Epic×模块轴子Issue・先行冻结契约#0并在Epic内串行直至merge完成 /
-  E-3 人工检查点表=仅在事先约定的节点停止・高风险领域+契约级偏离为必须行・
-  表的放宽需owner重新批准前旧表持续有效・无表=Epic不成立 /
-  E-4 epic整合分支・子→epic以每次一个PR合并・向main默认在完成时合并一次（中途merge需事先记载+作为全量gate的例外） /
-  E-5 sandbox自由权=除明确列举的禁止事项外均自由（禁止直接push main・超出范围・跨lane操作・改写epic历史・外泄机密・未经批准执行CP） /
-  E-6 沙漏式review：设计=每个Epic一次（实施着手前）・实施=按子任务权重进行轻量gate（高风险子任务优先5席位・保持证据底线：
-  merge时head一致SHA・diff核对・identity・inline证据）・整合=epic→main执行完整L1-7 /
-  E-7 Epic日志（必须列出未达成项・妥协点）+最终确认摘要 /
-  E-8 生命周期1〜2周（起点=kickoff批准）・staleness使用L0-3的独立计时 / E-9 终止同样使用5个词汇・ABANDONED必须处理分支+收敛子任务 /
-  E-10 Epic并行=子任务声明的并集∪EPIC WIP声明・比照L2-4处理
-FP: 无法验证时转为串行（写入・merge 也一律倒向停止一侧）。fail-open 并不意味着"通过"。Epic检查点表不存在或未获批准时应上报给人工处理（FP-9）。（详情见正本 docs/05）
+L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
+  L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
+  L2-5 広域Issueは単独実行 / L2-6 ホットスポットは並行安全マップ+分割投資
+L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予測 /
+  L1-3 merge レビュー=別モデル or 別エージェント・self-approve 禁止 /
+  L1-4 レーン状態は WIP/HOLD/MERGED/SUPERSEDED/ABANDONED の5語彙・不明状態=非アクティブ扱い /
+  L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
+  L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
+  証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
+  L1-9 Epic・アーキ・要件は実装前に異種レビュー（単発Issueには課さない） /
+  L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録 /
+  L1-11 席数 S/M=異種2・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT
+L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /
+  L0-2 宣言外は触らない・UNKNOWN=直列 / L0-3 stale=72h・引き取りは TAKEOVER+再開チェック+新WIP宣言 /
+  L0-4 1セッション=1Issue=1branch=1worktree / L0-5 main マージ専用 /
+  L0-6 PR にファイル一覧+diff照合 / L0-7 マージ1本ずつ / L0-8 ブランチ短命・HOLD 明示 /
+  L0-9 再開・引き継ぎは4点チェックを Issue に投稿してから書く
+B 委譲ブリーフ: B-1 実質的な委譲（実装・修正・生成）は3層必須（実装仕様/実装チェック/レビュー基準・様式は brief-template.md） /
+  B-2 読み捨ての調査・短い質問は免除・迷えば付ける / B-3 Issue が正本・ブリーフは導出物（食い違えば Issue を先に直す） /
+  B-4 文脈は前積み・委譲先に探索させない・レビュー委譲は最悪の失敗形を名指し・独立席には結論を混ぜない /
+  B-5 見出しは固定文字列で機械判定できる形に保つ・検査が無い環境でも契約は有効
+E Epic レーン: E-1 Epic はオーナーのキックオフ承認で成立（承認前は通常Issue運用） /
+  E-2 機能軸Epic×モジュール軸子Issue・契約凍結#0を先行しマージまでEpic内直列 /
+  E-3 人間チェックポイント表=事前合意した地点でのみ停止・高リスク領域+契約級逸脱は必須行・
+  表の緩和はオーナー再承認まで旧表有効・表なし=Epic不成立 /
+  E-4 epic統合ブランチ・子→epicはPRで1本ずつ・mainへは完了時1回既定（中間マージは事前記載+フルゲートの例外） /
+  E-5 サンドボックス自由権=禁止列挙以外自由（main直push・スコープ外・他レーン・epic履歴書換・秘密外送・無承認CP実行が禁止） /
+  E-6 砂時計レビュー: 設計=Epic1回（実装着手前）・実装=子の重さでライトゲート（高リスク子は5席優先・証拠フロア維持:
+  マージ時head一致SHA・diff照合・identity・インライン証拠）・統合=epic→mainフルL1-7 /
+  E-7 Epicログ（未達・妥協の列挙必須）+ダイジェスト最終確認 /
+  E-8 寿命1〜2週間（起点=キックオフ承認）・staleness は L0-3 の別時計 / E-9 終端も5語彙・ABANDONED はブランチ処分+子収束必須 /
+  E-10 Epic並走=子宣言の和集合∪EPIC WIP宣言で L2-4 準用
+FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
 ## 仓库侧的准备工作
@@ -75,9 +75,9 @@ FP: 无法验证时转为串行（写入・merge 也一律倒向停止一侧）�
 对于新仓库（或首次应用本协议的仓库）：
 
 1. 在 `ARCHITECTURE.md` 中创建"并行安全地图"章节（[模板](../templates/architecture-parallel-map.md)）
-2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
-3. 全员共同遵守避免直接 push main 的运作方式（若能设置 branch protection 则设置）
+2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放到 `.github/ISSUE_TEMPLATE/`（可选，但建议这样做）
+3. 全员共同遵守避免直接 push main 的运作方式（能设置 branch protection 的话就设置）
 
 ## 角色分工由各 Agent 自行决定
 
-实施 / review / 验证分配给哪个模型・工具，交由各 Agent 的工具链自行决定（例如：implementer=Codex / reviewer=GLM / verifier=Claude 这样的不同模型三角色配置）。**需要遵守的是协议本身（3层 + 交叉review + fail-posture），而不是具体工具的选型。**
+实现 / 审查 / 验证分别交给哪个模型・工具，由各 Agent 的工具链自行决定（例如: implementer=Codex / reviewer=GLM / verifier=Claude 这样的不同模型三角色配置）。**需要坚守的是协议本身（三层 + 交叉审查 + fail-posture），而不是具体工具。**

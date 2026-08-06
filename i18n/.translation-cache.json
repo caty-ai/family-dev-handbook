@@ -48,12 +48,12 @@
       },
       "zh": {
         "hash": "bcbab21545b02132",
-        "translated_at": "2026-08-06T19:15:35+00:00",
+        "translated_at": "2026-08-06T22:26:53+00:00",
         "model": "sonnet"
       },
       "th": {
         "hash": "bcbab21545b02132",
-        "translated_at": "2026-08-06T22:16:19+00:00",
+        "translated_at": "2026-08-06T22:44:30+00:00",
         "model": "sonnet"
       }
     },
@@ -63,17 +63,17 @@
     "translations": {
       "en": {
         "hash": "6e29c0b64834143f",
-        "translated_at": "2026-08-06T21:20:25+00:00",
+        "translated_at": "2026-08-06T22:57:39+00:00",
         "model": "sonnet"
       },
       "zh": {
         "hash": "6e29c0b64834143f",
-        "translated_at": "2026-08-06T21:21:08+00:00",
+        "translated_at": "2026-08-06T22:58:18+00:00",
         "model": "sonnet"
       },
       "th": {
         "hash": "6e29c0b64834143f",
-        "translated_at": "2026-08-06T21:22:19+00:00",
+        "translated_at": "2026-08-06T22:59:24+00:00",
         "model": "sonnet"
       }
     },
@@ -88,7 +88,7 @@
       },
       "zh": {
         "hash": "7bcea617c59ebe54",
-        "translated_at": "2026-08-06T21:23:59+00:00",
+        "translated_at": "2026-08-06T23:00:17+00:00",
         "model": "sonnet"
       },
       "th": {
@@ -203,12 +203,12 @@
     "translations": {
       "zh": {
         "hash": "5c61258083366ff6",
-        "translated_at": "2026-08-06T21:46:02+00:00",
+        "translated_at": "2026-08-06T23:01:18+00:00",
         "model": "sonnet"
       },
       "en": {
         "hash": "5c61258083366ff6",
-        "translated_at": "2026-08-06T21:58:13+00:00",
+        "translated_at": "2026-08-06T23:01:02+00:00",
         "model": "sonnet"
       },
       "th": {
@@ -223,7 +223,7 @@
     "translations": {
       "en": {
         "hash": "913a43add5b59d2a",
-        "translated_at": "2026-08-06T21:47:07+00:00",
+        "translated_at": "2026-08-06T22:52:53+00:00",
         "model": "sonnet"
       },
       "zh": {
@@ -243,12 +243,12 @@
     "translations": {
       "en": {
         "hash": "e446e08c35356fa5",
-        "translated_at": "2026-08-06T21:48:45+00:00",
+        "translated_at": "2026-08-06T22:53:54+00:00",
         "model": "sonnet"
       },
       "zh": {
         "hash": "e446e08c35356fa5",
-        "translated_at": "2026-08-06T21:49:19+00:00",
+        "translated_at": "2026-08-06T23:01:54+00:00",
         "model": "sonnet"
       },
       "th": {

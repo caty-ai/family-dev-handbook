@@ -2,7 +2,7 @@
 
 # 失败姿态 — fail-posture / parse-posture — 无法验证时该倒向哪一边
 
-> **范围与规范所有者**: 本页所定义的仅是 family-dev-handbook 协议（L2/L1/L0）内带守卫的转换的失败时姿态。**跨 Agent 的通用 fail-posture / stop-precedence 规范的所有者是 family-os 的 operations-policy**（posture 节、terminal 优先级节。2026-07-21 裁定。参见 [README](../../../README.zh.md) 的「Caty AI ファミリー」节）。本页是该协作协议的一种应用，并不新设跨领域规范。若有冲突，以 OS 规范为准。若在没有 sister projects 的情况下导入，本页的姿态将原样适用。
+> **范围与规范所有者**: 本页所定义的仅是 family-dev-handbook 协议（L2/L1/L0）内带守卫的转换的失败时姿态。**跨 Agent 的通用 fail-posture / stop-precedence 规范的所有者是 family-os 的 operations-policy**（posture 节、terminal 优先级节。2026-07-21 裁定。参见 [README](../../../README.zh.md) 的「Caty AI 家族」节）。本页是该协作协议的一种应用，并不新设跨领域规范。若有冲突，以 OS 规范为准。若在没有 sister projects 的情况下导入，本页的姿态将原样适用。
 
 为每条规则赋予稳定的 rule ID（`FP-1`〜`FP-9`）。
 

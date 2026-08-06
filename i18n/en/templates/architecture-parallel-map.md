@@ -1,34 +1,34 @@
 > **Machine translation.** The Japanese original ([architecture-parallel-map.md](../../../templates/architecture-parallel-map.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# Parallel Safety Map Template (section to append to each repo's ARCHITECTURE.md)
+# Parallel Safety Map Template (section to add to each repo's ARCHITECTURE.md)
 
 ```markdown
-## Parallel Safety Map
+## 並行安全マップ (Parallel Safety Map)
 
-> Input for parallel-GO decisions (family-dev-handbook L2-4).
-> When a PR moves module boundaries, update this map in the same PR.
+> 並行GO判定（family-dev-handbook L2-4）の判断材料。
+> モジュール境界を動かす PR を merge したら、このマップも同じ PR で更新する。
 
-### Module Boundaries
+### モジュール境界
 
-| Module | Path | Primary responsibility | Notes |
+| モジュール | パス | 主な責務 | 備考 |
 |---|---|---|---|
-| <!-- e.g.: iOS app --> | `ios-app/` | UI, audio input/output | |
-| <!-- e.g.: gateway --> | `gateway/` | Session management, LLM relay | |
+| <!-- 例: iOS app --> | `ios-app/` | UI・音声入出力 | |
+| <!-- 例: gateway --> | `gateway/` | セッション管理・LLM 中継 | |
 
-**Issues that don't cross module boundaries can generally run in parallel** (checking for file-set overlap is still mandatory).
+**境界をまたがない Issue 同士は原則並行可**（ファイル集合の交差チェックは必須）。
 
-### Hotspots (files needing parallel-work caution)
+### ホットスポット（並行注意ファイル）
 
-| File | Approx. line count | Co-located responsibilities | Split-off Issue |
+| ファイル | 行数目安 | 同居している責務 | 分割 Issue |
 |---|---|---|---|
-| <!-- e.g.: MainView.swift --> | 2,500+ | UI + gestures + engine calls | #NNN |
+| <!-- 例: MainView.swift --> | 2,500+ | UI + ジェスチャー + エンジン呼び出し | #NNN |
 
-**An Issue touching a hotspot must not run in parallel with other Issues in the same module.**
-Prioritize working through split-off Issues (investments toward future parallelizability).
+**ホットスポットを触る Issue は、他の同モジュール Issue と並行しない。**
+分割 Issue（並行可能性への投資）を優先的に消化する。
 
-### Wide-Scope Issue History
+### 広域 Issue の履歴
 
-| Issue | Description | When run | Run standalone? |
+| Issue | 内容 | 実行時期 | 単独実行したか |
 |---|---|---|---|
-| <!-- e.g.: #NNN --> | Full UI overhaul | | |
+| <!-- 例: #NNN --> | UI 全面刷新 | | |
 ```

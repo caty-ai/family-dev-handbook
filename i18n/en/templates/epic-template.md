@@ -1,95 +1,95 @@
 > **Machine translation.** The Japanese original ([epic-template.md](../../../templates/epic-template.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# EPIC Issue / Epic Lane Templates
+# EPIC Issue / Epic Lane Template
 
-The canonical field schema for the Epic lane ([docs/06](../docs/06-epic-lane.md), E-1 through E-10). Comment formats for single-shot Issues, WIP/HOLD, etc. remain as in [issue-template.md](issue-template.md) (child Issues within an Epic also use that file).
+Canonical field schema for the Epic lane ([docs/06](../docs/06-epic-lane.md), E-1–E-10). The comment format for standalone Issues, WIP/HOLD, etc. stays as defined in [issue-template.md](issue-template.md) (child Issues inside an Epic use that file too).
 
-## EPIC Issue body (E-1 / E-2 / E-3 / E-10)
+## EPIC Issue Body (E-1 / E-2 / E-3 / E-10)
 
 ```markdown
-## Purpose (Why) — feature axis
+## 目的 (Why) — 機能軸
 
-<!-- Write the value in human terms. Not module names — what becomes possible -->
+<!-- 人間の言葉で価値を書く。モジュール名ではなく「何ができるようになるか」 -->
 
-## Done when — Epic level
+## 完了条件 (Done when) — Epic レベル
 
-- [ ] <!-- State it so it can be judged from the integrated state (not a simple sum of the children's Done when) -->
-- [ ] Integration review (E-6③ full L1-7) passes, epic→main merge
+- [ ] <!-- 統合状態で判定できる形で（子の Done when の単純合算にしない） -->
+- [ ] 統合レビュー（E-6③ フル L1-7）通過・epic→main マージ
 
-## Child Issue list — module axis
+## 子 Issue 一覧 — モジュール軸
 
-<!-- 1 child = 1 module or 1 repo. Express dependencies via Blocked-by.
-     Contract freeze item #0 is required only for Epics that touch module-boundary interfaces (E-2) — for Epics that don't touch them,
-     omit row 0, and judge contract-level status via the Done when / external IF description in E-3 -->
+<!-- 1子 = 1モジュール or 1リポ。依存は Blocked-by で。
+     契約凍結の第0号はモジュール境界のインターフェースに触る Epic のみ必須（E-2）— 触れない Epic では行0を省略し、
+     E-3 の契約級判定は Done when・外部IF 記述で行う -->
 
-| # | Issue | Module / repo | Blocked-by |
+| # | Issue | モジュール / リポ | Blocked-by |
 |---|---|---|---|
-| 0 | #<n> Contract freeze (boundary interface finalized) | <target> | — |
-| 1 | #<n> | <target> | #0 |
+| 0 | #<n> 契約凍結（境界インターフェース確定） | <対象> | — |
+| 1 | #<n> | <対象> | #0 |
 
-## Effective declaration set (E-10 — union of children's declaration sets ∪ the EPIC Issue's WIP declaration set)
+## 実効宣言集合（E-10 — 子の宣言集合の和集合 ∪ EPIC Issue の WIP 宣言集合）
 
-<!-- Input for parallel-GO judgment (per L2-4) between Epics and against lanes outside the Epic. Update as children are added/removed and as the epic worktree's integration work targets (the E-4 WIP) change -->
+<!-- Epic 間・Epic 外レーンとの並行GO判定（L2-4 準用）の入力。子の増減・epic worktree の統合作業対象（E-4 の WIP）で更新する -->
 
 - path/to/module-a/
 - path/to/module-b/
 
-## Human checkpoint table (E-3 — required section)
+## 人間チェックポイント表（E-3 — 必須セクション）
 
-<!-- Required triggers (all high-risk-area items + contract-level deviations) must always get their own row, whether or not they apply (write "not applicable" if they don't).
-     Agents may add rows unilaterally (though narrowing an existing row counts as relaxation). Deleting or relaxing rows keeps the old table in effect until the owner re-approves (FP-8 / L1-8).
-     Passage approval requires an explicit owner comment only — rewriting the status column by itself does not constitute approval (E-3 / FP-8) -->
+<!-- 必須トリガー（高リスク領域の全項目 + 契約級の逸脱）は該当の有無を必ず行にする（該当なしなら「該当なし」と書く）。
+     行の追加はエージェント単独可（ただし既存行を狭める内容は緩和扱い）。行の削除・緩和はオーナー再承認まで旧表が有効（FP-8 / L1-8）。
+     通過承認はオーナーの明示コメントのみ — 状態欄の書き換え自体は承認を生まない（E-3 / FP-8） -->
 
-| # | Where it stops | What to show | Why it needs human judgment | Status |
+| # | どこで止まるか | 何を見せるか | なぜ人間判断か | 状態 |
 |---|---|---|---|---|
-| 1 | <e.g., after child #3 completes, immediately before external release> | <e.g., staging URL + diff summary> | External release (high-risk area) | Not reached / Approved YYYY-MM-DD + approval comment URL |
+| 1 | <例: 子#3 完了後・外部公開の直前> | <例: ステージング URL + 差分要約> | 対外公開（高リスク領域） | 未到達 / 承認済み YYYY-MM-DD + 承認コメント URL |
 
-## Kickoff approval (E-1 — evidence that the Epic is established)
+## キックオフ承認（E-1 — Epic 成立の証跡）
 
-<!-- Link to the owner's approval comment. Before approval, the Epic is not established (no E-4/E-5 privileges — FP-9).
-     The design-review deadline is the same clock as L1-9/E-6① (no later than before the first child Issue's implementation starts) — do not create a separate deadline.
-     If not yet done as of kickoff, write "not done" and do not start implementation on any child until it's done and recorded (L1-9 fail-closed) -->
+<!-- オーナーの承認コメントへのリンクを貼る。承認前は Epic 未成立（E-4/E-5 の特権なし・FP-9）。
+     設計レビューの締切は L1-9/E-6① と同一の時計（遅くとも最初の子 Issue の実装着手前）— 独自の締切を作らない。
+     キックオフ時点で未実施なら「未実施」と書き、実施・記録まで子の実装に着手しない（L1-9 fail-closed） -->
 
-- Design review record (E-6①/L1-9 — seats, requested/actual, verdict): <URL or "not done (required before the first child's implementation starts)">
-- Approval comment: <URL> (YYYY-MM-DD)
+- 設計レビュー記録（E-6①/L1-9 — 席・requested/actual・verdict）: <URL または「未実施（最初の子の実装着手前に必須）」>
+- 承認コメント: <URL>（YYYY-MM-DD）
 ```
 
-## Epic log comment (E-7 — posted to the EPIC Issue whenever a child Issue terminates)
+## Epic Log Comment (E-7 — post to the EPIC Issue each time a child Issue terminates)
 
 ```markdown
-📦 Epic log (<agent name>, YYYY-MM-DD): child #<n> terminated
+📦 Epic log (<agent名>, YYYY-MM-DD): 子 #<n> 終端
 
-- What became possible: <1-3 lines>
-- Evidence: <link to the child→epic PR + key points (e.g. final test-run values)>
-- Unmet Done when / compromises: <list them. If none, state "none" explicitly — cannot be omitted>
-- Next: <the child Issue that moves next / what it's waiting on>
+- できるようになったこと: <1〜3行>
+- 証拠: <子→epic PR リンク + 要点（テスト結果の終端値など）>
+- Done when 未達・妥協事項: <列挙。無ければ「なし」と明記 — 省略不可>
+- 次: <次に動く子 Issue / 待ち>
 ```
 
-## Child→epic light-gate record (E-6② — in the body of the child→epic PR)
+## Child→Epic Light-Gate Record (E-6② — in the body of the child→epic PR)
 
 ```markdown
-## Light-gate record (E-6②)
+## ライトゲート記録 (E-6②)
 
-candidate SHA: <commit SHA>   <!-- must match the PR head at merge time. If it changes after review, re-review (E-6②, per L1-8) -->
+candidate SHA: <commit SHA>   <!-- マージ時点の PR head と一致していること。レビュー後に変わったら再レビュー（E-6②・L1-8 準用） -->
 implementer: <agent/model>
-reviewers: <seat 1: agent/model (requested/actual)> <seat 2: …>   <!-- number of seats is looked up from the L1-11 table by the child's weight. A child touching a high-risk area gets 5 seats -->
-identity check: <different model | different agent>   <!-- L1-3. Blank is blocking -->
+reviewers: <席1: agent/model（requested/actual）> <席2: …>   <!-- 席数は子の重さで L1-11 表を引く。高リスク領域を触る子は5席 -->
+identity check: <別モデル | 別エージェント>   <!-- L1-3。空欄は blocking -->
 
-Test results (inline final values): <e.g., 24 passed / exit 0 / YYYY-MM-DD>
-Key points: <address the Done when in prose. Table format is optional. Link-only evidence does not qualify (keeps the L1-7 principle that "the record alone shows the final result")>
+テスト結果（インライン終端値）: <例: 24 passed / exit 0 / YYYY-MM-DD>
+要点: <Done when への対応を文章で。表形式は省略可。リンクだけの証拠は不適合（L1-7 の「記録単体で終端結果が読める」原則維持）>
 
-Declared vs. actual diff (L0-6 — required for child→epic too):
-git diff --stat <epic>...<candidate SHA>: <output or summary>
-Diff from the declared file set: none | <diff and explanation>   <!-- files in the diff but not in the declaration are blocking -->
+宣言 vs 実 diff（L0-6 — 子→epic でも必須）:
+git diff --stat <epic>...<候補SHA>: <出力 or 要約>
+宣言ファイル集合との差分: なし | <差分と説明>   <!-- diff にあって宣言にないファイルは blocking -->
 ```
 
-## Epic termination comment (E-9 — posted to the EPIC Issue. Applies the L1-4 five-vocabulary set)
+## Epic Termination Comment (E-9 — post to the EPIC Issue. Apply the L1-4 five-term vocabulary)
 
 ```markdown
-🏁 <MERGED|SUPERSEDED|ABANDONED> (<agent name>, YYYY-MM-DD): <1 line>
+🏁 <MERGED|SUPERSEDED|ABANDONED> (<agent名>, YYYY-MM-DD): <1行>
 
-- Disposition of the epic branch: discarded (deleted) | rescue PR <URL> (E-6③ gate applies)
-- Convergence of child Issue states: <each child's terminal state or the destination Issue it was split out to>
-- worktree cleanup: done (YYYY-MM-DD)
-- evidence / successor: <integration review record, successor Issue, etc.>
+- epic ブランチの処分: 破棄（削除） | 救出 PR <URL>（E-6③ ゲート適用）
+- 子 Issue の状態収束: <各子の終端状態 or 独立 Issue への切り出し先>
+- worktree 掃除: 済み（YYYY-MM-DD）
+- evidence / successor: <統合レビュー記録・後継 Issue 等>
 ```

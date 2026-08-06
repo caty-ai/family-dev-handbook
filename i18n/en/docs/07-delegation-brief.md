@@ -28,7 +28,7 @@ Reason: handing over the spec alone makes "it's done" unverifiable. By handing o
 - If the brief and the Issue disagree, **the Issue wins**. Whoever notices the discrepancy fixes the Issue first, then delegates — never let them silently diverge (the same direction as [L1-8](02-issue-loop.md))
 - It's normal for one Issue to produce multiple briefs (separate briefs for implementation, fix rounds, and review seats)
 
-## B-4 Front-Load Context — Don't Make Them Go探索
+## B-4 Front-Load Context — Don't Make Them Go Exploring
 
 - Front-load into the brief any facts the delegate needs (paths, specs, constraints, prohibitions, environment quirks). Don't rely on the delegate to explore for them
 - Reason: exploration results vary by delegate. Read-only seats or sandboxed environments sometimes can't explore at all. Front-loading is the only way to get the same quality of outcome whether the context is fresh or read-only
