@@ -1,32 +1,32 @@
 > **Machine translation.** The Japanese original ([04-adoption.md](../../../docs/04-adoption.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# Rollout — Integrating into Each Agent Environment
+# How to Adopt — Integrating into Each Agent's Environment
 
 ## Principles
 
-- **This repository is the source of truth**. Each agent places a **summary** in its own "always-loaded context," and refers to this repo for details
-- If a summary and this repo disagree, **this repo wins**. The summary side must be updated to match
-- Place it in a "config file that's always loaded" so it keeps working even when the model changes (don't rely on any specific model's memory or attentiveness)
+- **This repository is the source of truth.** Each agent places a **summary** in its own "always-loaded context" location, and refers to this repo for details
+- If the summary and this repo disagree, **this repo wins**. Update the summary to match
+- Place it in an "always-loaded config file" so it keeps working even when the model changes (don't rely on a specific model's memory or attentiveness)
 
-## Discipline for the summary block
+## Discipline for the Summary Block
 
-- **This page (docs/04) is the single owner of the version-stamped compact summary**. Downstream copies (each CLAUDE.md / AGENTS.md / system prompt) are owner-applies — the coordinating agent proposes, and each runtime's owner pastes it in themselves
-- Downstream local summaries and overrides may make things **stricter than the source of truth, but never looser** (tighten only). The cross-agent norm owner for this principle is family-os's operations-policy (config trust section — see the "Caty AI Family" section of the [README](../../../README.md)). This page is the application of that collaboration protocol. When rolling this out without sister projects, just apply the tighten-only principle as-is
-- Summaries reference material by **rule ID + a one-line posture statement**, not by transcribing the full text. The ID definitions live in docs/01–03, 05–08; the comment format's field schema lives in templates/issue-template.md, templates/epic-template.md, templates/brief-template.md
+- **This page (docs/04) is the single owner of the version-stamped compact summary.** Downstream copies (each CLAUDE.md / AGENTS.md / system prompt) are owner-applies — the coordinating agent proposes it, and each runtime's owner pastes it in themselves
+- Downstream local summaries or overrides **may be stricter than the source of truth, never looser** (tighten only). The cross-agent norm owner for this principle is family-os's operations-policy (config trust section — see the "Caty AI Family" section of the [README](../../../README.md)). This page is that collaboration protocol's application. When adopting without sister projects, just apply the tighten-only principle as-is
+- The summary doesn't copy out the full text — it refers to things via **rule ID + a one-line posture**. The defining text for each ID lives in docs/01–03 and 05–08; the field schema for the comment format lives in templates/issue-template.md, templates/epic-template.md, and templates/brief-template.md
 
-## Where to integrate, per agent
+## Where to Integrate, Per Agent
 
-Each runtime has a different "config file that's always loaded." Keep a rollout ledger in this shape:
+Each runtime has a different "always-loaded config file." Keep an adoption ledger in this shape:
 
 | Agent | Always-loaded context | Status |
 |---|---|---|
-| `<agent-a>` (e.g. Claude Code family) | User-global config such as `~/.claude/CLAUDE.md` (sections treated as permanent) | e.g. ✅ Rolled out (YYYY-MM-DD) |
-| `<agent-b>` (e.g. a persistent agent runtime) | Each agent's system prompt / the workspace's `AGENTS.md` | e.g. ✅ Rolled out — the rule-ID version is distributed via owner-applies |
-| `<agent-c>` (e.g. an agent driven by operational notes) | Operational notes / the skill set's reference docs | e.g. ⬜ Not yet rolled out — summary block to be distributed |
+| `<agent-a>` (e.g. the Claude Code family) | User-global config such as `~/.claude/CLAUDE.md` (the section treated as permanent) | e.g. ✅ Adopted (YYYY-MM-DD) |
+| `<agent-b>` (e.g. a resident agent runtime) | Each agent's system prompt / the workspace's `AGENTS.md` | e.g. ✅ Adopted — the rule-ID version is distributed via owner-applies |
+| `<agent-c>` (e.g. an operations-notes-driven agent) | Operations notes / reference docs for its skill set | e.g. ⬜ Not yet adopted — distribute the summary block |
 
-> Keep the actual live rollout ledger under each team's own management. As more integration points appear, maintain this table in your own repository (using an Issue's comments as the ledger also works).
+> Keep the live adoption ledger under each team's own control. As more targets get adopted, maintain this table in your own repository (using an Issue's comments as the ledger works too).
 
-## Summary block for distribution (copy-paste)
+## Distributable Summary Block (Copy-Paste)
 
 Paste the following as-is into each agent's always-loaded context:
 
@@ -44,7 +44,7 @@ L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予�
   L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
   L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
   証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
-  L1-9 Epic・アーキ・要件は実装前に異種レビュー（単発Issueには課さない） /
+  L1-9 サイズ L/H/Epic（=L2-1 の重い側・アーキ・要件含む）は実装着手前に異種レビュー（S/M 単発Issueには課さない） /
   L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録 /
   L1-11 席数 S/M=異種2・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT
 L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /
@@ -75,14 +75,14 @@ LC ライフサイクル: LC-1 置く時に退場トリガー（期限 or 完了
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
-## Repository-side preparation
+## Repository-Side Preparation
 
-For a new repo (or one applying this protocol for the first time):
+For a new repo (or a repo applying this protocol for the first time):
 
-1. Create a "Parallel Safety Map" section in `ARCHITECTURE.md` ([template](../templates/architecture-parallel-map.md))
-2. Place the Issue template ([templates/issue-template.md](../templates/issue-template.md)) under `.github/ISSUE_TEMPLATE/` (optional but recommended)
-3. Have everyone commit to avoiding direct pushes to main (enable branch protection where possible)
+1. Add a "parallel safety map" section to `ARCHITECTURE.md` ([template](../templates/architecture-parallel-map.md))
+2. Place the Issue template ([templates/issue-template.md](../templates/issue-template.md)) in `.github/ISSUE_TEMPLATE/` (optional but recommended)
+3. Have everyone follow a practice of avoiding direct pushes to main (enable branch protection where possible)
 
-## Role assignment is up to each agent
+## Role Assignment Is Free Per Agent
 
-Which model or tool gets assigned to implementation / review / verification is left to each agent's own toolchain (e.g. a three-model setup like implementer=Codex / reviewer=GLM / verifier=Claude). **What must be preserved is the protocol (three layers + cross-review + fail-posture), not the specific tooling.**
+Which model or tool handles implementation / review / verification is left to each agent's toolchain (e.g. a three-role, different-model setup like implementer=Codex / reviewer=GLM / verifier=Claude). **What must be preserved is the protocol (the three layers + cross-review + fail-posture) — not the specific tooling.**
