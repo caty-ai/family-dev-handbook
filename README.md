@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.7.0-blue)
+![version](https://img.shields.io/badge/version-v0.7.1-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -345,8 +345,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.7.0** (2026-08-07). It turned the size criteria (S / M / L / H / Epic, L2-1 in [docs/01](docs/01-milestone-loop.md)) into contract text — a size definition table plus three axes (blast radius, irreversibility, duration) decide the size, and when in doubt you round up. The inputs to reviewer seat counts (L1-11) and the Epic entrance (E-1) no longer rely on adopters' tacit knowledge.
+The current version is **v0.7.1** (2026-08-07). It turned the size criteria (S / M / L / H / Epic, L2-1 in [docs/01](docs/01-milestone-loop.md)) into contract text — a size definition table plus three axes (blast radius, irreversibility, duration) decide the size, and when in doubt you round up. The inputs to reviewer seat counts (L1-11) and the Epic entrance (E-1) no longer rely on adopters' tacit knowledge. v0.7.1 is a wording follow-up that aligns the scope enumeration of upstream review (L1-9 in [docs/02](docs/02-issue-loop.md)) with the same size system (L / H / Epic = the heavy side).
 
+- **v0.7.0** (2026-08-07) — the size criteria (`L2-1` extension, [docs/01](docs/01-milestone-loop.md)): definition table plus three axes, round up when in doubt
 - **v0.6.0** (2026-08-07) — the workspace-lifecycle layer (`LC-1`–`LC-5`, [docs/08](docs/08-lifecycle.md)): departure as a contract (exit triggers, inspection warns only, numbers in exit conditions canonical in local settings)
 - **v0.5.0** (2026-08-06) — the delegation-brief layer (`B-1`–`B-5`, [docs/07](docs/07-delegation-brief.md)): the prompt that hands work to a subagent becomes a three-layer contract of specification, self-verification, and reviewer criteria ([templates/brief-template.md](templates/brief-template.md))
 - **v0.4.0** (2026-08-05) — the third premise: keep systems simple, remove complexity at the requirement ([docs/why-simple-systems.md](docs/why-simple-systems.md)), and the requirement-questioning hook in L2-1 (dropping a requirement belongs to the requester)
