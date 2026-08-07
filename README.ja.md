@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.6.0-blue)
+![version](https://img.shields.io/badge/version-v0.7.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -343,8 +343,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.6.0**（2026-08-07）。ワークスペース・ライフサイクル層（`LC-1`〜`LC-5`・[docs/08](docs/08-lifecycle.md)）が加わりました — 共有ストアや作業領域に「置いた物がいつ・どうやって出て行くか」を契約にします。置く時に退場トリガーを決め、検査は警告のみ（ファイルを動かさない）、退場条件の数値はローカル設定が正本です。
+現行バージョンは **v0.7.0**（2026-08-07）。サイズ判別基準（S / M / L / H / Epic・[docs/01](docs/01-milestone-loop.md) の L2-1）が条文になりました — サイズの定義表と3軸（影響範囲・不可逆性・期間）で判定し、迷ったら重い側へ倒します。レビュー席数（L1-11）や Epic 入口（E-1）への入力が、導入先の暗黙知に頼らなくなります。
 
+- **v0.6.0**（2026-08-07） — ワークスペース・ライフサイクル層（`LC-1`〜`LC-5`・[docs/08](docs/08-lifecycle.md)）。置いた物の退場を契約に（退場トリガー・検査は警告のみ・退場条件の数値はローカル正本）
 - **v0.5.0**（2026-08-06） — 委譲ブリーフ層（`B-1`〜`B-5`・[docs/07](docs/07-delegation-brief.md)）。依頼文を実装仕様・実装チェック・レビュー基準の3層で契約に（様式は [templates/brief-template.md](templates/brief-template.md)）
 - **v0.4.0**（2026-08-05） — 第3の前提「シンプルに作る — 複雑さは要件で消す」（[docs/why-simple-systems.md](docs/why-simple-systems.md)）と、L2-1 への要件疑いフック（消す決定は依頼者）
 - **v0.3.0**（2026-07-31） — Epic レーン（`E-1`〜`E-10`）と、実装着手前の上流異種レビュー（`L1-9`〜`L1-11`）

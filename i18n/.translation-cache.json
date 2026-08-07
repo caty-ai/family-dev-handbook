@@ -22,22 +22,22 @@
   "docs/01-milestone-loop.md": {
     "translations": {
       "en": {
-        "hash": "a9947790896f6a3d",
-        "translated_at": "2026-08-06T19:11:49+00:00",
+        "hash": "095b7e26a69be5d6",
+        "translated_at": "2026-08-07T14:57:32+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "a9947790896f6a3d",
-        "translated_at": "2026-08-06T19:12:18+00:00",
+        "hash": "095b7e26a69be5d6",
+        "translated_at": "2026-08-07T14:58:12+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "a9947790896f6a3d",
-        "translated_at": "2026-08-06T19:13:12+00:00",
+        "hash": "095b7e26a69be5d6",
+        "translated_at": "2026-08-07T14:59:28+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "a9947790896f6a3d"
+    "source_hash": "095b7e26a69be5d6"
   },
   "docs/02-issue-loop.md": {
     "translations": {
