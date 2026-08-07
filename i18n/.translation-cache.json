@@ -42,22 +42,22 @@
   "docs/02-issue-loop.md": {
     "translations": {
       "en": {
-        "hash": "a0f6eefaddcc3b13",
-        "translated_at": "2026-08-07T16:17:19+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T16:39:04+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "a0f6eefaddcc3b13",
-        "translated_at": "2026-08-07T16:18:38+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T16:40:21+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "a0f6eefaddcc3b13",
-        "translated_at": "2026-08-07T16:26:27+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T17:30:01+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "a0f6eefaddcc3b13"
+    "source_hash": "5e84a04dfa60daf4"
   },
   "docs/03-git-protocol.md": {
     "translations": {

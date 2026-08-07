@@ -1,24 +1,24 @@
 > **Machine translation.** The Japanese original ([02-issue-loop.md](../../../docs/02-issue-loop.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# L1 Issue Loop — The Layer That Completes One Piece of Work
+# L1 Issue Loop — the layer that completes a single piece of work
 
-Each rule carries a stable rule ID (`L1-1` through `L1-11`). The summary side ([docs/04](04-adoption.md)) references these IDs. The stance to take when verification isn't possible is in [docs/05](05-fail-posture.md).
+Each rule carries a stable rule ID (`L1-1` through `L1-11`). The summary side ([docs/04](04-adoption.md)) refers back to these IDs. The stance to take when something can't be verified is in [docs/05](05-fail-posture.md).
 
-## L1-1 The Issue-First Principle
+## L1-1 The Issue-first principle
 
-Code changes in a repository start from a **GitHub Issue**. Don't implement without an Issue (exceptions: one-line fixes like typos, non-code md/json/yaml, and scratch work outside git).
+Code changes in a repository start from a **GitHub Issue**. Don't implement without one (exceptions: one-line fixes like typos, non-code md/json/yaml, and scratch work outside git).
 
-Reason: the Issue body + PR diff become the **source of truth for handoff across sessions and agents**. Any agent that picks up the work partway through should be able to continue just by reading the Issue.
+Why: the Issue body plus the PR diff becomes the **source of truth for handoff across sessions and agents**. No matter which agent picks it up midway, reading the Issue should let them continue.
 
-## L1-2 The Three Required Elements of an Issue Body
+## L1-2 The three required parts of an Issue body
 
 Use the [template](../templates/issue-template.md).
 
-1. **Purpose / Why** — why this is being done. Background, and what breaks if it isn't
-2. **Done when** — in checkbox form. Written so it can be judged mechanically or by hands-on verification, e.g. "tests green," "verified on device"
-3. **Predicted files / modules to touch** — input to L2's parallel-GO decision. Redeclare the confirmed version in a WIP comment when work starts
+1. **Purpose (Why)** — why this is being done. The background, and what breaks if it isn't
+2. **Done when** — as checkboxes. Written so it can be judged mechanically or by hands-on check, like "tests green" or "verified on device"
+3. **Predicted files / modules to touch** — the input for L2's parallel-GO judgment. Re-declare the finalized version in the WIP comment when work starts
 
-## The Implement → Review → Merge Flow
+## The implement → review → merge flow
 
 ```
 Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint green
@@ -26,89 +26,89 @@ Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint gr
 → merge → Issue close → 安定点で git tag
 ```
 
-## L1-3 Principles of Cross-Review
+## L1-3 Principles of cross-review
 
-- **No self-approval** — don't merge on the implementer's approval alone
-- **The reviewer who clears a merge must be a different model or agent from the implementer** (e.g. Claude implements → GPT/GLM reviews, Codex implements → Claude reviews). Same model but a **different agent** is valid for merge. The same model and the same agent is insufficient for merge even across different sessions — a different session is only enough for checkpoints other than merge
-- By default, the round-1 reviewer stays the reviewer through completion. If a handoff happens, it must be declared, and the incoming reviewer must **re-review the current candidate in full** (don't merge on a partial review stitched together with another)
-- Loop implementer → reviewer until blocking findings reach zero
-- Review lens: correctness / boundaries (are out-of-scope files being touched?) / test adequacy / revertability
+- **No self-approval** — don't merge on the implementer's own approval alone
+- **The review that clears a merge must come from a different model or agent than the implementer** (e.g., Claude implements → GPT/GLM reviews, Codex implements → Claude reviews). Even the same model is fine for merge if it's a **different agent**. The same model and the same agent is not sufficient for merge even across different sessions — a different session is only enough for checkpoints other than merge
+- The Round-1 reviewer is the default full-run reviewer. If the reviewer changes, that change must be declared, and the replacement reviewer must **re-review the entire current candidate** (don't merge on a partial review stitched together)
+- Loop implementer → reviewer until blocking findings reach 0
+- Review angles: correctness / boundaries (are out-of-scope files being touched?) / test adequacy / revertability
 
-## L1-4 Lane State — A Closed Vocabulary of 5 States
+## L1-4 Lane states — a closed vocabulary of 5 states
 
 Lane state is declared via a labeled comment on the owning Issue. **The Issue is the source of truth for lane state** (a pending PR points back to the Issue):
 
 `WIP / HOLD / MERGED / SUPERSEDED / ABANDONED`
 
 - **WIP is a state you declare explicitly — it is not the default**
-- `STUCK` is **not** a sixth state — it's a trigger condition, and the only legitimate exit is a valid HOLD (or escalation to a human)
-- A lane with missing, unknown, or malformed state is treated as **inactive (HOLD-equivalent posture: no writes) pending state repair**. Don't count this lane as "available" in a GO decision — any work that could intersect its declared scope stays serialized until repair ([FP-1](05-fail-posture.md)). Don't fabricate a valid HOLD record out of malformed input (HOLD's required fields can't be manufactured from malformed input) — the first duty of the next agent to touch it is **repairing the state**, not writing ([FP-7](05-fail-posture.md))
-- **Termination / blocker declarations take priority over pressure to continue**. If a blocker appears within the same update, that update's completion claim is void
+- `STUCK` is **not** a sixth state — it's a trigger condition, and the only legal way out is a valid HOLD (or escalation to a human)
+- A lane with a missing, unknown, or malformed state is **treated as inactive (HOLD-equivalent stance: no writes) pending state repair**. Don't count this lane as "available" in a GO judgment — work that could intersect the declared scope stays serial until repair ([FP-1](05-fail-posture.md)). Don't fabricate a valid HOLD record from malformed input (HOLD's required fields can't be manufactured from malformed input) — the next agent to touch this lane's first obligation is **repairing the state**, not writing ([FP-7](05-fail-posture.md))
+- **A termination / blocker declaration outweighs pressure to continue**. If a blocker appears within the same update, that update's completion claim is void
 
-## L1-5 HOLD's Required Fields
+## L1-5 HOLD's required fields
 
-HOLD is **resumable, non-terminal**. It's only valid when all of the following are present:
+HOLD is **resumable, non-terminal**. It's only valid when it carries all of the following:
 
-`owner / reason / review-by / lock disposition (retain the lock until review-by, or release it) / remaining work or successor`
+`owner / reason / review-by / lock disposition (hold the lock until review-by, or release it) / remaining work or successor`
 
-- **A HOLD silent on lock disposition is invalid** — because both readings (ghost lock / double-write) become collision paths
-- Passing review-by creates a **visible review obligation** (it resurfaces via the weekly ops probe). There's no auto-release and no auto-ABANDONED
+- **A HOLD silent on lock disposition is invalid** — because either reading (ghost lock or double-write) becomes a collision path
+- Passing review-by creates a **visible review obligation** (it resurfaces via the weekly ops probe). There is no auto-release or auto-ABANDONED
 - `retained until review-by` does **not** mean "auto-released at review-by" — review-by is the date the review obligation kicks in; the lock stays held until an explicit action (a HOLD update, RELEASE, or the TAKEOVER procedure after going stale)
 
-## L1-6 Retries Are Finite
+## L1-6 Retries are finite
 
-Retries are capped. Once exhausted, declare **HOLD / ABANDONED with evidence** — exhausting retries never counts as success (HOLD if you intend to continue, ABANDONED if you're cutting it off. Exits via the STUCK trigger follow L1-4: a valid HOLD or escalation to a human).
+Retries are capped. Once exhausted, declare a **HOLD / ABANDONED with evidence** — exhausting retries never counts as success (HOLD if continuation is intended, ABANDONED if cutting it off; an exit via the STUCK trigger follows L1-4 — a valid HOLD, or escalation to a human).
 
-> Footnote (outside the contract body — a candidate tunable policy): the specific trigger "same failure twice in a row (same review finding or same CI signature) ⇒ STUCK" is a single reviewer's proposal and is not part of this contract. The default is left to maintainer judgment or per-repo choice.
+> Footnote (outside the contract body — a tunable policy candidate): the specific trigger "two consecutive identical failures (same review finding or same CI signature) ⇒ STUCK" is a single reviewer's proposal and is not part of this contract. The default is left to maintainer judgment or per-repo choice.
 
-## L1-7 The Completion-Evidence Merge Gate
+## L1-7 The completion-evidence merge gate
 
-A PR may only be merged when the PR body contains a **completion record** ([template](../templates/issue-template.md)) satisfying all of the following:
+A PR may only be merged when a **completion record** ([template](../templates/issue-template.md)) meeting the following is present in the PR body:
 
-1. **Map every Done-when item to `PASS` / `FAIL` / `N/A` with a reason** — a command having "run" is not a PASS. A FAIL on a required item, or an N/A without a reason, blocks the merge
-2. Each item has **persistent evidence with a terminal result** (command or manual procedure + observed outcome + date). **The inline excerpt is authoritative** — the terminal result must be readable from the record alone. A URL to CI or an external log is a convenience pointer; a link alone is not adequate evidence
+1. **Map every Done-when item to `PASS` / `FAIL` / `N/A` with a reason** — a command having "run" is not the same as PASS. A FAIL on a required item, or an N/A without a reason, blocks the merge
+2. Each item needs **durable evidence with a terminal result** (the command or manual procedure + observed outcome + date). **The inline excerpt is authoritative** — the terminal result must be readable from the record alone. URLs to CI or external logs are convenience pointers; link-only evidence doesn't qualify
 3. State the **candidate commit SHA** explicitly — it must match the PR head at review time (if it changes before merge, that's a superseding record per L1-8)
-4. Cross-check the declared file set against `git diff --stat origin/main...<candidate-SHA>` (a file in the diff but not in the list is blocking — [L0-6](03-git-protocol.md))
-5. Link the identities of implementer and reviewer, and confirm **the model or agent differs** (L1-3)
+4. Cross-check the declared file set against `git diff --stat origin/main...<candidate SHA>` (a file in the diff but not in the list is blocking — [L0-6](03-git-protocol.md))
+5. Link the identities of implementer and reviewer, confirming **the model or agent differs** (L1-3)
 
-**Evidence exists before the claim is made.** Success that exists only locally is not completion.
+**Evidence exists before the claim does.** Success that only exists locally is not completion.
 
-## L1-8 Corrections Go Through a Superseding Record
+## L1-8 Corrections go through a superseding record
 
-A correction to a completion record means **publishing a full replacement record and reopening review**. No silent edits.
+Correcting a completion record means **publishing a full replacement record and reopening the review**. No silent edits.
 
-## L1-9 Upstream Heterogeneous Review — Extending No-Self-Approval Upstream
+## L1-9 Upstream heterogeneous review — the upstream extension of no-self-approval
 
-- **Sizes L / H / Epic** (= the heavy side of the size classification in [L2-1](01-milestone-loop.md); architecture changes and requirements definition fall here too) must pass heterogeneous cross-review (L1-10's seats, L1-11's seat counts) **before implementation starts**. The source of truth for size definitions is L2-1 — don't copy it here. For an Epic, the timing is one pass, either "after the EPIC Issue is filed, or at the latest before the first child Issue's implementation starts" (same clock as [E-6①](06-epic-lane.md) — don't let "before filing" and "before implementation starts" coexist as two different readings). Since drift in the initial direction propagates downstream, review should be heaviest upstream
-- Applies **only** to the heavy side: single S / M Issues (bug fixes, single features) don't carry an upstream review requirement — just the usual implementation review (L1-3 / L1-11) as before. Widening this scope would bring back per-Issue review waits, contradicting the speed goal ([docs/06](06-epic-lane.md))
-- **If upstream review can't be verified as having happened, don't start implementation** (fail-closed — the same direction as halting writes. The record is linked from the EPIC Issue — the kickoff section of the [template](../templates/epic-template.md). For a standalone L / H, link it from the owning Issue)
+- **Size L / H / Epic** (= the heavy side of [L2-1](01-milestone-loop.md)'s size classification criteria; architecture changes and requirements definition fall here too) must pass heterogeneous cross-review (L1-10's seats, L1-11's seat counts) **before implementation starts**. The source of truth for the size definition is L2-1 — it isn't copied here. For Epics, the timing is "either after the EPIC Issue is filed, or at the latest before the first child Issue's implementation starts" — one pass ([E-6①](06-epic-lane.md), the same clock — don't let "before filing" and "before implementation starts" coexist as two readings). Since drift in the initial direction propagates downstream, review gets heavier the further upstream it sits
+- Applies **only** to the heavy side: single S/M Issues (bug fixes, single features) don't carry an upstream review requirement — just the usual implementation review (L1-3 / L1-11) as before. Widening this here would bring back per-Issue review waits and conflict with the speed goal ([docs/06](06-epic-lane.md))
+- If **whether the upstream review happened can't be verified, don't start implementation** (fail-closed — the same direction as halting writes. The record links from the EPIC Issue — the kickoff section of the [template](../templates/epic-template.md). For standalone L/H Issues, it links from the owning Issue)
 
-## L1-10 The Principle of Heterogeneous, Top-Tier Review Seats
+## L1-10 The principle of heterogeneous, top-tier review seats
 
-- Review seats are chosen from **mutually distinct models**, and distinct from the implementation writer's model ("N heterogeneous seats" means the N seats are mutually heterogeneous — N different agents on the same model is not N heterogeneous seats)
-- **Whoever designed or implemented what's under review does not count as a seat** (including the orchestrator — a seat that reviews its own design runs against the intent of L1-3 / FP-8). Same model, different agent is valid as the minimum bar for merge per L1-3, but doesn't count toward L1-11's seat count (the only exception is L1-11's own demotion procedure)
-- Seats are filled with **the top-tier class of model launchable in that household**. Enforcement: each household maintains a **roster of review-seat-eligible models** in local config (CLAUDE.md / AGENTS.md, etc.), and the handbook requires ① the roster exists, ② nothing outside the roster is seated, ③ roster updates are visible. Which models (by actual name) go on the roster is not written into the handbook — models turn over, so the source of truth shouldn't have to be chased through handbook PRs
-- Review records must always keep **requested / actual model** on file (auditability — evidence exists before the claim)
+- Review seats must be drawn from **mutually different models**, and different from **the implementation writer's model** ("N heterogeneous seats" means the N seats are mutually heterogeneous — N different agents on the same model is not N heterogeneous seats)
+- **Whoever designed or implemented what's under review doesn't count toward a seat** (including the orchestrator — a seat reviewing its own design defeats the point of L1-3 / FP-8). Same model, different agent is valid as the minimum bar for merge per L1-3, but doesn't count toward L1-11's seat total (the only exception is L1-11's downgrade procedure)
+- Seats should be filled with **the top-tier class of model that household can launch**. Enforcement: each household maintains a **seat-eligible model roster** in local config (CLAUDE.md / AGENTS.md, etc.), and the handbook requires ① that a roster exists, ② that nothing outside the roster is seated, and ③ that roster updates are visible. Which models (by name) go on the roster is not written into the handbook — models change, so the source of truth shouldn't be chased through a PR
+- Review records must always retain **requested / actual model** (auditability — evidence exists before the claim does)
 
-## L1-11 Seat-Count Scaling
+## L1-11 Seat-count scaling
 
-The seat counts in this table apply to **implementation review that clears a merge** and to **upstream review (L1-9)** (L1-3 is the minimum identity condition; this table sets the seat count — the two don't conflict). The child-to-epic gate inside an Epic also looks up this table by **the child's weight** ([E-6②](06-epic-lane.md) — children touching high-risk areas default to 5 seats).
+The seat counts in this table apply to **implementation review that clears a merge** and to **upstream review (L1-9)** (L1-3 is the identity minimum; this table sets the seat count — the two don't conflict). The child→epic gate within an Epic also looks up this table **by the child's weight** ([E-6②](06-epic-lane.md) — a child touching a high-risk area gets priority for 5 seats).
 
-| Target | Seat count |
+| Target | Seats |
 |---|---|
 | S / M (local, single feature) | 2 heterogeneous seats |
 | L / H (multiple modules, boundary changes, new features) | 3 heterogeneous seats |
-| **High-risk areas** (defined at the [top of docs/06](06-epic-lane.md); a single definition; takes priority over size classification) | 5 heterogeneous seats |
-| **Upstream review** (L1-9) for Epics, architecture, and requirements definition | L/H staffing before implementation starts (5 seats if it includes a high-risk area) |
+| **High-risk areas** (defined at [the top of docs/06](06-epic-lane.md) — a single definition; takes priority over size classification) | 5 heterogeneous seats |
+| **Upstream review** (L1-9) for size L / H / Epic | L/H setup before implementation starts (5 seats if it includes a high-risk area) |
 
-- Fill an absence with **another heterogeneous seat**
-- A household that physically cannot secure heterogeneous seats (fewer launchable model families than seats required) can use the **demotion procedure**: a seat filled by the same model with a different agent, **plus explicit approval from the owner (a human)**, plus the demotion noted in the review record. An unapproved demotion counts the same as failing to meet the seat count
-- If still short after backfill and demotion, stop at **SEAT-WAIT** (a waiting state prior to review being launched. Distinct from L1-4's HOLD lane state — L1-5's 5 required fields don't apply, so the weekly probe doesn't misclassify it as a HOLD). Make SEAT-WAIT visible via a comment on the owning Issue, stating three things: **owner / seats short / retry-by date** (a SEAT-WAIT missing any of the three is invalid). A SEAT-WAIT comment counts as an activity update under [L0-3](03-git-protocol.md) — letting a seat-short lane go stale → TAKEOVER doesn't add seats, so this surfaces the root cause instead of just advancing the clock
-- Adjust the seat-count numbers only through a handbook PR (same treatment as the 72h in [L0-3](03-git-protocol.md))
+- A no-show is backfilled with **another heterogeneous seat**
+- A household that can't physically secure heterogeneous seats (fewer launchable model families than seats) can use the **downgrade procedure**: a seat filled by the same model with a different agent, **plus explicit approval from the owner (a human)**, plus the downgrade noted in the review record. An unapproved downgrade counts the same as an unmet seat count
+- If backfilling or downgrading still falls short, stop at **SEAT-WAIT** (a waiting state before review starts — a distinct term from L1-4's HOLD lane state; L1-5's 5 required fields don't apply, to keep the weekly probe from misdetecting it as a HOLD). Make SEAT-WAIT visible via a comment on the owning Issue, stating three things: **owner / which seats are missing / a retry-by date** (a SEAT-WAIT missing any of the three is invalid). A SEAT-WAIT comment counts as an activity update under [L0-3](03-git-protocol.md) — letting a seat-short lane go stale → TAKEOVER doesn't create more seats, so this surfaces the root cause instead of just advancing the clock
+- Adjusting the seat-count numbers can only be done via a PR to the handbook (same treatment as [L0-3](03-git-protocol.md)'s 72h)
 
-## Definition of Done
+## Definition of done
 
 - Tests and lint pass
-- A PR carrying an L1-7 completion record has been merged, and the Issue is closed
-- **The online repo is the up-to-date source of truth** (it doesn't end with results existing only locally)
-- When work spans multiple sessions, the entry point for continuing (what to do next) is left in an Issue comment or a handoff
+- The PR carrying an L1-7 completion record is merged, and the Issue is closed
+- **The online repo is the up-to-date source of truth** (it doesn't end with results that only exist locally)
+- If work spans multiple sessions, the entry point for continuing (what to do next) is left in an Issue comment or a handoff
