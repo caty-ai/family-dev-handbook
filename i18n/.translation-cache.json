@@ -82,22 +82,22 @@
   "docs/04-adoption.md": {
     "translations": {
       "en": {
-        "hash": "d12bb9527dd54e36",
-        "translated_at": "2026-08-07T13:49:45+00:00",
+        "hash": "36efe32eabe7b292",
+        "translated_at": "2026-08-07T14:17:01+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "d12bb9527dd54e36",
-        "translated_at": "2026-08-07T13:50:40+00:00",
+        "hash": "36efe32eabe7b292",
+        "translated_at": "2026-08-07T14:18:01+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "d12bb9527dd54e36",
-        "translated_at": "2026-08-07T13:51:58+00:00",
+        "hash": "36efe32eabe7b292",
+        "translated_at": "2026-08-07T14:19:57+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "d12bb9527dd54e36"
+    "source_hash": "36efe32eabe7b292"
   },
   "docs/05-fail-posture.md": {
     "translations": {
@@ -282,21 +282,21 @@
   "docs/08-lifecycle.md": {
     "translations": {
       "en": {
-        "hash": "8cc75b35840356d0",
-        "translated_at": "2026-08-07T13:52:56+00:00",
+        "hash": "3d053de274459558",
+        "translated_at": "2026-08-07T14:20:22+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "8cc75b35840356d0",
-        "translated_at": "2026-08-07T13:53:31+00:00",
+        "hash": "3d053de274459558",
+        "translated_at": "2026-08-07T14:20:55+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "8cc75b35840356d0",
-        "translated_at": "2026-08-07T13:55:26+00:00",
+        "hash": "3d053de274459558",
+        "translated_at": "2026-08-07T14:22:53+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "8cc75b35840356d0"
+    "source_hash": "3d053de274459558"
   }
 }

@@ -1,51 +1,51 @@
 > **Machine translation.** The Japanese original ([08-lifecycle.md](../../../docs/08-lifecycle.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# LC Workspace Lifecycle — the layer that turns departure of stored things into a contract
+# LC Workspace Lifecycle — Making the Exit of Placed Items a Contract
 
-While the L layer (L2 / L1 / L0) is a contract for **how work proceeds**, the LC layer defines the contract for **when and how something that was placed in a persistently accumulating location (shared store, working directory, handoff spot) leaves it**. Each rule carries a stable rule ID (`LC-1` through `LC-5`), and the scope each clause applies to is stated in 〔 〕. The summary side ([docs/04](04-adoption.md)) references these IDs. Stance under unverifiable conditions is covered in [docs/05](05-fail-posture.md).
+While the L layers (L2 / L1 / L0) are contracts for **how work proceeds**, the LC layer defines the contract for **when and how a placed item leaves a place where things accumulate persistently (a shared store, a working directory, a handoff location)**. Each rule is given a stable rule ID (`LC-1` through `LC-5`), and the scope of application for each clause is noted in 〔 〕. The summary side ([docs/04](04-adoption.md)) references these IDs. For the stance to take when verification isn't possible, see [docs/05](05-fail-posture.md).
 
-Background: defining only write-side discipline (Issue-first, where to write things) is not enough — **anything without a departure trigger will inevitably pile up**. The LC layer defines a single "how it leaves" contract to pair with the "how it's placed" rules. Stage names use the role term as canonical, with the English label as a parenthetical aid.
+Background: defining only write-side discipline (Issue-first, where to write) is not enough — **anything without an exit trigger will inevitably accumulate**. The LC layer defines a single "how it leaves" counterpart to the rules for "how it's placed." Role terms are canonical for stage names; English labels are a supplementary notation in parentheses.
 
-## LC-1 Deadline Trigger Principle 〔all adopting projects〕
+## LC-1 Expiry Trigger Principle 〔all adopters〕
 
-**When placing something, always decide its departure trigger (a deadline or a completion condition) at the same time.**
+**When you place an item, always decide its exit trigger (an expiry or a completion condition) at the same time.**
 
-Operate on the premise that "anything without a trigger becomes permanently retained." A trigger can take the form of a deadline (a date or a number of days) or a completion condition (once merged, once triaged, once aggregated). When the placement convention (naming, deadline metadata) can't express it, leave one line in the Issue or declaration made at the time of placement.
+Operate on the premise that "anything without a trigger becomes permanently retained." The trigger can take the form of an expiry (a date or a day count) or a completion condition (once merged, once triaged, once aggregated). When the placement convention (naming, expiry metadata) can't express it, leave one line in the Issue or declaration at the time of placement.
 
-## LC-2 One-Way Lifecycle 〔houses with persistent storage areas〕
+## LC-2 One-Way Lifecycle 〔homes with persistent areas〕
 
-**git branch / worktree are out of scope for this chapter — the canonical source for cleanup is [L0-4 / L0-8](03-git-protocol.md) (delete after merge).**
+**git branch / worktree are out of scope for this chapter — the canonical source for cleanup is [L0-4 / L0-8](03-git-protocol.md).**
 
-Things placed in a persistent storage area flow one-way through **intake → active → complete → archive**. Never flow backward.
+Items placed in a persistent area flow one-way through **intake → active → complete → archive**. Do not reverse the flow.
 
 - Archive is **immutable** — once something enters, it is not rewritten or deleted
-- When restoration is needed, don't remove it from the archive — bring it back to the active side **as a new copy**
+- When restoration is needed, do not delete from the archive — bring it back to the active side **as a new copy**
 - Attach a record (manifest) to the archive destination noting what was moved, when, why, and how to restore it
 
-## LC-3 Explicit Departure Conditions 〔houses with a persistent workspace / shared store〕
+## LC-3 Explicit Exit Conditions 〔homes with persistent workspaces / shared stores〕
 
-For the following **three categories**, **write numeric departure conditions into local configuration**:
+For the following **three categories**, **document numeric exit conditions in local configuration**:
 
-1. **Heavy binaries** — non-text items placed that exceed a given size (e.g., anything over 1MB goes to archive)
-2. **Explicit old versions** — items placed under a name or location identifiable as an old version (e.g., `旧〜/` or `.bak` goes to archive as soon as detected)
-3. **Aggregation of periodic items** — the source items behind a periodic item, once aggregated (e.g., after a monthly digest is generated, the raw files go to archive)
+1. **Heavy binaries** — non-text items placed that exceed a certain size (e.g., anything over 1MB goes to archive)
+2. **Explicit old versions** — items placed with a name or location marking them as an old version (e.g., `old~/` or `.bak` go to archive as soon as detected)
+3. **Aggregation of periodic items** — raw source files after periodic-item aggregation (e.g., after monthly digest generation, the raw files go to archive)
 
-**The canonical numbers live on the local configuration side — every number that appears in this chapter's body text (day counts, sizes, etc.) is an "example" and does not count as part of the contract** (MUST). The contract of this chapter is the frame (that departure conditions exist for the three categories); the actual numbers belong to the local side — the same approach as putting the qualified model roster in local configuration under [L1-10](02-issue-loop.md).
+**The canonical source for the numbers lives in local configuration, and any numbers appearing in this chapter's body (day counts, sizes, etc.) are all "examples" and do not count as part of the contract** (MUST). The frame (having exit conditions for the three categories) is this chapter's contract; the actual values belong to the local side — the same approach as putting the qualified-model roster in local configuration under [L1-10](02-issue-loop.md).
 
-## LC-4 Three-Piece Departure Set for Append-Only Stores 〔MUST, limited to stores declared append-only〕
+## LC-4 Three-Part Exit Set for Append-Only Stores 〔MUST only for stores declared append-only〕
 
-**Append-only store** = a storage location that has declared an operating policy of never rewriting or deleting existing content. **This clause applies as a MUST only to houses that have declared a store append-only. Houses without such a store are N/A** — this premise is not imposed on all adopting projects.
+**Append-only store** = a storage location that has declared an operating policy of not rewriting or deleting existing content. **This clause applies as a MUST only to homes that have declared a store append-only. Homes with no such store are N/A** — this premise is not imposed on all adopters.
 
-Departure from an append-only store (a move to archive) is the sole explicit exception to the append-only principle, and it must always be done as the following **three-piece set**:
+Exiting an append-only store (moving to archive) is the sole explicit exception to the append-only principle, and it must always be done as the following **three-part set**:
 
 1. **Backup** — take a snapshot of the store before the move
-2. **Move** — move it to the archive destination (a move, not a copy that leaves the original behind)
-3. **Leave a pointer** — leave a pointer at the original location indicating where it moved to, when, and why
+2. **Move** — move it to the archive destination (a move, not a copy that leaves the original)
+3. **Leave a pointer** — leave a pointer at the original location indicating where, when, and why it was moved
 
-**The actual work of departure is always a manual operation by a human / agent.** Do not place automated moves or deletions in this path (→ LC-5).
+**The actual exit work is always a manual operation by a person / agent.** Do not place automated move or delete operations in this path (→ LC-5).
 
-## LC-5 Inspection Is Warning-Only 〔all adopting projects〕
+## LC-5 Inspection Is Warning-Only 〔all adopters〕
 
-**Inspection / lint does not move files.** What it may do is: detect → periodic report → a human (or owner) decides. No automated departure.
+**Inspection and linting do not move files.** What's allowed is: detect → periodic report → a person (or the owner) decides. No automatic exit.
 
-The information plumbing for lint is fail-open ([FP-4](05-fail-posture.md)) — "an inspection failure does not halt work" (FP-4) and "inspection does not move files" (this clause) are a pair, and inspection always defaults to read-only.
+The information plumbing for lint is fail-open ([FP-4](05-fail-posture.md)) — "an inspection failure doesn't stop work" (FP-4) and "inspection doesn't move files" (this clause) are a pair; inspection always defaults to read-only.
