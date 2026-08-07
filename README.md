@@ -283,6 +283,8 @@ All of the rule text lives under `docs/`. Here is the index.
 
 ## Deeper documentation
 
+The files below are Japanese (canonical). A machine-translated English mirror of docs/ and templates/ lives in [i18n/en/](i18n/en/) — where they disagree, the Japanese text wins.
+
 | File | Content |
 |---|---|
 | [docs/why-issue-first.md](docs/why-issue-first.md) | What Issue-first means — the premise explained (**not a contract**: why work starts from an Issue rather than a conversation, what goes in one, and when you do not need one) |
