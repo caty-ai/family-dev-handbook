@@ -1,6 +1,6 @@
 # なぜシンプルに作るのか — 複雑さは設計で解くより、要件で消す
 
-> このページは条文ではありません。条文の本文は [docs/01](01-milestone-loop.md)〜[docs/06](06-epic-lane.md) にあります。
+> このページは条文ではありません。条文の本文は [docs/01](01-milestone-loop.md)〜[docs/03](03-git-protocol.md) と [docs/05](05-fail-posture.md)〜[docs/08](08-lifecycle.md) にあります。
 > ここに書いてあるのは、それらの条文が**前提にしている考え方**です。
 
 ## 目指しているもの
