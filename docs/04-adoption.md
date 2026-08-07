@@ -10,7 +10,7 @@
 
 - **バージョン刻印付きのコンパクト要約のオーナーは本ページ（docs/04）ただ1つ**。下流コピー（各 CLAUDE.md / AGENTS.md / system prompt）は owner-applies — 幹事エージェントが提案し、各ランタイムのオーナーが自分で貼る
 - 下流のローカル要約・上書きは、正本より**厳しくするのは可・緩めるのは禁止**（tighten only）。この原則のエージェント横断規範オーナーは family-os の operations-policy（config trust 節 — [README](../README.ja.md) の「Caty AI ファミリー」節参照）。本ページはその協働プロトコルへの適用。sister projects なしで導入する場合は tighten-only 原則をそのまま適用すればよい
-- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜07、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜08、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## エージェント別の組み込み先
 
@@ -29,9 +29,9 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-06 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-07 / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜07、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜08、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -65,6 +65,11 @@ E Epic レーン: E-1 Epic はオーナーのキックオフ承認で成立（�
   E-7 Epicログ（未達・妥協の列挙必須）+ダイジェスト最終確認 /
   E-8 寿命1〜2週間（起点=キックオフ承認）・staleness は L0-3 の別時計 / E-9 終端も5語彙・ABANDONED はブランチ処分+子収束必須 /
   E-10 Epic並走=子宣言の和集合∪EPIC WIP宣言で L2-4 準用
+LC ライフサイクル: LC-1 置く時に退場トリガー（期限 or 完了条件）を必ず一緒に決める（トリガー無し=永久保持になる前提で扱う） /
+  LC-2 持続領域は受け取り→現役→完成→退蔵の一方通行・退蔵は不変（git branch / worktree は対象外=L0-4 / L0-8） /
+  LC-3 3類型の退場条件を数値つきでローカル設定に明文化（数値は正本に書かない） /
+  LC-4 追記型と宣言したストアに限り退場はバックアップ→移動→ポインタ残置の3点セット・実作業は常に手動 /
+  LC-5 検査・lint はファイルを動かさない（検知→定期レポート→人が判断・自動退場なし）
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 

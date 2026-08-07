@@ -1,6 +1,6 @@
 # なぜモジュールを小さく切るのか — 分割は「並行可能性への投資」
 
-> このページは条文ではありません。条文の本文は [docs/01](01-milestone-loop.md)〜[docs/06](06-epic-lane.md) にあります。
+> このページは条文ではありません。条文の本文は [docs/01](01-milestone-loop.md)〜[docs/03](03-git-protocol.md) と [docs/05](05-fail-posture.md)〜[docs/08](08-lifecycle.md) にあります。
 > ここに書いてあるのは、それらの条文が**前提にしている考え方**です。
 
 ## 並行できるかどうかは、着手する前に決まっている
@@ -84,7 +84,7 @@
 
 このリポジトリも同じ原則で作られています。
 
-- **条文は層ごとに1ファイル** — L2 = [docs/01](01-milestone-loop.md)、L1 = [docs/02](02-issue-loop.md)、L0 = [docs/03](03-git-protocol.md)、失敗時姿勢 = [docs/05](05-fail-posture.md)、Epic = [docs/06](06-epic-lane.md)。いちばん長いものでも100行強です
+- **条文は層ごとに1ファイル** — L2 = [docs/01](01-milestone-loop.md)、L1 = [docs/02](02-issue-loop.md)、L0 = [docs/03](03-git-protocol.md)、失敗時姿勢 = [docs/05](05-fail-posture.md)、Epic = [docs/06](06-epic-lane.md)、委譲ブリーフ = [docs/07](07-delegation-brief.md)、ライフサイクル = [docs/08](08-lifecycle.md)。いちばん長いものでも100行強です
 - **条文と様式を混ぜない** — コメントの書式やテンプレートは [templates/](../templates/issue-template.md) に分けてあります
 - **参照は安定 rule ID で行う** — ファイル同士は `L2-4` のような ID で指し合います。ファイルを動かしても参照が壊れません
 - **同じ定義を2箇所に置かない** — 高リスク領域の定義は [docs/06](06-epic-lane.md) だけ、配布用の要約ブロックは [docs/04](04-adoption.md) だけです

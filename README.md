@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.5.0-blue)
+![version](https://img.shields.io/badge/version-v0.6.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -189,7 +189,7 @@ Do not change the handbook-revision value.
 3. On the first line, rewrite `owner` and `last-verified` for yourself and today. Leave `handbook-revision` untouched
 4. On the second line, rewrite `正本:` to the URL of this repository (or of your fork, if you forked it)
 
-That is the whole installation. What you pasted is six families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
+That is the whole installation. What you pasted is seven families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
 
 If you change your mind, delete those 30 lines and you are back where you started. Nothing else is touched.
 
@@ -245,7 +245,7 @@ That single diagram is one clause, `L2-4`. The map of everything else is below.
 
 ## The full rule map
 
-The rules fall into six families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
+The rules fall into seven families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
 
 | Family | What it decides | Rule IDs | Text |
 |---|---|---|---|
@@ -255,6 +255,7 @@ The rules fall into six families, and every one of them carries an ID that does 
 | **FP** Failure posture | Which way to fall when you cannot verify | `FP-1`–`FP-9` | [docs/05](docs/05-fail-posture.md) |
 | **E** Epic lane | How a bundle of Issues is carried | `E-1`–`E-10` | [docs/06](docs/06-epic-lane.md) |
 | **B** Delegation brief | How a single delegation becomes a contract | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
+| **LC** Lifecycle | When and how what you put down leaves | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 
 Two clauses matter most for whether any of this actually works. One is the **FP** watchword, "if you cannot verify it, go serial — fail-open never means *passed*" — a declaration that even where you deliberately choose to let something through unverified, that can never be read as having been confirmed. The other is the **single definition of high-risk territory**. Work that touches it always stops for a human, and its review seats increase (publishing, spending money, irreversible operations, and permission boundaries are the kind of thing it covers — read the canonical text for the exact line). So that the definition never lives in two places, its only canonical home is [docs/06](docs/06-epic-lane.md).
 
@@ -297,6 +298,7 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [docs/05-fail-posture.md](docs/05-fail-posture.md) | Failure posture — which way to fall when verification is impossible (`FP-1`–`FP-9`) |
 | [docs/06-epic-lane.md](docs/06-epic-lane.md) | Epic lane — bundling human checkpoints per Epic, and the single definition of high-risk territory (`E-1`–`E-10`) |
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B delegation brief — the contract carried by the prompt each time work is handed to a subagent (`B-1`–`B-5`) |
+| [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC workspace lifecycle — the layer that turns departure into a contract; the numbers in exit conditions live in local settings (`LC-1`–`LC-5`) |
 | [templates/issue-template.md](templates/issue-template.md) | Issue template and every lane comment format (WIP / HOLD / termination / TAKEOVER / resume check / completion record) |
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
@@ -343,8 +345,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.5.0** (2026-08-06). It added the delegation-brief layer (`B-1`–`B-5`, [docs/07](docs/07-delegation-brief.md)) — the prompt that hands work to a subagent becomes a three-layer contract of specification, self-verification, and reviewer criteria ([templates/brief-template.md](templates/brief-template.md)).
+The current version is **v0.6.0** (2026-08-07). It added the workspace-lifecycle layer (`LC-1`–`LC-5`, [docs/08](docs/08-lifecycle.md)) — a contract for when and how things placed in shared stores and workspaces leave. You decide the exit trigger at the moment you put something down, inspection only warns (it never moves files), and the numbers in exit conditions are canonical in local settings.
 
+- **v0.5.0** (2026-08-06) — the delegation-brief layer (`B-1`–`B-5`, [docs/07](docs/07-delegation-brief.md)): the prompt that hands work to a subagent becomes a three-layer contract of specification, self-verification, and reviewer criteria ([templates/brief-template.md](templates/brief-template.md))
 - **v0.4.0** (2026-08-05) — the third premise: keep systems simple, remove complexity at the requirement ([docs/why-simple-systems.md](docs/why-simple-systems.md)), and the requirement-questioning hook in L2-1 (dropping a requirement belongs to the requester)
 - **v0.3.0** (2026-07-31) — the Epic lane (`E-1`–`E-10`) and upstream heterogeneous review before implementation begins (`L1-9`–`L1-11`)
 - **v0.2.1 / v0.2.0** (2026-07-22) — MIT license and community health files; generalization that removed family-specific wording

@@ -1,111 +1,111 @@
 > **Machine translation.** The Japanese original ([why-simple-systems.md](../../../docs/why-simple-systems.md)) is canonical — if this page and the original disagree, the Japanese text wins.
 
-# Why We Build Simply — Complexity Is Removed Through Requirements, Not Solved Through Design
+# Why Build Simple — Complexity Gets Removed at the Requirements Level, Not Solved by Design
 
-> This page is not a rule. The rules themselves live in [docs/01](01-milestone-loop.md) through [docs/06](06-epic-lane.md).
+> This page is not a rule. The rule text itself lives in [docs/01](01-milestone-loop.md)–[docs/03](03-git-protocol.md) and [docs/05](05-fail-posture.md)–[docs/08](08-lifecycle.md).
 > What's written here is the **thinking those rules assume**.
 
-## What We're Aiming For
+## What we're aiming for
 
-The rules in this handbook (L2 / L1 / L0) are a mechanism for protecting "how to build" and "how to run things in parallel." But before that — at the stage of **deciding what to build** — some things are already settled. Fragility, and the weight of maintenance.
+The rules in this handbook (L2 / L1 / L0) are a mechanism for protecting "how to build, how to run things in parallel." But there's a stage before that — **deciding what to build** — where fragility and maintenance weight are already locked in.
 
-We're aiming for four states.
+We're aiming for four things.
 
 - **Simple and hard to break** — fewer parts means fewer places to break
-- **Tolerant of neglect** — a long lead time before the next maintenance is needed. Keeping it running doesn't require human attention
-- **Understandable by anyone** — readable and traceable without explanation, whether by your future self months later or by an agent seeing it for the first time. "Only the person who built it understands it" or "takes a long time to decode later" is treated as a defect in itself
-- **A module structure with exactly as many modules as there are responsibilities** — split neither more nor fewer than the responsibilities call for (the same measure as "the number of responsibilities" in [Why We Cut Modules Small](why-small-modules.md))
+- **Tolerant of neglect** — a long lead time before the next maintenance need, and no human attention required to keep it running
+- **Understandable by anyone** — readable and traceable, without explanation, by your future self months later or by an agent seeing it for the first time. "Only the person who built it understands it" or "takes forever to decode later" is treated as a defect in itself
+- **A module structure sized to the number of responsibilities** — split neither more nor less than the responsibilities warrant (measured the same way as "number of responsibilities" in [Why Cut Modules Small](why-small-modules.md))
 
-## When You Get Stuck in Design, Question the Requirements
+## When you get stuck on design, question the requirements
 
-Partway through building, this happens:
+While building, this happens sometimes:
 
-- The logic has gotten unreasonably hard to follow
-- It can't be solved by combining modules and seems to need some special mechanism
+- The logic has gotten impossibly convoluted
+- Combining modules can't solve it, and some special mechanism seems necessary
 - You're stuck on the design itself
 
-The first move here isn't "look for a smarter design." It's **questioning the requirement itself**.
+The first move here is not "look for a smarter design." It's **questioning the requirement itself**.
 
-Most difficulty is brought in by requirements, not by design. If you can remove one requirement, the design difficulty that requirement demanded disappears entirely — along with the implementation, the tests, and the future maintenance it would have needed. Clever design can only **dilute** difficulty. Revisiting requirements can **eliminate** it.
+Most difficulty is brought in by requirements, not design. If you can remove one requirement, the design difficulty that requirement demanded disappears entirely — along with the implementation, the tests, and all future maintenance for it. Design cleverness can only **dilute** difficulty; revisiting a requirement can **eliminate** it.
 
-## Questions to Ask When Questioning
+## Questions to ask when doubting a requirement
 
-Ask them in order. None of these ask "can we cut a requirement?" — they all ask "**can we remove the premise and eliminate the problem itself?**"
+Ask these in order. None of them is "can we cut this requirement" — all of them are searching for whether **removing the premise removes the problem itself**.
 
-1. **Who really uses this?** — the wider you set the intended user base, the thicker authentication, permissions, error handling, and support become. Once you check who actually uses it, you often find most of that thickness is unnecessary
-2. **Does this really need to be online?** — if local execution or a closed network (a VPN, for instance) is enough, then login design for public exposure, attack countermeasures, and availability design never exist as problems in the first place
-3. **Can narrowing the use case remove the hard part?** — dropping "handle anything" in favor of limiting inputs or usage can make a whole tangle of difficult branching disappear
-4. **Did someone actually ask for this requirement?** — requirements added because "it seemed like it'd be nice to have" are the most expensive ones. Check the answer with whoever requested it — a requirement recorded in an Issue is a record of a past agreement, so it's not something an agent gets to unilaterally judge as "nobody asked for this" and remove
+1. **Who actually uses this?** — the broader you set the intended user base, the heavier authentication, permissions, error handling, and support become. Checking the actual users can reveal that most of that weight is unnecessary
+2. **Does this really need to be online?** — if local execution or a closed network (e.g., a VPN) is enough, the login design, attack defenses, and availability design needed for public exposure never exist as a problem in the first place
+3. **Can narrowing the use case remove the hard part?** — dropping "handle anything" in favor of limiting inputs or usage can wipe out branches that were previously intractable
+4. **Did someone actually ask for this requirement?** — requirements added because "it seemed like it'd be nice to have" are the most expensive kind. Confirm the answer with whoever asked — a requirement recorded in an Issue is a record of past agreement, so it's not something an agent gets to unilaterally judge as "nobody asked for this" and remove
 
-### Example: "Please build an internal SaaS"
+### Example: "Build us an internal SaaS tool"
 
-Taken at face value, this kicks off design for safe public exposure. Login, password reset, session management, a permissions table — all of it difficult, all of it fragile, all of it ongoing maintenance.
+Taken at face value, this kicks off design work for safe public exposure. Login, password reset, session management, permission tables — all of it hard, all of it fragile, all of it ongoing maintenance.
 
-So go back to question 1. "Who uses this?" — if the answer is "just our own team," there's no need to expose it publicly at all. Run it locally, or put it on a closed network, and **the login problem itself disappears**. One question asked before building removed the most fragile part entirely.
+So go back to question 1: "Who uses this?" — if the answer is "just our own team," there's no need to expose it publicly at all. Run it locally or put it on a closed network, and **the login problem itself disappears**. One question asked before building removed the most fragile part entirely.
 
 This is what "solving by removing the premise" means.
 
-> **Note:** This is an example of "confirming the user-base requirement before building" — it is not about stripping authentication from a system that's meant to be public. Any decision touching the boundary of authentication, permissions, or public exposure — before building, and especially for a live system — falls under **high-risk areas** (the single definition in [docs/06](06-epic-lane.md)), and is subject to human decision-making.
+> **Note:** this is an example of "confirming the scope-of-users requirement before building" — not an argument for stripping authentication from a system that's meant to be public. Decisions touching boundaries like authentication, permissions, or public exposure — before building, and especially for a live system — fall under **high-risk areas** (the single definition in [docs/06](06-epic-lane.md)) and are subject to human sign-off.
 
-## Questioning Is Free; the Decision to Remove Belongs to the Requester
+## Questioning is free; the decision to remove belongs to the requester
 
-This is the most important line to draw. **The output of questioning is not the deletion of a requirement — it's a "question" and a "proposal" that goes back to goal agreement ([`L2-1`](01-milestone-loop.md)).**
+This is the most important line to draw. **The output of questioning is not a requirement deletion — it's a question and a proposal that returns to goal agreement ([`L2-1`](01-milestone-loop.md)).**
 
-- An agent can go as far as offering alternatives. **The final decision on what to drop belongs to the requester**
-- Don't let an agent unilaterally rewrite or dilute an agreed-upon requirement or Done when. Don't mark a Done when as N/A on the grounds that "we questioned it and judged it unnecessary"
-- If you want to drop a requirement partway through: don't rewrite Done when while continuing implementation — **confirm with the requester on the Issue**. Once agreed, update the Why / Done when before resuming
-- This is **not a substitute** for the standard way out of a stuck point. The proper exit when implementation is stuck is HOLD per [`L1-4`](02-issue-loop.md) / [`L1-6`](02-issue-loop.md) or escalation to a human — not "question the requirement." **"Couldn't do it" and "turned out to be unnecessary" are different things, and are recorded separately**
-- Even when removing a requirement makes the work lighter, that is **not a way to dodge review weight** ([`L1-9`](02-issue-loop.md) / seat count). The agreement to remove something is itself a requirement change, and for heavier work it is subject to upstream review
-- For heavy work, the rules already draw this line — requirements definition is subject to cross-model review before implementation starts ([`L1-9`](02-issue-loop.md)), and Done when inside an Epic is a frozen deliverable whose changes are subject to a human checkpoint stop ([`E-3`](06-epic-lane.md)). This page does not loosen that
+- An agent can go as far as proposing alternatives. **The final call on what to drop belongs to whoever made the request**
+- Don't let an agent unilaterally rewrite or dilute agreed-upon requirements or Done when on its own. Don't mark Done when as N/A on the grounds that "I questioned it and decided it was unnecessary"
+- If you want to drop a requirement mid-work: don't rewrite Done when while proceeding with the implementation — **confirm with the requester on the Issue**. Once agreed, update the Why / Done when before resuming
+- This is **not a substitute** for the standard way out of a stall. The proper exit when implementation gets stuck is HOLD under [`L1-4`](02-issue-loop.md) / [`L1-6`](02-issue-loop.md) or escalation to a human — not "question the requirement." **"Couldn't do it" and "turned out to be unnecessary" are different things and get recorded separately**
+- Even when removing a requirement lightens the work, that is **not a way to dodge** review weight ([`L1-9`](02-issue-loop.md) / seat count). The agreement to remove something is itself a requirement change, and for heavier work it's subject to upstream review
+- For heavier work this line is already drawn by the rules — requirements definition is subject to cross-model review before implementation starts ([`L1-9`](02-issue-loop.md)), and Done when inside an Epic is a frozen deliverable, where any change is a stop-point for a human checkpoint ([`E-3`](06-epic-lane.md)). This page doesn't loosen any of that
 
-## Not Everything Can Be Handled This Way
+## Not everything can be done this way
 
-Sometimes the requirement is real and the complexity is unavoidable. Regulatory compliance, audit logs, protection of personal information, billing — these are **requirements we don't have the freedom to remove in the first place**. They aren't things to question; they're things to confirm and satisfy. This page isn't saying "don't build complex things." It's saying "**question the requirement at least once before accepting the complexity**."
+Sometimes the requirement is real and the complexity is unavoidable. Regulatory compliance, audit logs, personal-data protection, billing — these are **requirements we don't have the freedom to remove in the first place**. They aren't something to question; they're something to confirm and satisfy. This page isn't saying "don't build complex things" — it's saying "**question the requirement at least once before accepting the complexity**."
 
-If, having questioned it, you accept it — that's fine. Just **leave one line in the Issue's purpose (Why) explaining why you accepted it** (see [`L1-2`](02-issue-loop.md) for how to write a Why). If it's recorded, someone can reopen the question "is this complexity actually necessary?" months later. If it isn't recorded, the complexity becomes a fait accompli.
+If, after questioning, you accept it — that's fine. Just **leave one line in the Issue's purpose (Why) explaining why you accepted it** (see [`L1-2`](02-issue-loop.md) for how to write a Why). If it's recorded, someone months later can ask "is this complexity actually needed?" If it isn't recorded, the complexity becomes an unquestioned fait accompli.
 
-## Relationship to the Parallel-Work Rules
+## Relationship to the parallel-work rules
 
 This premise connects to the world of the rules.
 
-- Removing a requirement shrinks the set of files touched. A smaller set of files makes the **files-to-touch prediction** ([`L2-3`](01-milestone-loop.md)) easier to write, which makes a parallel GO ([`L2-4`](01-milestone-loop.md)) easier to get. A simple system is also a system that's strong under parallel development
-- "A module structure with exactly as many modules as there are responsibilities" is the same judgment axis as [Splitting Is an Investment in Parallelizability](why-small-modules.md): split when responsibilities are cohabiting (that page's topic), don't add parts when there's no responsibility to justify them (this page's topic) — same yardstick, **number of responsibilities**, applied in opposite directions
-- [`L2-1`](01-milestone-loop.md)'s "when in doubt, go heavy" is a judgment about **process** (whether to make it an Epic, how thick the review is) — it's not about adding features. "Light on requirements, heavy on process" can coexist
-- Anyone being able to understand the structure shares the same motive as putting the canonical handoff record in the Issue ([Issue-first](why-issue-first.md)). The benchmark is **the next reader who walks in with zero memory of the work**
+- Removing a requirement shrinks the set of files touched. A smaller file set makes the **files-to-touch prediction** ([`L2-3`](01-milestone-loop.md)) easier to write, which makes a parallel GO ([`L2-4`](01-milestone-loop.md)) more likely. A simple system is also a system that's strong under parallel development
+- "A module structure sized to the number of responsibilities" uses the same judgment axis as [Splitting Is an Investment in Parallelizability](why-small-modules.md). Split when responsibilities are cohabiting (that page's concern); don't multiply parts when there's no responsibility driving it (this page's concern) — opposite directions, but both measured by **number of responsibilities**
+- [`L2-1`](01-milestone-loop.md)'s "when in doubt, treat it as heavy" is a judgment about **process** (whether to make it an Epic, how thick the review is), not about adding features. "Light requirements, heavy process" can coexist
+- Making the structure understandable by anyone shares the same motive as placing the canonical handoff record in the Issue ([Issue-first](why-issue-first.md)). The benchmark is **the next reader arriving with zero memory of this**
 
-## Frequently Asked Questions
+## Frequently asked questions
 
-**Won't an agent use "questioning requirements" as an excuse to unilaterally cut them?**
+**Won't an agent use "questioning the requirement" as an excuse to cut requirements on its own?**
 
-Under this page's reading, that's forbidden. Questioning means raising a question and proposing — nothing further. The decision to remove or narrow belongs to the requester (see "Questioning Is Free; the Decision to Remove Belongs to the Requester" above). Diluting Done when without agreement should be treated as the kind of deviation that gets caught when cross-checked against the completion record ([`L1-7`](02-issue-loop.md)).
+Reading this page that way is forbidden. Questioning means raising a question and proposing — nothing further. The decision to remove or narrow belongs to the requester (see "Questioning is free; the decision to remove belongs to the requester" above). Treat diluting Done when without agreement as the kind of deviation that gets exposed when checked against the completion record ([`L1-7`](02-issue-loop.md)).
 
-**Isn't questioning requirements disrespectful to the person who asked?**
+**Isn't questioning a requirement disrespectful to whoever asked for it?**
 
-What's being questioned isn't the requester — it's the translation between requirement and design. "Who uses this?" isn't a negotiation to lowball the request; it's work to confirm the request's actual purpose. If the purpose can still be met, building less is to the requester's benefit.
+What's being questioned isn't the requester — it's the translation between requirement and design. A question like "who uses this?" isn't haggling down the request; it's confirming the request's real purpose. If the purpose can still be met, less to build is better for whoever asked.
 
-**Won't building simply make it impossible to extend later?**
+**Doesn't building simple mean you can't extend it later?**
 
-Often the opposite happens. Mechanisms added in advance for future extension usually get used by an extension that arrives from an unexpected direction — never the anticipated one — and end up only getting in the reader's way of understanding. A structure that's small and easy to understand is the most adaptable kind of extensibility there is.
+Often the opposite is true. Mechanisms added ahead of time in anticipation of future extension usually end up unused because the actual extension comes from an unexpected direction — and all they do is get in the way of the reader's understanding. A structure that's small and easy to understand is the most adaptable kind of extensibility there is.
 
-**When should requirements be questioned?**
+**When should you question a requirement?**
 
-Twice. First, before starting — when requirements are being locked in during goal agreement ([`L2-1`](01-milestone-loop.md)). This is a dialogue with the requester, so asking in the moment is enough. Second, partway through — when design starts to feel hard to follow, when you feel stuck. Here the requester isn't present, so per the line drawn above, the agent's job goes only as far as "write the question in the Issue and confirm." Getting stuck tends to push both people and agents toward "an even more complicated solution." This page exists to stop that reflex.
+There are two moments. The first is before starting — when nailing down requirements during goal agreement ([`L2-1`](01-milestone-loop.md)). That's a dialogue with the requester, so asking there is enough. The second is mid-work — when the design starts getting convoluted or you feel stuck. The requester isn't present for that one, so per the line drawn above, an agent's job stops at "write the question in the Issue and confirm." Getting stuck tends to push both people and agents toward "an even more complicated solution." This page exists to stop that reflex.
 
-## Where the Rules Live
+## Where the rules live
 
 | What you want to know | Rule |
 |---|---|
-| Where requirements get locked in (goal agreement, weight judgment) | [`L2-1`](01-milestone-loop.md) |
-| Where to record the reason for accepted complexity (the Issue's Why) | [`L1-2`](02-issue-loop.md) |
-| Files-to-touch prediction, parallel GO judgment | [`L2-3`](01-milestone-loop.md) / [`L2-4`](01-milestone-loop.md) |
-| Cross-checking Done when (where unauthorized shrinkage gets caught) | [`L1-7`](02-issue-loop.md) |
+| Where requirements get fixed (goal agreement, weight判定) | [`L2-1`](01-milestone-loop.md) |
+| Where to record the reason for accepted complexity (Issue's Why) | [`L1-2`](02-issue-loop.md) |
+| Files-to-touch prediction / parallel GO判定 | [`L2-3`](01-milestone-loop.md) / [`L2-4`](01-milestone-loop.md) |
+| Checking Done when (where unilateral shrinking gets exposed) | [`L1-7`](02-issue-loop.md) |
 | The proper path when stuck (HOLD) | [`L1-4`](02-issue-loop.md) / [`L1-6`](02-issue-loop.md) |
-| Review of requirements definition (heavier-side work) | [`L1-9`](02-issue-loop.md) |
-| Done when inside an Epic is a frozen deliverable (changes require a human stop) | [`E-3`](06-epic-lane.md) |
+| Review of requirements definition (heavier-work territory) | [`L1-9`](02-issue-loop.md) |
+| Done when inside an Epic is a frozen deliverable (changes stop for a human) | [`E-3`](06-epic-lane.md) |
 | Splitting hotspots is an investment in parallelizability | [`L2-6`](01-milestone-loop.md) |
 | In an Epic, one child Issue = one module | [`E-2`](06-epic-lane.md) |
-| How to measure a module's "smallness" (number of responsibilities) | [Why We Cut Modules Small](why-small-modules.md) |
+| How to measure a module's "smallness" (number of responsibilities) | [Why Cut Modules Small](why-small-modules.md) |
 
-Two more premises: [What Is Issue-First](why-issue-first.md) / [Why We Cut Modules Small](why-small-modules.md)
+Two more premises: [What Is Issue-First](why-issue-first.md) / [Why Cut Modules Small](why-small-modules.md)
 
 Back to the front door: [README](../../../README.md)

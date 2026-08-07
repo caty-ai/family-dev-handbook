@@ -2,22 +2,22 @@
   "docs/why-issue-first.md": {
     "translations": {
       "en": {
-        "hash": "ea6d5055a5a1e4e7",
-        "translated_at": "2026-08-06T19:10:45+00:00",
+        "hash": "ebc5554ef68fe55f",
+        "translated_at": "2026-08-07T13:56:03+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "ea6d5055a5a1e4e7",
-        "translated_at": "2026-08-06T21:14:56+00:00",
+        "hash": "ebc5554ef68fe55f",
+        "translated_at": "2026-08-07T13:56:42+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "ea6d5055a5a1e4e7",
-        "translated_at": "2026-08-06T21:38:10+00:00",
+        "hash": "ebc5554ef68fe55f",
+        "translated_at": "2026-08-07T13:57:59+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "ea6d5055a5a1e4e7"
+    "source_hash": "ebc5554ef68fe55f"
   },
   "docs/01-milestone-loop.md": {
     "translations": {
@@ -82,22 +82,22 @@
   "docs/04-adoption.md": {
     "translations": {
       "en": {
-        "hash": "7bcea617c59ebe54",
-        "translated_at": "2026-08-06T21:23:07+00:00",
+        "hash": "d12bb9527dd54e36",
+        "translated_at": "2026-08-07T13:49:45+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "7bcea617c59ebe54",
-        "translated_at": "2026-08-06T23:00:17+00:00",
+        "hash": "d12bb9527dd54e36",
+        "translated_at": "2026-08-07T13:50:40+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "7bcea617c59ebe54",
-        "translated_at": "2026-08-06T21:25:52+00:00",
+        "hash": "d12bb9527dd54e36",
+        "translated_at": "2026-08-07T13:51:58+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "7bcea617c59ebe54"
+    "source_hash": "d12bb9527dd54e36"
   },
   "docs/05-fail-posture.md": {
     "translations": {
@@ -162,42 +162,42 @@
   "docs/why-simple-systems.md": {
     "translations": {
       "en": {
-        "hash": "ce121a5b04d5c7de",
-        "translated_at": "2026-08-06T21:38:56+00:00",
+        "hash": "f943b40caacbf0d8",
+        "translated_at": "2026-08-07T13:58:47+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "ce121a5b04d5c7de",
-        "translated_at": "2026-08-06T21:39:55+00:00",
+        "hash": "f943b40caacbf0d8",
+        "translated_at": "2026-08-07T13:59:44+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "ce121a5b04d5c7de",
-        "translated_at": "2026-08-06T21:41:50+00:00",
+        "hash": "f943b40caacbf0d8",
+        "translated_at": "2026-08-07T14:01:43+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "ce121a5b04d5c7de"
+    "source_hash": "f943b40caacbf0d8"
   },
   "docs/why-small-modules.md": {
     "translations": {
       "en": {
-        "hash": "283967fc06ff47bc",
-        "translated_at": "2026-08-06T21:42:31+00:00",
+        "hash": "a915bd9e3764f132",
+        "translated_at": "2026-08-07T14:02:24+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "283967fc06ff47bc",
-        "translated_at": "2026-08-06T21:43:20+00:00",
+        "hash": "a915bd9e3764f132",
+        "translated_at": "2026-08-07T14:03:16+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "283967fc06ff47bc",
-        "translated_at": "2026-08-06T21:45:01+00:00",
+        "hash": "a915bd9e3764f132",
+        "translated_at": "2026-08-07T14:04:56+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "283967fc06ff47bc"
+    "source_hash": "a915bd9e3764f132"
   },
   "templates/architecture-parallel-map.md": {
     "translations": {
@@ -262,21 +262,41 @@
   "templates/issue-template.md": {
     "translations": {
       "en": {
-        "hash": "1e48feeda32fcd38",
-        "translated_at": "2026-08-06T21:50:49+00:00",
+        "hash": "9320b63f3f89bb31",
+        "translated_at": "2026-08-07T14:05:35+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "1e48feeda32fcd38",
-        "translated_at": "2026-08-06T21:51:25+00:00",
+        "hash": "9320b63f3f89bb31",
+        "translated_at": "2026-08-07T14:06:12+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "1e48feeda32fcd38",
-        "translated_at": "2026-08-06T21:52:40+00:00",
+        "hash": "9320b63f3f89bb31",
+        "translated_at": "2026-08-07T14:07:00+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "1e48feeda32fcd38"
+    "source_hash": "9320b63f3f89bb31"
+  },
+  "docs/08-lifecycle.md": {
+    "translations": {
+      "en": {
+        "hash": "8cc75b35840356d0",
+        "translated_at": "2026-08-07T13:52:56+00:00",
+        "model": "sonnet"
+      },
+      "zh": {
+        "hash": "8cc75b35840356d0",
+        "translated_at": "2026-08-07T13:53:31+00:00",
+        "model": "sonnet"
+      },
+      "th": {
+        "hash": "8cc75b35840356d0",
+        "translated_at": "2026-08-07T13:55:26+00:00",
+        "model": "sonnet"
+      }
+    },
+    "source_hash": "8cc75b35840356d0"
   }
 }

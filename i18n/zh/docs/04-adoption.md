@@ -1,39 +1,39 @@
 > **机器翻译。**日文原文（[04-adoption.md](../../../docs/04-adoption.md)）是正本 — 本页与原文不一致时，以日文为准。
 
-# 接入方法 — 集成到各 Agent 环境
+# 引入方法 — 集成到各 Agent 环境
 
 ## 原则
 
-- **正本是这个仓库**。每个 Agent 在自己"始终加载的上下文位置"放置**摘要**，详细内容参照本仓库
-- 摘要与本仓库不一致时，**以本仓库为准**。摘要一侧需要跟进修改
-- 为了在模型变化后依然有效，要放在"始终会被加载的配置文件"里（不要依赖特定模型的记忆或体贴）
+- **正本是本仓库**。每个 agent 在自己"常驻上下文"的位置放置**摘要**，详情参照本仓库
+- 若摘要与本仓库不一致，**以本仓库为准**。摘要一方需跟进修正
+- 为了在模型变化时依然生效，应放在"始终会被加载的配置文件"中（不依赖特定模型的记忆或体贴）
 
-## 摘要块的规范
+## 摘要区块的规范
 
-- **带版本刻印的精简摘要，唯一的 owner 是本页面（docs/04）**。下游副本（各个 CLAUDE.md / AGENTS.md / system prompt）是 owner-applies——由干事 Agent 提出建议，各运行时的 owner 自行贴上
-- 下游本地摘要、覆盖内容，相对正本**只能收紧、不能放松**（tighten only）。这一原则的跨 Agent 通用规范 owner 是 family-os 的 operations-policy（config trust 节 —— 参见 [README](../../../README.zh.md) 的「Caty AI 家族」节）。本页面是该协作协议的应用。若在没有 sister projects 的情况下引入本协议，直接套用 tighten-only 原则即可
-- 摘要不誊抄正文，而是用 **rule ID + 一行 posture** 来引用。ID 的定义正文在 docs/01〜03、05〜07，注释样式的字段 schema 在 templates/issue-template.md、templates/epic-template.md、templates/brief-template.md
+- **带版本刻印的精简摘要，其所有者只有本页面（docs/04）一处**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）采用 owner-applies 方式 —— 由干事 agent 提出建议，再由各运行时的所有者亲自贴入
+- 下游本地摘要的覆写，**只允许比正本更严格，禁止放宽**（tighten only）。这一原则的跨 agent 通用规范所有者是 family-os 的 operations-policy（config trust 章节 —— 参见 [README](../../../README.zh.md) 的「Caty AI ファミリー」章节）。本页面是该协作协议的一种应用。若不涉及 sister projects 而单独引入本协议，直接套用 tighten-only 原则即可
+- 摘要不誊抄正文，而是用 **rule ID + 一行态度**来引用。ID 的定义正文在 docs/01〜03、05〜08，注释格式的字段 schema 在 templates/issue-template.md、templates/epic-template.md、templates/brief-template.md
 
-## 各 Agent 的接入位置
+## 各 Agent 的集成位置
 
-不同运行时的"始终加载的配置文件"各不相同。用这种形式维护接入台账：
+不同运行时"始终会被加载的配置文件"各不相同。以如下形式维护引入台账：
 
-| Agent | 始终上下文 | 状态 |
+| Agent | 常驻上下文 | 状态 |
 |---|---|---|
-| `<agent-a>`（例: Claude Code 系） | `~/.claude/CLAUDE.md` 等用户全局配置（视为 permanent 的部分） | 例: ✅ 已接入（YYYY-MM-DD） |
-| `<agent-b>`（例: 常驻 agent 运行时） | 各 Agent 的 system prompt / 工作区的 `AGENTS.md` | 例: ✅ 已接入 — rule-ID 版通过 owner-applies 分发 |
-| `<agent-c>`（例: 运维笔记驱动的 agent） | 运维笔记 / 技能组的参照文档 | 例: ⬜ 未接入 — 待分发摘要块 |
+| `<agent-a>`（例：Claude Code 系） | `~/.claude/CLAUDE.md` 等用户全局配置（视为 permanent 的章节） | 例：✅ 已引入（YYYY-MM-DD） |
+| `<agent-b>`（例：常驻 agent 运行时） | 各 agent 的 system prompt / 工作区的 `AGENTS.md` | 例：✅ 已引入 —— rule-ID 版通过 owner-applies 方式分发 |
+| `<agent-c>`（例：运营笔记驱动的 agent） | 运营笔记 / 技能集的参考文档 | 例：⬜ 未引入 —— 待分发摘要区块 |
 
-> 实际接入情况的活台账由各团队自行管理。接入对象增多后，请在自己的仓库中维护此表（也可以用 Issue 评论作为台账）。
+> 实际引入情况的活台账由各团队自行管理。引入位置增加时，请在自己的仓库中维护此表（用 Issue 评论作为台账也可以）。
 
-## 供分发使用的摘要块（可直接复制粘贴）
+## 用于分发的摘要区块（可直接复制粘贴）
 
-将以下内容原样贴到各 Agent 的始终上下文中：
+将以下内容原样粘贴到各 agent 的常驻上下文中：
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-06 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-07 / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜07、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜08、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -67,17 +67,22 @@ E Epic レーン: E-1 Epic はオーナーのキックオフ承認で成立（�
   E-7 Epicログ（未達・妥協の列挙必須）+ダイジェスト最終確認 /
   E-8 寿命1〜2週間（起点=キックオフ承認）・staleness は L0-3 の別時計 / E-9 終端も5語彙・ABANDONED はブランチ処分+子収束必須 /
   E-10 Epic並走=子宣言の和集合∪EPIC WIP宣言で L2-4 準用
+LC ライフサイクル: LC-1 置く時に退場トリガー（期限 or 完了条件）を必ず一緒に決める（トリガー無し=永久保持になる前提で扱う） /
+  LC-2 持続領域は受け取り→現役→完成→退蔵の一方通行・退蔵は不変（git branch / worktree は対象外=L0-4 / L0-8） /
+  LC-3 3類型の退場条件を数値つきでローカル設定に明文化（数値は正本に書かない） /
+  LC-4 追記型と宣言したストアに限り退場はバックアップ→移動→ポインタ残置の3点セット・実作業は常に手動 /
+  LC-5 検査・lint はファイルを動かさない（検知→定期レポート→人が判断・自動退場なし）
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
 ## 仓库侧的准备工作
 
-对于新仓库（或首次应用本协议的仓库）：
+在新仓库（或首次应用本协议的仓库）中：
 
-1. 在 `ARCHITECTURE.md` 中创建"并行安全地图"章节（[模板](../templates/architecture-parallel-map.md)）
-2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放到 `.github/ISSUE_TEMPLATE/`（可选，但建议这样做）
-3. 全员共同遵守避免直接 push main 的运作方式（能设置 branch protection 的话就设置）
+1. 在 `ARCHITECTURE.md` 中新增「并行安全地图」章节（[模板](../templates/architecture-parallel-map.md)）
+2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
+3. 全员共同遵守避免直接 push main 的运营方式（能设置 branch protection 的话就设置）
 
-## 角色分工由各 Agent 自行决定
+## 角色分工由各 agent 自行决定
 
-实现 / 审查 / 验证分别交给哪个模型・工具，由各 Agent 的工具链自行决定（例如: implementer=Codex / reviewer=GLM / verifier=Claude 这样的不同模型三角色配置）。**需要坚守的是协议本身（三层 + 交叉审查 + fail-posture），而不是具体工具。**
+实施 / 评审 / 验证分配给哪个模型・工具，交由各 agent 的工具链自行决定（例如 implementer=Codex / reviewer=GLM / verifier=Claude 这样的不同模型三角色配置）。**需要遵守的是协议本身（三层 + 交叉评审 + fail-posture），而不是具体工具的选择。**
