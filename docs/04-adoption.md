@@ -42,7 +42,7 @@ L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予�
   L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
   L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
   証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
-  L1-9 Epic・アーキ・要件は実装前に異種レビュー（単発Issueには課さない） /
+  L1-9 サイズ L/H/Epic（=L2-1 の重い側・アーキ・要件含む）は実装着手前に異種レビュー（S/M 単発Issueには課さない） /
   L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録 /
   L1-11 席数 S/M=異種2・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT
 L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /

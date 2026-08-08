@@ -42,22 +42,22 @@
   "docs/02-issue-loop.md": {
     "translations": {
       "en": {
-        "hash": "bcbab21545b02132",
-        "translated_at": "2026-08-06T19:14:16+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T16:39:04+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "bcbab21545b02132",
-        "translated_at": "2026-08-06T22:26:53+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T16:40:21+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "bcbab21545b02132",
-        "translated_at": "2026-08-06T22:44:30+00:00",
+        "hash": "5e84a04dfa60daf4",
+        "translated_at": "2026-08-07T17:30:01+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "bcbab21545b02132"
+    "source_hash": "5e84a04dfa60daf4"
   },
   "docs/03-git-protocol.md": {
     "translations": {
@@ -82,22 +82,22 @@
   "docs/04-adoption.md": {
     "translations": {
       "en": {
-        "hash": "36efe32eabe7b292",
-        "translated_at": "2026-08-07T14:17:01+00:00",
+        "hash": "6a3593bfae1148e4",
+        "translated_at": "2026-08-07T16:27:51+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "36efe32eabe7b292",
-        "translated_at": "2026-08-07T14:18:01+00:00",
+        "hash": "6a3593bfae1148e4",
+        "translated_at": "2026-08-07T16:28:47+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "36efe32eabe7b292",
-        "translated_at": "2026-08-07T14:19:57+00:00",
+        "hash": "6a3593bfae1148e4",
+        "translated_at": "2026-08-07T16:30:04+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "36efe32eabe7b292"
+    "source_hash": "6a3593bfae1148e4"
   },
   "docs/05-fail-posture.md": {
     "translations": {

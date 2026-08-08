@@ -4,31 +4,31 @@
 
 ## 原则
 
-- **正本是这个仓库**。各 Agent 在自己"常驻上下文"的位置放置**摘要**，详情参照这个仓库
-- 摘要与本仓库出现分歧时，**以本仓库为准**。让摘要一方跟进修改
-- 为了在模型更换后依然生效，放在"始终被加载的配置文件"中（不依赖特定模型的记忆或体贴）
+- **本仓库是唯一正本**。每个 Agent 在自己"常驻上下文"的位置放置**摘要**，详细内容参照本仓库
+- 摘要与本仓库不一致时，**以本仓库为准**。摘要一侧需要跟进修改
+- 为了在模型更换后依然生效，应放在"始终会被加载的配置文件"中（不要依赖特定模型的记忆或体贴）
 
 ## 摘要区块的规范
 
-- **带版本刻印的精简摘要，唯一所有者是本页（docs/04）**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）遵循 owner-applies 原则 —— 由干事 Agent 提出建议，由各运行时的所有者亲自粘贴
-- 下游本地摘要、覆盖版本，相对正本**可以收紧、禁止放宽**（tighten only）。这一原则的跨 Agent 通用规范所有者是 family-os 的 operations-policy（config trust 节 — 参见 [README](../../../README.zh.md) 的「Caty AI ファミリー」节）。本页是该协作协议的一种应用。若在没有 sister projects 的情况下导入，直接套用 tighten-only 原则即可
-- 摘要不誊写正文，而是用 **rule ID + 一行态度**来引用。ID 的定义正文在 docs/01〜03・05〜08，注释样式的字段 schema 在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- **带版本刻印的精简摘要，唯一 owner 是本页面（docs/04）**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）采用 owner-applies 方式——由干事 Agent 提出建议，由各运行时的 owner 自行贴入
+- 下游本地摘要的覆盖，**只能比正本更严格，不允许放宽**（tighten only）。该原则跨 Agent 的规范 owner 是 family-os 的 operations-policy（config trust 节 — 参见 [README](../README.zh-CN.md) 的"Caty AI 家族"节）。本页面是该协作协议的具体应用。若在没有 sister projects 的情况下引入本协议，直接套用 tighten-only 原则即可
+- 摘要**不誊抄正文**，而是以 **rule ID + 一行姿态**来引用。ID 的定义正文在 docs/01〜03・05〜08，评论样式的字段 schema 在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## 各 Agent 的集成位置
 
-不同运行时"始终被加载的配置文件"各不相同。导入台账按以下形式维护：
+不同运行时"始终会被加载的配置文件"各不相同。按以下形式维护导入台账：
 
 | Agent | 常驻上下文 | 状态 |
 |---|---|---|
 | `<agent-a>`（例：Claude Code 系） | `~/.claude/CLAUDE.md` 等用户全局配置（视为 permanent 的章节） | 例：✅ 已导入（YYYY-MM-DD） |
-| `<agent-b>`（例：常驻 agent 运行时） | 各 Agent 的 system prompt / 工作区的 `AGENTS.md` | 例：✅ 已导入 — rule-ID 版通过 owner-applies 方式分发 |
-| `<agent-c>`（例：由运维笔记驱动的 agent） | 运维笔记 / 技能组的参照文档 | 例：⬜ 未导入 — 待分发摘要区块 |
+| `<agent-b>`（例：常驻 agent 运行时） | 各 Agent 的 system prompt / 工作区的 `AGENTS.md` | 例：✅ 已导入 — rule-ID 版本通过 owner-applies 方式分发 |
+| `<agent-c>`（例：由运维笔记驱动的 agent） | 运维笔记 / 技能组的参考文档 | 例：⬜ 未导入 — 待分发摘要区块 |
 
-> 实际导入的活台账由各团队自行管理。导入对象增多后，请在自己的仓库中维护此表（用 Issue 评论作为台账也可以）。
+> 实际导入的活台账由各团队自行管理。导入对象增加时，请在自己的仓库中维护此表（用 Issue 的评论作为台账运营也可以）。
 
 ## 用于分发的摘要区块（可直接复制粘贴）
 
-将以下内容原样粘贴到各 Agent 的常驻上下文中：
+在各 Agent 的常驻上下文中，原样粘贴以下内容：
 
 ```markdown
 ## 並行開発プロトコル要約（handbook-revision: 2026-08-07 / owner: 貼った本人名 / last-verified: 貼った日付）
@@ -44,7 +44,7 @@ L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予�
   L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
   L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
   証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
-  L1-9 Epic・アーキ・要件は実装前に異種レビュー（単発Issueには課さない） /
+  L1-9 サイズ L/H/Epic（=L2-1 の重い側・アーキ・要件含む）は実装着手前に異種レビュー（S/M 単発Issueには課さない） /
   L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録 /
   L1-11 席数 S/M=異種2・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT
 L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /
@@ -79,10 +79,10 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 
 对于新仓库（或首次应用本协议的仓库）：
 
-1. 在 `ARCHITECTURE.md` 中新建「并行安全地图」章节（[模板](../templates/architecture-parallel-map.md)）
-2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放到 `.github/ISSUE_TEMPLATE/` 下（非必需，但推荐）
-3. 全员共同遵守避免直接 push main 的规范（能设置 branch protection 的话就设置）
+1. 在 `ARCHITECTURE.md` 中新增"并行安全地图"章节（[模板](../templates/architecture-parallel-map.md)）
+2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
+3. 全员共同遵守避免直接 push main 的运作方式（能设置 branch protection 的情况下就设置）
 
 ## 角色分工由各 Agent 自行决定
 
-将实现 / 审查 / 验证分配给哪个模型・工具，交由各 Agent 的工具链自行决定（例如 implementer=Codex / reviewer=GLM / verifier=Claude 这种不同模型三角色的组合方式）。**需要遵守的是协议本身（三层结构 + 交叉审查 + fail-posture），而不是具体工具。**
+实现 / 评审 / 验证具体分配给哪个模型或工具，交由各 Agent 自己的工具链决定（例如 implementer=Codex / reviewer=GLM / verifier=Claude 这样的不同模型三角色配置）。**需要遵守的是协议本身（三层 + 交叉评审 + fail-posture），而不是具体的工具选择。**

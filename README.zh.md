@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.7.0-blue)
+![version](https://img.shields.io/badge/version-v0.7.1-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -346,8 +346,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.7.0**（2026-08-07）。它把尺寸判别标准（S / M / L / H / Epic，[docs/01](docs/01-milestone-loop.md) 的 L2-1）写成了条文——用尺寸定义表加三条轴（影响范围、不可逆性、周期）来判定，拿不准就往重的一侧靠。评审席位数（L1-11）与 Epic 入口（E-1）的输入不再依赖引入方的默会知识。
+当前版本是 **v0.7.1**（2026-08-07）。它把尺寸判别标准（S / M / L / H / Epic，[docs/01](docs/01-milestone-loop.md) 的 L2-1）写成了条文——用尺寸定义表加三条轴（影响范围、不可逆性、周期）来判定，拿不准就往重的一侧靠。评审席位数（L1-11）与 Epic 入口（E-1）的输入不再依赖引入方的默会知识。v0.7.1 是措辞跟进：把上游评审（[docs/02](docs/02-issue-loop.md) 的 L1-9）的适用对象列举对齐到同一尺寸体系（L / H / Epic = 重的一侧）。
 
+- **v0.7.0**（2026-08-07） — 尺寸判别标准（`L2-1` 扩展，[docs/01](docs/01-milestone-loop.md)）：定义表加三条轴，拿不准就往重的一侧靠
 - **v0.6.0**（2026-08-07） — 工作区生命周期层（`LC-1`–`LC-5`，[docs/08](docs/08-lifecycle.md)）：把退场变成契约（退场触发器、检查只告警、退场条件数值以本地设置为正本）
 - **v0.5.0**（2026-08-06） — 委派简报层（`B-1`–`B-5`，[docs/07](docs/07-delegation-brief.md)）：把工作交给子智能体的提示词，成为“实现规格、自我检查、评审标准”三层的契约（样式见 [templates/brief-template.md](templates/brief-template.md)）
 - **v0.4.0**（2026-08-05） — 第三个前提“构建得简单——复杂度在需求处消除”（[docs/why-simple-systems.md](docs/why-simple-systems.md)），以及 L2-1 的怀疑需求钩子（删需求的决定属于委托人）
