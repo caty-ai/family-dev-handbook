@@ -9,7 +9,7 @@ L 層（L2 / L1 / L0）が「どう進めるか」、B 層が「どう頼むか�
 
 各ルールに安定 rule ID（`R-1`〜`R-6`）を付し、箇条は ①②③… で参照する（[E-6](06-epic-lane.md)① と同形式）。要約側（[docs/04](04-adoption.md)）はこの ID を参照する。検証できない時の姿勢は [docs/05](05-fail-posture.md)。
 
-出典: この章は NousResearch/hermes-agent の AGENTS.md 「Contribution Rubric」（MIT）の翻案である。
+出典: この章は NousResearch/hermes-agent の AGENTS.md 「Contribution Rubric」（MIT）の翻案である。取得日・由来区分・ライセンス全文は [templates/ci/NOTICE.md](../templates/ci/NOTICE.md) に一本化している。
 
 ## R-1 自動却下の3理由 — 価値判断はオーナー専決
 
@@ -85,4 +85,4 @@ L 層（L2 / L1 / L0）が「どう進めるか」、B 層が「どう頼むか�
 - check は**実体で検知**する（ディレクトリ名や拡張子の綴りではなく中身・パターンの本質でマッチさせる — 綴り違いにすり抜けられた実例が出典にある）
 - check の姿勢は既存条文と揃える: **マージを止めるゲートは fail-closed**（[FP-3](05-fail-posture.md) の向き）、**報告・合成・通知の配管は fail-open**（[FP-4](05-fail-posture.md)）。check はファイルを動かさない（[LC-5](08-lifecycle.md) — 検知して止めるだけ・自動修理や自動退場をしない）
 - 承認系の check（人間のラベル等）は、**承認の実在を検証する** — 本文やラベルの存在だけで通さない（[FP-8](05-fail-posture.md) の向き）。承認の検証には限界がありうる（identity 共有環境等）— その場合、限界を check の説明に明記し、「検証済み」を装わない（[FP-5](05-fail-posture.md)）
-- 型の正本は本リポの `templates/ci/`（#18 で整備）
+- 型の正本は本リポの [templates/ci/](../templates/ci/)

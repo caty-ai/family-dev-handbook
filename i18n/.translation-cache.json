@@ -302,21 +302,21 @@
   "docs/09-rejection-rubric.md": {
     "translations": {
       "en": {
-        "hash": "e727346ea297c323",
-        "translated_at": "2026-08-09T13:22:51+00:00",
+        "hash": "05ec654ad2c44092",
+        "translated_at": "2026-08-09T14:26:34+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "e727346ea297c323",
-        "translated_at": "2026-08-09T13:24:02+00:00",
+        "hash": "05ec654ad2c44092",
+        "translated_at": "2026-08-09T14:27:48+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "e727346ea297c323",
-        "translated_at": "2026-08-09T13:26:21+00:00",
+        "hash": "05ec654ad2c44092",
+        "translated_at": "2026-08-09T14:30:06+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "e727346ea297c323"
+    "source_hash": "05ec654ad2c44092"
   }
 }

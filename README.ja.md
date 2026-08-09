@@ -7,8 +7,8 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![version](https://img.shields.io/badge/version-v0.9.0-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ flowchart TB
 
 ## 使うのに必要なもの
 
-このリポジトリはドキュメントだけでできています。インストールするプログラムはありません。
+このリポジトリの条文はドキュメントだけでできています。このリポジトリ自体にインストールするプログラムはありません（[templates/ci/](templates/ci/) に、各リポへ配布して使う型 — YAML とスクリプト — を含みます）。
 
 | 必要なもの | 対応 |
 |---|---|
-| 実行するランタイム（Node / Python など） | 不要（ドキュメントのみ・インストール作業なし） |
+| 実行するランタイム（Node / Python など） | 不要（条文は docs のみ。templates/ci に配布用の型（YAML+スクリプト）を含む） |
 | バージョン管理 | ✅ git |
 | 作業の記録場所 | ✅ GitHub の Issue / Pull Request |
 | AI エージェント | ✅ 常時読み込まれる設定ファイル（`CLAUDE.md` / `AGENTS.md` / システムプロンプトなど）を持つものなら種類を問わない |
@@ -303,6 +303,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
+| [templates/ci/](templates/ci/) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -346,7 +347,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.8.0**（2026-08-09）。却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（NousResearch/hermes-agent の Contribution Rubric（MIT）の翻案）。
+現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。一部は NousResearch/hermes-agent（MIT）の翻案です。
+
+- **v0.8.0**（2026-08-09） — R 却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（NousResearch/hermes-agent の Contribution Rubric（MIT）の翻案）。
 
 - **v0.7.1**（2026-08-07） — 上流レビュー（`L1-9`・[docs/02](docs/02-issue-loop.md)）の対象列挙をサイズ体系（L / H / Epic = 重い側）へ揃える文言追従
 - **v0.7.0**（2026-08-07） — サイズ判別基準（`L2-1` 拡張・[docs/01](docs/01-milestone-loop.md)）。定義表と3軸・迷ったら重い側
@@ -385,6 +388,6 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 <div align="center">
 
-**ドキュメントのみ** ｜ **ランタイム不要** ｜ **git と Issue / PR だけで動く**
+**条文はドキュメントのみ** ｜ **ランタイム不要** ｜ **git と Issue / PR だけで動く**
 
 </div>

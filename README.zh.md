@@ -7,8 +7,8 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![version](https://img.shields.io/badge/version-v0.9.0-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ flowchart TB
 
 ## 使用它需要什么
 
-这个仓库只由文档组成。没有任何程序需要安装。
+这个仓库的条文只由文档组成。仓库本身没有任何程序需要安装（[templates/ci/](templates/ci/) 中含有分发用的门禁模板 — YAML 与脚本 — 供复制到各仓库使用）。
 
 | 需要的东西 | 情况 |
 |---|---|
-| 运行时（Node、Python 等） | 不需要 — 只有文档，无需安装 |
+| 运行时（Node、Python 等） | 不需要 — 条文只有文档；templates/ci 含分发用的门禁模板（YAML+脚本） |
 | 版本管理 | ✅ git |
 | 记录工作的地方 | ✅ GitHub 的 Issue / Pull Request |
 | AI 智能体 | ✅ 只要它有一个常驻加载的配置文件（`CLAUDE.md` / `AGENTS.md` / 系统提示词等），什么产品都可以 |
@@ -305,6 +305,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
+| [templates/ci/](templates/ci/) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献的流程（Issue-first / WIP 声明 / 完成记录的摘要） |
 
 最后，用一句话说说这本手册从哪里来、在哪里被使用。
@@ -348,7 +349,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.8.0**（2026-08-09）。新增了拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（改编自 NousResearch/hermes-agent 的 Contribution Rubric，MIT）。
+当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。部分改编自 NousResearch/hermes-agent（MIT）。
+
+- **v0.8.0**（2026-08-09） — 拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（改编自 NousResearch/hermes-agent 的 Contribution Rubric，MIT）。
 
 - **v0.7.1**（2026-08-07） — 措辞跟进：把上游评审（`L1-9`，[docs/02](docs/02-issue-loop.md)）的适用对象列举对齐到尺寸体系（L / H / Epic = 重的一侧）
 - **v0.7.0**（2026-08-07） — 尺寸判别标准（`L2-1` 扩展，[docs/01](docs/01-milestone-loop.md)）：定义表加三条轴，拿不准就往重的一侧靠
@@ -389,6 +392,6 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 <div align="center">
 
-**只有文档** ｜ **无需运行时** ｜ **只靠 git 和 Issue / PR 就能运转**
+**条文只有文档** ｜ **无需运行时** ｜ **只靠 git 和 Issue / PR 就能运转**
 
 </div>
