@@ -82,22 +82,22 @@
   "docs/04-adoption.md": {
     "translations": {
       "en": {
-        "hash": "6a3593bfae1148e4",
-        "translated_at": "2026-08-07T16:27:51+00:00",
+        "hash": "2190ce8d84ee91fb",
+        "translated_at": "2026-08-09T12:47:11+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "6a3593bfae1148e4",
-        "translated_at": "2026-08-07T16:28:47+00:00",
+        "hash": "2190ce8d84ee91fb",
+        "translated_at": "2026-08-09T12:48:11+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "6a3593bfae1148e4",
-        "translated_at": "2026-08-07T16:30:04+00:00",
+        "hash": "2190ce8d84ee91fb",
+        "translated_at": "2026-08-09T12:59:56+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "6a3593bfae1148e4"
+    "source_hash": "2190ce8d84ee91fb"
   },
   "docs/05-fail-posture.md": {
     "translations": {
@@ -262,22 +262,22 @@
   "templates/issue-template.md": {
     "translations": {
       "en": {
-        "hash": "9320b63f3f89bb31",
-        "translated_at": "2026-08-07T14:05:35+00:00",
+        "hash": "2107045a025edd16",
+        "translated_at": "2026-08-09T12:50:26+00:00",
         "model": "sonnet"
       },
       "zh": {
-        "hash": "9320b63f3f89bb31",
-        "translated_at": "2026-08-07T14:06:12+00:00",
+        "hash": "2107045a025edd16",
+        "translated_at": "2026-08-09T12:51:01+00:00",
         "model": "sonnet"
       },
       "th": {
-        "hash": "9320b63f3f89bb31",
-        "translated_at": "2026-08-07T14:07:00+00:00",
+        "hash": "2107045a025edd16",
+        "translated_at": "2026-08-09T12:51:48+00:00",
         "model": "sonnet"
       }
     },
-    "source_hash": "9320b63f3f89bb31"
+    "source_hash": "2107045a025edd16"
   },
   "docs/08-lifecycle.md": {
     "translations": {
@@ -298,5 +298,25 @@
       }
     },
     "source_hash": "3d053de274459558"
+  },
+  "docs/09-rejection-rubric.md": {
+    "translations": {
+      "en": {
+        "hash": "e727346ea297c323",
+        "translated_at": "2026-08-09T13:22:51+00:00",
+        "model": "sonnet"
+      },
+      "zh": {
+        "hash": "e727346ea297c323",
+        "translated_at": "2026-08-09T13:24:02+00:00",
+        "model": "sonnet"
+      },
+      "th": {
+        "hash": "e727346ea297c323",
+        "translated_at": "2026-08-09T13:26:21+00:00",
+        "model": "sonnet"
+      }
+    },
+    "source_hash": "e727346ea297c323"
   }
 }

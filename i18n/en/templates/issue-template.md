@@ -2,8 +2,8 @@
 
 # Issue / Lane Comment Templates
 
-Canonical source for the field schema of each contract (rule ID). The body pages (docs/01–03, 05–08) hold only minimal MUST statements; the details live here.
-The EPIC Issue and the formats specific to the Epic lane (checkpoint table, Epic log, light-gate records, Epic termination) are in [epic-template.md](epic-template.md) (the E series). Child Issues inside an Epic use this page's format as-is.
+The canonical field schema for each contract (rule ID). The body text (docs/01–03, 05–09) carries only minimal MUST statements; the details live here.
+The EPIC Issue and the formats specific to the Epic lane (checkpoint table, Epic log, light-gate record, Epic termination) live in [epic-template.md](epic-template.md) (E series). Child Issues within an Epic use this page's formats as-is.
 
 ## Issue body (L1-2)
 
@@ -35,7 +35,7 @@ The EPIC Issue and the formats specific to the Epic lane (checkpoint table, Epic
 <!-- 先に終わっているべき Issue / PR。なければ削除 -->
 ```
 
-## WIP comment (L0-1 — posted to the Issue at kickoff. All 4 fields required)
+## WIP comment (L0-1 — post to the Issue when starting work. All 4 fields required)
 
 ```markdown
 🔒 WIP (<agent名> session, YYYY-MM-DD): <何をするか1行>
@@ -48,9 +48,9 @@ Files to touch:
 Branch: fix/<issue>-<slug> (worktree)
 ```
 
-- A WIP missing any of the 4 fields (agent / date / Files to touch / Branch) makes the lock invalid (L0-1)
-- When scope can't be predicted, write `Files to touch: UNKNOWN` — this means serial-only (L0-2)
-- A lane that expects to go silent for longer than 72h must state an explicit longer staleness window **with a reason** in the body (an exception declaration under L0-3; extending it after the fact is fine as long as it's made visible in a new comment)
+- A WIP missing any of the 4 fields (agent / date / Files to touch / Branch) is an invalid lock (L0-1)
+- When the scope can't be predicted, write `Files to touch: UNKNOWN` = serial-only (L0-2)
+- A lane that expects a silence longer than 72h must state the longer staleness window explicitly in the body **with a reason** (L0-3 exception declaration. A later extension must be made visible via a new comment)
 
 ## HOLD comment (L1-5 — all 5 fields required)
 
@@ -82,11 +82,11 @@ stale WIP: <引用（宣言者・日付・最終更新からの経過時間）>
 resume checklist: <L0-9 チェック結果コメントへのリンク or 本文に併記>
 ```
 
-Post a fresh WIP comment (the format above) immediately afterward.
+Post a new WIP comment (format above) immediately after.
 
-## RELEASE / HANDED-OFF comment (L0-3 — a lifecycle comment for the lock, not a lane state)
+## RELEASE / HANDED-OFF comment (L0-3 — lock lifecycle comment. Not a lane state)
 
-Can only be issued by the **lock owner (the agent from the WIP)**. The only way anyone else can clear the lock is via stale + TAKEOVER.
+Can only be issued by the **lock owner (the WIP's agent)**. The only path for someone else to remove the lock is stale + TAKEOVER.
 
 ```markdown
 🔓 RELEASE (<agent名>, YYYY-MM-DD): <ロックを手放す理由1行。レーン状態は L1-4 のコメントで別途宣言>
@@ -110,7 +110,7 @@ handoff note: <続きの入口・残作業へのポインタ>   <!-- 引き継�
 4. Done when: handoff 時から変更なし | 変更あり → <対応>
 ```
 
-Fixed at 4 items. Don't add more (L0-9).
+Fixed at 4 items. Do not add more (L0-9).
 
 ## Completion record (L1-7 — the merge gate pasted into the PR body)
 
@@ -137,4 +137,4 @@ git diff --stat origin/main...<候補SHA>: <出力 or 要約>
 宣言ファイル集合との差分: なし | <差分と説明>   <!-- diff にあって宣言にないファイルは blocking -->
 ```
 
-Corrections require publishing a new replacement record and reopening review (L1-8). No silent edits.
+Corrections are made by publishing a new replacement record and reopening review (L1-8). Never edit silently.
