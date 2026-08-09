@@ -9,7 +9,8 @@
 # - 計測は merge-base 起点 3 点 diff + rename/copy 検出 (-M -C)。純粋な移動・リネーム由来の行は
 #   計測から外れるので、R-2③ が歓迎する抽出リファクタの大半は閾値を割る。
 # - 免除は size-exempt ラベル。免除された PR はその旨を green ログに明示する (黙って通さない — FP-5)。
-#   新しい push (synchronize) でラベルは自動で剥がれる (承認は head SHA に束縛 — 剥がしは機械・貼るのは人間)。
+#   免除は head SHA に束縛される: 束縛の本体はゲート側のイベント判定 (synchronize / reopened の run では
+#   ラベルが残っていても免除を無効化) で、剥がしジョブの成功に依存しない。剥がしは可視化のための衛生。
 # - 範囲解決に失敗したら赤 (FP-6)。
 # - pull_request_target は使わない (untrusted コードに write トークンを渡す典型的脆弱形)。
 # 型の正本: caty-ai/family-dev-handbook templates/ci/
@@ -19,8 +20,9 @@ name: PR Size
 on:
   pull_request:
     # 既定 types に labeled/unlabeled は含まれない。省くと「免除ラベルを貼っても再評価されない」
-    # 「剥がしても緑が残る」の両不具合になるため明示する。
-    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+    # 「剥がしても緑が残る」の両不具合になるため明示する。edited は PR 本文の
+    # 「## リファクタ宣言」追記を超過メッセージへ反映するため。
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review, edited]
 
 permissions:
   contents: read
@@ -49,6 +51,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_ACTION: ${{ github.event.action }}
           MAX_LINES: "250" # 既定上限 (推奨値)。変更は各リポの判断
         run: |
           set -euo pipefail
@@ -59,12 +62,18 @@ jobs:
           [ -n "$BASE" ] || { echo "::error::empty merge-base — failing closed."; exit 1; }
 
           # 免除ラベル (size-exempt): 付いていれば green だが、黙って通さず明示する (FP-5)。
-          # ラベルは synchronize で自動で剥がれるため、免除は「オーナーが見た head SHA」に束縛される。
-          LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
-            echo "::error::label fetch failed — cannot judge exemption, failing closed (FP-6)."; exit 1; }
-          if grep -Fxq 'size-exempt' <<<"$LABELS"; then
-            echo "::notice::size-exempt label present — size gate exempted by owner for this head SHA. This exemption is logged, not silent (FP-5)."
-            exit 0
+          # 束縛はイベント種別で行う: synchronize (新 push)・reopened の run では、ラベルが
+          # 残っていても免除を無効化する (剥がしジョブの成功に依存しない)。オーナーが貼り直すと
+          # labeled イベントで再評価される。
+          if [ "$EVENT_ACTION" != "synchronize" ] && [ "$EVENT_ACTION" != "reopened" ]; then
+            LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
+              echo "::error::label fetch failed — cannot judge exemption, failing closed (FP-6)."; exit 1; }
+            if grep -Fxq 'size-exempt' <<<"$LABELS"; then
+              echo "::notice::size-exempt label present — size gate exempted by owner for this head SHA. This exemption is logged, not silent (FP-5)."
+              exit 0
+            fi
+          else
+            echo "head changed (event: ${EVENT_ACTION}) — any size-exempt label is void for this head; measuring size normally."
           fi
 
           # 計測: merge-base 起点 3 点 diff・rename/copy 検出・numstat (バイナリは '-' で自動除外)。
@@ -77,6 +86,9 @@ jobs:
           TOTAL=$(git diff -M -C --numstat "${BASE}...HEAD" -- . "${EXCLUDES[@]}" \
             | awk '$1 != "-" && $2 != "-" { total += $1 + $2 } END { print total + 0 }')
           echo "measured size (additions+deletions, moves/renames/binaries/excludes removed): ${TOTAL} lines (limit ${MAX_LINES})"
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "::notice::measured size is 0 lines (empty commits, pure moves, or fully excluded paths) — nothing to advise on. Making the empty measurement explicit rather than silently green (FP-5)."
+          fi
 
           if [ "$TOTAL" -gt "$MAX_LINES" ]; then
             BODY=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json body --jq '.body // ""') || BODY=""

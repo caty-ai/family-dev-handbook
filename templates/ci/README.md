@@ -50,10 +50,11 @@
 
 - **required checks 未登録** — 門番は赤を出すが merge は止まらない。手順 6 の機械確認まで終えて「展開済み」
 - **fetch-depth** — 履歴を使う門番（gitleaks / pr-size / history-check / review-labels）は `fetch-depth: 0` が必須（型に焼き込み済み・浅くすると「diff 解決不能 → 緑」の fail-open になる）
-- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。ラベル付与・剥がし（write）だけが 403 で警告になる（fail-open）。fork では「push でラベルが剥がれる」束縛が効かない点も認識しておく
+- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除の head SHA 束縛は**ゲート側のイベント判定**（synchronize / reopened の run ではラベルが残っていても無効）で成立するため、fork でも有効。ラベル付与・剥がし（write）だけが 403 で警告になる（fail-open・可視化の劣化のみ）
 - **`pull_request_target` は使わない** — untrusted コードに write トークンを渡す典型的脆弱形（全門番 `pull_request` トリガ）
-- **gitleaks の赤を消しても秘密は無効化されない** — 一度 push した秘密は必ず rotate する。本線は commit 前のローカル hook・CI は最後の網
-- **承認後 push でラベルが剥がれるのは仕様** — 承認（`risk-reviewed` / `size-exempt`）は「オーナーが見た head SHA」に束縛される。「剥がしは機械・貼るのは人間」
+- **gitleaks の赤を消しても秘密は無効化されない** — 一度 push した秘密は必ず rotate する。本線は commit 前のローカル hook・CI は最後の網。検知の許容（allowlist）は base 側 `.gitleaks.toml` だけが効く — PR 側の設定・`.gitleaksignore`・inline `gitleaks:allow` は無効化してある（自己緩和封じ）
+- **承認後の push で承認が無効になるのは仕様** — 承認（`risk-reviewed` / `size-exempt`）は「オーナーが見た head SHA」に束縛される。無効化はゲート自身のイベント判定で行われ、ラベル剥がしジョブは可視化のための衛生（「剥がしは機械・貼るのは人間」）
+- **ワークフロー自身の改変は機械的には止められない** — `pull_request` トリガは PR head 側のワークフロー定義（RISK_PATHS の写像を含む）で実行されるため、門番を無力化する PR はその無力化された門番で判定される（循環）。防御は PR timeline の監査＋可能なら `.github/workflows/` への CODEOWNERS 必須化。これがこのゲートを「可視化+監査」装置と位置づける理由の一つ
 
 ## Layer 2（合成器）の配線スケッチ
 

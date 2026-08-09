@@ -71,6 +71,8 @@ jobs:
             .github/risk-reviewers.txt
             .gitleaks.toml
             gitleaks.toml
+            .gitleaksignore
+            **/.gitleaksignore
             **/.env*
             **/*secret*
             **/auth/**
@@ -100,7 +102,7 @@ jobs:
           ${RISK_PATHS_REPO}"
           HITS=""
           while IFS= read -r pat; do
-            pat="$(echo "$pat" | xargs)"
+            pat="$(echo "$pat" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
             [ -n "$pat" ] || continue
             MATCHED=$(git diff --name-only "${BASE}...HEAD" -- ":(glob,icase)${pat}" || {
               echo "::error::diff/pathspec resolution failed for pattern '${pat}' — failing closed (FP-6)." >&2; exit 1; })
@@ -130,6 +132,10 @@ jobs:
   gate:
     name: risk-review-gate
     needs: detect
+    # if: always() — detect が落ちた時に本ジョブが skipped になる経路を塞ぐ。
+    # branch protection は skipped の required check を成功扱いするため、skipped = fail-open。
+    # detect の失敗は下の明示チェックで本ジョブの赤として現れる (required 登録名で赤を出す)。
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -147,10 +153,17 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DETECT_RESULT: ${{ needs.detect.result }}
+          EVENT_ACTION: ${{ github.event.action }}
           RISK_HIT: ${{ needs.detect.outputs.risk_hit }}
           RISK_FILES: ${{ needs.detect.outputs.risk_files }}
         run: |
           set -euo pipefail
+          # detect が success 以外 (宣言忘れの赤・範囲解決失敗・キャンセル) なら本ジョブも赤 (fail-closed)。
+          if [ "$DETECT_RESULT" != "success" ]; then
+            echo "::error::detect job result is '${DETECT_RESULT}' — cannot judge risk paths, failing closed. See the detect-risk-paths job log (undeclared RISK_PATHS_REPO placeholder, unresolved diff range, etc.)."
+            exit 1
+          fi
           if [ "$RISK_HIT" != "true" ]; then
             echo "::notice::no high-risk paths touched — gate green."
             # 高リスク変更が無くても check は常に走って明示的な緑を出す (skipped の意味論に頼らない)。
@@ -169,15 +182,29 @@ jobs:
             echo "::error::risk reviewer roster still contains the REPLACE_ME placeholder — failing closed."; exit 1;
           fi
 
+          # 承認の head SHA 束縛はイベント種別で行う (剥がしジョブの成功に依存しない):
+          # synchronize (新 push) と reopened (閉鎖中の push を挟みうる) では、承認ラベルの有無に
+          # かかわらず赤 — 「新しい head は未承認」。オーナーが再確認してラベルを貼り直すと
+          # labeled イベントで再評価されて緑になる。これにより fork PR (剥がし 403) でも、
+          # 同一 run 内の gate と剥がしの並列レースでも、承認の持ち回しは成立しない。
+          if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ]; then
+            echo "::error::new head SHA (event: ${EVENT_ACTION}) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
+            echo ""
+            echo "touched high-risk files:"
+            printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
+            STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk re-review required","summary":"The head changed; previous approval is void. Re-apply risk-reviewed for this head SHA.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the new diff and re-apply the risk-reviewed label."}]}]'
+            echo "review_status=${STATUS}" > review-status.json
+            exit 1
+          fi
+
           # ラベル取得の失敗・空応答は赤 (FP-6: 判定不能 = 赤)。
           LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
             echo "::error::label fetch failed — cannot judge, failing closed (FP-6)."; exit 1; }
 
-          # 方式1 (既定): risk-reviewed の現在有無で判定する。head SHA への束縛は
-          # strip-labels-on-push ジョブ (synchronize で機械剥がし) が担う。
+          # 方式1 (既定): risk-reviewed の現在有無で判定する (上のイベント束縛と対で機能する)。
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
             echo "::notice::risk-reviewed label present — gate green."
-            echo "audit: this approval is bound to the current head SHA (labels are machine-stripped on every new push)."
+            echo "audit: approval is bound to the current head SHA at the gate itself (synchronize/reopened runs go red regardless of the label); the strip job additionally removes the stale label for visibility."
             echo "audit: roster (origin/${BASE_REF}:.github/risk-reviewers.txt):"
             printf '%s\n' "$ROSTER" | sed 's/^/  - /'
             STATUS='[{"source":"risk review","results":[]}]'

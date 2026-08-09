@@ -9,7 +9,7 @@ L 層（L2 / L1 / L0）が「どう進めるか」、B 層が「どう頼むか�
 
 各ルールに安定 rule ID（`R-1`〜`R-6`）を付し、箇条は ①②③… で参照する（[E-6](06-epic-lane.md)① と同形式）。要約側（[docs/04](04-adoption.md)）はこの ID を参照する。検証できない時の姿勢は [docs/05](05-fail-posture.md)。
 
-出典: この章は NousResearch/hermes-agent の AGENTS.md 「Contribution Rubric」（MIT）の翻案である。
+出典: この章は NousResearch/hermes-agent の AGENTS.md 「Contribution Rubric」（MIT）の翻案である。取得日・由来区分・ライセンス全文は [templates/ci/NOTICE.md](../templates/ci/NOTICE.md) に一本化している。
 
 ## R-1 自動却下の3理由 — 価値判断はオーナー専決
 

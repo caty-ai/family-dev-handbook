@@ -7,8 +7,11 @@
 # - gitleaks-action は使わない (Organization リポで有償キーが要る)。MIT の gitleaks バイナリを
 #   バージョン pin + SHA256 検証つきで直接実行する — 秘密検知ゲートが未検証バイナリを実行時取得する形にしない。
 # - 走査範囲が解決できない・空になったら赤 (FP-6: 空集合からゲート判定を導出しない)。
-# - 設定の自己緩和封じ: gitleaks は無指定だとスキャン対象リポルートの .gitleaks.toml を自動検出する。
-#   PR が自分の秘密を allowlist に足して green にできてしまうため、設定は base (main) 側から取り出して固定する。
+# - 設定の自己緩和封じ: gitleaks は無指定だとスキャン対象リポルートの .gitleaks.toml を自動検出し、
+#   さらに cwd の .gitleaksignore と inline の gitleaks:allow コメントも既定で尊重する。
+#   どれも「PR が自分の秘密を allowlist して green にする」経路になるため、①設定は base (main) 側から
+#   取り出して固定 (無ければ PR 側設定を退けて default ルール) ②.gitleaksignore は無効化
+#   ③gitleaks:allow コメントは --ignore-gitleaks-allow で無視する (許容の宣言は base 側 .gitleaks.toml へ)。
 # - --redact 必須 (検知した秘密そのものを CI ログに残さない)。
 # 運用注記: 秘密は commit 前に止めるのが本線 (ローカル hook)・CI は最後の網。
 #   一度 push した秘密は必ず rotate する — CI の赤が消えても秘密が無効化されたことにはならない。
@@ -43,7 +46,7 @@ jobs:
           # バージョンと SHA256 は型の固定値 (# CUSTOMIZE 外)。更新は handbook 側の改訂で行う。
           GITLEAKS_VERSION="8.30.1"
           GITLEAKS_SHA256="551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
-          curl -sSL -o gitleaks.tar.gz \
+          curl -fsSL -o gitleaks.tar.gz \
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
           tar -xzf gitleaks.tar.gz gitleaks
@@ -68,11 +71,27 @@ jobs:
             echo "::error::commit range ${BASE}..HEAD is empty — nothing to scan means 'cannot judge', failing closed (FP-6)."
             exit 1
           fi
-          # 設定の自己緩和封じ: 設定は base (main) 側から固定。main に無ければ設定なしで実行。
+          # 設定の自己緩和封じ: 設定は base (main) 側から固定 (.gitleaks.toml → gitleaks.toml の順)。
+          # base のどちらにも無い場合は、PR 側 (checkout ツリー) の設定ファイルを退けてから
+          # default ルールで実行する — 「引数なし実行」は PR head の .gitleaks.toml を自動検出して
+          # PR 自身の allowlist が効いてしまう (fail-open) ため禁止。
           CONFIG_ARGS=()
-          if git cat-file -e "origin/${BASE_REF}:.gitleaks.toml" 2>/dev/null; then
-            git show "origin/${BASE_REF}:.gitleaks.toml" > /tmp/gitleaks-base-config.toml
+          BASE_CONFIG=""
+          for CFG in .gitleaks.toml gitleaks.toml; do
+            if git cat-file -e "origin/${BASE_REF}:${CFG}" 2>/dev/null; then
+              BASE_CONFIG="$CFG"
+              break
+            fi
+          done
+          if [ -n "$BASE_CONFIG" ]; then
+            git show "origin/${BASE_REF}:${BASE_CONFIG}" > /tmp/gitleaks-base-config.toml
             CONFIG_ARGS=(--config /tmp/gitleaks-base-config.toml)
-            echo "using .gitleaks.toml from origin/${BASE_REF} (PR-side config changes are intentionally ignored)"
+            echo "using ${BASE_CONFIG} from origin/${BASE_REF} (PR-side config changes are intentionally ignored)"
+          else
+            rm -f .gitleaks.toml gitleaks.toml
+            echo "no gitleaks config on origin/${BASE_REF} — running with default rules (PR-side config files are removed from the checkout before scanning)"
           fi
-          ./gitleaks git --no-banner --redact "${CONFIG_ARGS[@]}" --log-opts="${BASE}..HEAD"
+          # .gitleaksignore と inline gitleaks:allow も PR 側から無効化できる自己緩和経路 — 両方塞ぐ。
+          rm -f .gitleaksignore
+          ./gitleaks git --no-banner --redact --ignore-gitleaks-allow \
+            "${CONFIG_ARGS[@]}" --log-opts="${BASE}..HEAD"
