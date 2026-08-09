@@ -1,7 +1,8 @@
 # Adapted from NousResearch/hermes-agent (MIT)
 # Source: https://github.com/NousResearch/hermes-agent/blob/main/.github/workflows/history-check.yml
-# Retrieved: 2026-08-09 / Changes: standalone 化 (workflow_call → pull_request)。事故実録コメント・
-#   検知ロジック・review_status のインライン生成・artifact 出力 (Layer 2 用) は原文のまま維持。
+# Retrieved: 2026-08-09 / Changes: standalone 化 (workflow_call → pull_request) + checkout を PR head に固定
+#   (既定の合成 merge ref は base を親に持つため merge-base が常に存在し、検査が恒久 green になる)。
+#   事故実録コメント・検知ロジック・review_status のインライン生成・artifact 出力 (Layer 2 用) は原文のまま維持。
 #
 # 守るもの: main と共通祖先のない PR (歴史切断 PR) が merge されないこと。
 # 配り方: このファイルを .github/workflows/ へコピーするだけ。差し替え箇所なし。
@@ -44,6 +45,9 @@ jobs:
         with:
           fetch-depth: 0 # full history both sides for merge-base
           persist-credentials: false
+          # PR head そのものを検査する。既定の合成 merge ref (refs/pull/N/merge) は base を親に持つため
+          # merge-base が常に非空になり、歴史切断 PR でも検査が絶対に赤にならない (恒久 fail-open)。
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - id: merge-base-check
         name: Reject PRs with no common ancestor on main
@@ -51,6 +55,9 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           set -euo pipefail
+          # 範囲解決の fail-closed: base ref が取れなければ赤 (head の取得失敗は checkout 自体が赤になる)。
+          git rev-parse --verify "origin/${BASE_REF}" >/dev/null || {
+            echo "::error::base ref origin/${BASE_REF} not found — cannot judge, failing closed."; exit 1; }
           # `git merge-base` exits non-zero AND prints nothing when the two
           # commits share no ancestor.  We check both conditions explicitly
           # so the failure message is clear regardless of which signal fires

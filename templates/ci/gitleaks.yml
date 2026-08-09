@@ -85,6 +85,13 @@ jobs:
           done
           if [ -n "$BASE_CONFIG" ]; then
             git show "origin/${BASE_REF}:${BASE_CONFIG}" > /tmp/gitleaks-base-config.toml
+            # [extend] の path は「設定ファイルの位置」ではなく実行時の作業ディレクトリ基準で解決される。
+            # base 設定が extend を持つと、参照先ファイルを PR 側 (checkout ツリー) が差し替えられ、
+            # base 固定を迂回できる — extend を含む base 設定は赤 (ルールは base 設定にインライン化する)。
+            if grep -qE '^[[:space:]]*\[extend\]' /tmp/gitleaks-base-config.toml; then
+              echo "::error::base gitleaks config contains [extend] — extend paths resolve against the working directory and can be redirected to PR-controlled files. Inline all rules into ${BASE_CONFIG} on the base branch (fail-closed)."
+              exit 1
+            fi
             CONFIG_ARGS=(--config /tmp/gitleaks-base-config.toml)
             echo "using ${BASE_CONFIG} from origin/${BASE_REF} (PR-side config changes are intentionally ignored)"
           else

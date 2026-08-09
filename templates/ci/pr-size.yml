@@ -125,7 +125,10 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
-          if gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name' | grep -Fxq 'size-exempt'; then
+          # if 条件内のパイプラインは errexit の対象外で API 失敗が黙って成功になる — 取得は明示代入で行う。
+          LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
+            echo "::warning::label fetch failed — skipping strip (hygiene only; gate evaluation is unaffected)."; exit 0; }
+          if grep -Fxq 'size-exempt' <<<"$LABELS"; then
             gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label 'size-exempt' \
               || echo "::warning::could not remove size-exempt (fork PR has no write token — 403 is expected there). Gate evaluation is unaffected."
             echo "size-exempt removed: exemption is bound to the head SHA the owner saw; a new push requires re-exemption."

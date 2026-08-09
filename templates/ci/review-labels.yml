@@ -82,18 +82,27 @@ jobs:
             **/migrations/**
             **/*migration*
           '
-          # CUSTOMIZE (宣言必須): 課金・支出 / 対外公開・対人送信に当たるこのリポ固有のパスを列挙する。
-          # 該当が無いリポは none と明示宣言する。__DECLARE_ME__ のまま (宣言なし) なら赤 —
-          # 「書き忘れたカテゴリだけ静かに fail-open」を許さない (fail-closed)。
-          RISK_PATHS_REPO='__DECLARE_ME__'
+          # CUSTOMIZE (宣言必須・カテゴリ別): このリポ固有のパスをカテゴリごとに列挙する。
+          # 該当が無いカテゴリは none と明示宣言する。どちらか一方でも __DECLARE_ME__ のまま
+          # (宣言なし) なら赤 — 「書き忘れたカテゴリだけ静かに fail-open」をカテゴリ単位で
+          # 許さない (fail-closed)。
+          RISK_PATHS_BILLING='__DECLARE_ME__'   # 課金・支出 (例: **/billing/**) — 該当なしなら none
+          RISK_PATHS_OUTBOUND='__DECLARE_ME__'  # 対外公開・対人送信 (例: **/publish/**) — 該当なしなら none
 
-          if [ "$(echo "${RISK_PATHS_REPO}" | tr -d '[:space:]')" = "__DECLARE_ME__" ]; then
-            echo "::error::RISK_PATHS_REPO is still the placeholder. Declare repo-specific billing/outbound paths, or declare 'none' explicitly — an undeclared category must not silently pass (fail-closed)."
-            exit 1
-          fi
-          if [ "$(echo "${RISK_PATHS_REPO}" | tr -d '[:space:]')" = "none" ]; then
-            RISK_PATHS_REPO=''
-          fi
+          RISK_PATHS_REPO=''
+          check_category() {
+            NAME="$1"; VAL="$2"
+            STRIPPED="$(echo "${VAL}" | tr -d '[:space:]')"
+            if [ "$STRIPPED" = "__DECLARE_ME__" ]; then
+              echo "::error::${NAME} is still the placeholder. Declare paths for this category, or declare 'none' explicitly — an undeclared category must not silently pass (fail-closed)."
+              exit 1
+            fi
+            if [ "$STRIPPED" != "none" ]; then
+              RISK_PATHS_REPO="${RISK_PATHS_REPO}${VAL}"$'\n'
+            fi
+          }
+          check_category RISK_PATHS_BILLING "$RISK_PATHS_BILLING"
+          check_category RISK_PATHS_OUTBOUND "$RISK_PATHS_OUTBOUND"
 
           git rev-parse --verify "origin/${BASE_REF}" >/dev/null || {
             echo "::error::base ref not found — failing closed (FP-6)."; exit 1; }
@@ -266,7 +275,10 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
-          if gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name' | grep -Fxq 'risk-reviewed'; then
+          # if 条件内のパイプラインは errexit の対象外で API 失敗が黙って成功になる — 取得は明示代入で行う。
+          LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
+            echo "::warning::label fetch failed — skipping strip (hygiene only; gate judgment is unaffected)."; exit 0; }
+          if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
             gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label 'risk-reviewed' \
               || echo "::warning::could not remove risk-reviewed (fork PR has no write token — 403 is expected there)."
             echo "risk-reviewed removed: approval is bound to the head SHA the owner saw; a new push requires re-review."

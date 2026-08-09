@@ -28,7 +28,7 @@
 4. `# CUSTOMIZE` を埋める:
    - `test-lint.yml` — テスト/lint コマンド（**未設定のままだと赤で落ち続ける = 仕様**）
    - `pr-size.yml` — サイズ計測の除外パターン
-   - `review-labels.yml` — **高リスク領域のリポ固有パス。課金・支出 / 対外公開・対人送信は「該当なし」でも `none` の明示宣言まで必須**（`__DECLARE_ME__` のままなら赤）
+   - `review-labels.yml` — **高リスク領域のリポ固有パスをカテゴリ別に宣言（`RISK_PATHS_BILLING` = 課金・支出 / `RISK_PATHS_OUTBOUND` = 対外公開・対人送信）。「該当なし」でもカテゴリごとに `none` の明示宣言まで必須**（どちらかが `__DECLARE_ME__` のままなら赤）
 5. branch protection の required status checks に各門番の check 名（`test` / `lint` / `gitleaks` / `history-check` / `risk-review-gate`）を登録する。**`pr-size` は既定で required に含めない**（可視化ゲート・required 化は各リポの判断）
 6. **`check-required-checks.sh` を実行して登録を機械確認する**:
    ```bash
@@ -43,7 +43,7 @@
 | `test-lint.yml` | `# CUSTOMIZE` ×2（test / lint コマンド） | `make test` / `make lint`（Makefile 不在 = 赤） |
 | `gitleaks.yml` | なし（バージョン pin + SHA256 は型の固定値・更新は handbook 改訂で） | gitleaks v8.30.1 |
 | `pr-size.yml` | 除外パターン / `MAX_LINES` | lockfile・`i18n/**` 除外 / 250 行 |
-| `review-labels.yml` | `RISK_PATHS_REPO`（課金・対外送信のリポ固有パス・宣言必須） | `__DECLARE_ME__`（= 赤） |
+| `review-labels.yml` | `RISK_PATHS_BILLING` / `RISK_PATHS_OUTBOUND`（カテゴリ別・宣言必須） | 各 `__DECLARE_ME__`（= 赤） |
 | `check-required-checks.sh` | `EXPECTED`（required に登録した check 名） | 5 門番（pr-size 除く） |
 
 ## 落とし穴
