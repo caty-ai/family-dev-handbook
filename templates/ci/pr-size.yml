@@ -9,8 +9,9 @@
 # - 計測は merge-base 起点 3 点 diff + rename/copy 検出 (-M -C)。純粋な移動・リネーム由来の行は
 #   計測から外れるので、R-2③ が歓迎する抽出リファクタの大半は閾値を割る。
 # - 免除は size-exempt ラベル。免除された PR はその旨を green ログに明示する (黙って通さない — FP-5)。
-#   免除は head SHA に束縛される: 束縛の本体はゲート側のイベント判定 (synchronize / reopened の run では
-#   ラベルが残っていても免除を無効化) で、剥がしジョブの成功に依存しない。剥がしは可視化のための衛生。
+#   免除は head SHA に束縛される: 束縛の本体はゲート側のイベント判定 (作者が単独で起こせる
+#   synchronize / reopened / ready_for_review / edited の run ではラベルが残っていても免除を無効化)
+#   で、剥がしジョブの成功に依存しない。剥がしは可視化のための衛生。
 # - 範囲解決に失敗したら赤 (FP-6)。
 # - pull_request_target は使わない (untrusted コードに write トークンを渡す典型的脆弱形)。
 # 型の正本: caty-ai/family-dev-handbook templates/ci/
