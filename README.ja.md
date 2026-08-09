@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.7.1-blue)
+![version](https://img.shields.io/badge/version-v0.8.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -182,14 +182,14 @@ handbook-revision の値は書き換えないでください。
 
 ### 自分で入れる
 
-1. [docs/04](docs/04-adoption.md) の「配布用の要約ブロック」を開く（40行ほどのテキストです）
+1. [docs/04](docs/04-adoption.md) の「配布用の要約ブロック」を開く（50行ほどのテキストです）
 2. 常時読み込まれる設定ファイルに、丸ごと貼る
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は7系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は8系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
-やめたくなったら、貼った40行を消すだけで元に戻ります。ほかのファイルには触りません。
+やめたくなったら、貼った50行ほどを消すだけで元に戻ります。ほかのファイルには触りません。
 
 リポジトリ側の準備（並行安全マップ・Issue テンプレート・main の保護）は [docs/04](docs/04-adoption.md) にあります。
 
@@ -243,7 +243,7 @@ flowchart TD
 
 ## ルールの全体像
 
-ルールは7系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
+ルールは8系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
 
 | 系統 | 決めること | rule ID | 本文 |
 |---|---|---|---|
@@ -254,6 +254,7 @@ flowchart TD
 | **E** Epic レーン | 複数 Issue の束をどう運ぶか | `E-1`〜`E-10` | [docs/06](docs/06-epic-lane.md) |
 | **B** 委譲ブリーフ | 1回の委譲をどう契約にするか | `B-1`〜`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** ライフサイクル | 置いた物をいつ・どう退場させるか | `LC-1`〜`LC-5` | [docs/08](docs/08-lifecycle.md) |
+| **R** 却下ルーブリック | 何を受け入れ・何を断るか | `R-1`〜`R-6` | [docs/09](docs/09-rejection-rubric.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -297,6 +298,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [docs/06-epic-lane.md](docs/06-epic-lane.md) | Epic レーン — 人間の確認を Epic 単位に束ねる層・高リスク領域の単一定義（`E-1`〜`E-10`） |
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委譲ブリーフ — サブエージェントへ仕事を1回渡すときの依頼文の契約（`B-1`〜`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC ワークスペース・ライフサイクル — 置いた物の退場を契約にする層・退場条件の数値はローカル正本（`LC-1`〜`LC-5`） |
+| [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 却下ルーブリック — 何を受け入れ・何を断るかの意図の層。自動却下の3理由・歓迎/却下の判断基準・前提検証・置き場所のはしご・check 昇格（`R-1`〜`R-6`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
@@ -344,8 +346,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.7.1**（2026-08-07）。サイズ判別基準（S / M / L / H / Epic・[docs/01](docs/01-milestone-loop.md) の L2-1）が条文になりました — サイズの定義表と3軸（影響範囲・不可逆性・期間）で判定し、迷ったら重い側へ倒します。レビュー席数（L1-11）や Epic 入口（E-1）への入力が、導入先の暗黙知に頼らなくなります。v0.7.1 は上流レビュー（[docs/02](docs/02-issue-loop.md) の L1-9）の対象列挙を同じサイズ体系（L / H / Epic = 重い側）へ揃える文言追従です。
+現行バージョンは **v0.8.0**（2026-08-09）。却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（NousResearch/hermes-agent の Contribution Rubric（MIT）の翻案）。
 
+- **v0.7.1**（2026-08-07） — 上流レビュー（`L1-9`・[docs/02](docs/02-issue-loop.md)）の対象列挙をサイズ体系（L / H / Epic = 重い側）へ揃える文言追従
 - **v0.7.0**（2026-08-07） — サイズ判別基準（`L2-1` 拡張・[docs/01](docs/01-milestone-loop.md)）。定義表と3軸・迷ったら重い側
 - **v0.6.0**（2026-08-07） — ワークスペース・ライフサイクル層（`LC-1`〜`LC-5`・[docs/08](docs/08-lifecycle.md)）。置いた物の退場を契約に（退場トリガー・検査は警告のみ・退場条件の数値はローカル正本）
 - **v0.5.0**（2026-08-06） — 委譲ブリーフ層（`B-1`〜`B-5`・[docs/07](docs/07-delegation-brief.md)）。依頼文を実装仕様・実装チェック・レビュー基準の3層で契約に（様式は [templates/brief-template.md](templates/brief-template.md)）

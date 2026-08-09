@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.7.1-blue)
+![version](https://img.shields.io/badge/version-v0.8.0-blue)
 ![type](https://img.shields.io/badge/type-docs--only-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -184,14 +184,14 @@ Do not change the handbook-revision value.
 
 ### Do it yourself
 
-1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 40 lines of text
+1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 50 lines of text
 2. Paste the whole thing into a config file that is always loaded
 3. On the first line, rewrite `owner` and `last-verified` for yourself and today. Leave `handbook-revision` untouched
 4. On the second line, rewrite `正本:` to the URL of this repository (or of your fork, if you forked it)
 
-That is the whole installation. What you pasted is seven families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
+That is the whole installation. What you pasted is eight families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
 
-If you change your mind, delete those 40 lines and you are back where you started. Nothing else is touched.
+If you change your mind, delete those 50-odd lines and you are back where you started. Nothing else is touched.
 
 Repository-side preparation (the parallel-safety map, Issue templates, protecting main) is described in [docs/04](docs/04-adoption.md).
 
@@ -245,7 +245,7 @@ That single diagram is one clause, `L2-4`. The map of everything else is below.
 
 ## The full rule map
 
-The rules fall into seven families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
+The rules fall into eight families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
 
 | Family | What it decides | Rule IDs | Text |
 |---|---|---|---|
@@ -256,6 +256,7 @@ The rules fall into seven families, and every one of them carries an ID that doe
 | **E** Epic lane | How a bundle of Issues is carried | `E-1`–`E-10` | [docs/06](docs/06-epic-lane.md) |
 | **B** Delegation brief | How a single delegation becomes a contract | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** Lifecycle | When and how what you put down leaves | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
+| **R** Rejection rubric | What gets accepted and what gets declined | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
 
 Two clauses matter most for whether any of this actually works. One is the **FP** watchword, "if you cannot verify it, go serial — fail-open never means *passed*" — a declaration that even where you deliberately choose to let something through unverified, that can never be read as having been confirmed. The other is the **single definition of high-risk territory**. Work that touches it always stops for a human, and its review seats increase (publishing, spending money, irreversible operations, and permission boundaries are the kind of thing it covers — read the canonical text for the exact line). So that the definition never lives in two places, its only canonical home is [docs/06](docs/06-epic-lane.md).
 
@@ -299,6 +300,7 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [docs/06-epic-lane.md](docs/06-epic-lane.md) | Epic lane — bundling human checkpoints per Epic, and the single definition of high-risk territory (`E-1`–`E-10`) |
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B delegation brief — the contract carried by the prompt each time work is handed to a subagent (`B-1`–`B-5`) |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC workspace lifecycle — the layer that turns departure into a contract; the numbers in exit conditions live in local settings (`LC-1`–`LC-5`) |
+| [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R rejection rubric — the intent layer for what gets accepted and what gets declined: the three auto-decline reasons, welcome/decline criteria, premise verification, the placement ladder, and promoting policies to checks (`R-1`–`R-6`) |
 | [templates/issue-template.md](templates/issue-template.md) | Issue template and every lane comment format (WIP / HOLD / termination / TAKEOVER / resume check / completion record) |
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
@@ -346,8 +348,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.7.1** (2026-08-07). It turned the size criteria (S / M / L / H / Epic, L2-1 in [docs/01](docs/01-milestone-loop.md)) into contract text — a size definition table plus three axes (blast radius, irreversibility, duration) decide the size, and when in doubt you round up. The inputs to reviewer seat counts (L1-11) and the Epic entrance (E-1) no longer rely on adopters' tacit knowledge. v0.7.1 is a wording follow-up that aligns the scope enumeration of upstream review (L1-9 in [docs/02](docs/02-issue-loop.md)) with the same size system (L / H / Epic = the heavy side).
+The current version is **v0.8.0** (2026-08-09). It adds the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (an adaptation of the Contribution Rubric from NousResearch/hermes-agent, MIT).
 
+- **v0.7.1** (2026-08-07) — a wording follow-up aligning the scope enumeration of upstream review (`L1-9`, [docs/02](docs/02-issue-loop.md)) with the size system (L / H / Epic = the heavy side)
 - **v0.7.0** (2026-08-07) — the size criteria (`L2-1` extension, [docs/01](docs/01-milestone-loop.md)): definition table plus three axes, round up when in doubt
 - **v0.6.0** (2026-08-07) — the workspace-lifecycle layer (`LC-1`–`LC-5`, [docs/08](docs/08-lifecycle.md)): departure as a contract (exit triggers, inspection warns only, numbers in exit conditions canonical in local settings)
 - **v0.5.0** (2026-08-06) — the delegation-brief layer (`B-1`–`B-5`, [docs/07](docs/07-delegation-brief.md)): the prompt that hands work to a subagent becomes a three-layer contract of specification, self-verification, and reviewer criteria ([templates/brief-template.md](templates/brief-template.md))

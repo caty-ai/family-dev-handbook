@@ -10,7 +10,7 @@
 
 - **バージョン刻印付きのコンパクト要約のオーナーは本ページ（docs/04）ただ1つ**。下流コピー（各 CLAUDE.md / AGENTS.md / system prompt）は owner-applies — 幹事エージェントが提案し、各ランタイムのオーナーが自分で貼る
 - 下流のローカル要約・上書きは、正本より**厳しくするのは可・緩めるのは禁止**（tighten only）。この原則のエージェント横断規範オーナーは family-os の operations-policy（config trust 節 — [README](../README.ja.md) の「Caty AI ファミリー」節参照）。本ページはその協働プロトコルへの適用。sister projects なしで導入する場合は tighten-only 原則をそのまま適用すればよい
-- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜08、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜09、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## エージェント別の組み込み先
 
@@ -29,9 +29,9 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-07 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-09 / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜08、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜09、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -70,6 +70,10 @@ LC ライフサイクル: LC-1 置く時に退場トリガー（期限 or 完了
   LC-3 3類型の退場条件を数値つきでローカル設定に明文化（数値は正本に書かない） /
   LC-4 追記型と宣言したストアに限り退場はバックアップ→移動→ポインタ残置の3点セット・実作業は常に手動 /
   LC-5 検査・lint はファイルを動かさない（検知→定期レポート→人が判断・自動退場なし）
+R 却下ルーブリック: R-1 自動却下は3理由のみ（main 済を行で指す/バグ再現不能の記録付き/照会後も内容不存在）・証拠必須・
+  価値判断の却下はオーナー専決・迷ったら閉じない / R-2 歓迎6箇条（クラス全体修正・端は拡張腰は保守・宣言リファクタ歓迎=宣言と照合は緩まない等） /
+  R-3 良品でも断る7箇条（執行は常にオーナー専決） / R-4 前提検証4パターン+「行を指させないなら前提未検証」 /
+  R-5 置き場所はしご6段・最小の段・新リポはオーナー承認・同種3つで共通受け口 / R-6 方針は check で強制・2回破られたら起票・ゲートは fail-closed
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
