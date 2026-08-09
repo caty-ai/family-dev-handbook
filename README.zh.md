@@ -40,6 +40,7 @@
 - [Caty AI 家族](#ecosystem)
 - [开发状态](#status)
 - [参与贡献](#contributing)
+- [致谢](#acknowledgements)
 - [许可证](#license)
 
 ---
@@ -339,7 +340,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 这本手册本身是自洽的。不需要外部服务，不需要姊妹仓库，也不需要特定的记忆基础设施。需要的只有 git、Issue / PR，以及愿意守规则的主体。表中的每个仓库也一样，都能单独使用——组合是可选的，只用其中一个也完全成立。
 
-跨智能体的一般规范（例如 fail-posture 适用到哪里）归 family-os 那一侧所有，**只有人与智能体协作协议的措辞属于这本手册**。一般规范不会在这里新设。
+跨智能体的一般规范（例如 fail-posture 适用到哪里）归 family-os 那一侧所有，**这本手册只负责人与智能体的协作协议——条文，以及帮助执行条文的分发用模板（templates/）**。一般规范不会在这里新设。
 
 下面是现状与接下来的方向。
 
@@ -349,9 +350,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。部分改编自 NousResearch/hermes-agent（MIT）。
+当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。
 
-- **v0.8.0**（2026-08-09） — 拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（改编自 NousResearch/hermes-agent 的 Contribution Rubric，MIT）。
+- **v0.8.0**（2026-08-09） — 拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 的 Contribution Rubric，MIT）。
 
 - **v0.7.1**（2026-08-07） — 措辞跟进：把上游评审（`L1-9`，[docs/02](docs/02-issue-loop.md)）的适用对象列举对齐到尺寸体系（L / H / Epic = 重的一侧）
 - **v0.7.0**（2026-08-07） — 尺寸判别标准（`L2-1` 扩展，[docs/01](docs/01-milestone-loop.md)）：定义表加三条轴，拿不准就往重的一侧靠
@@ -375,6 +376,16 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 - 变更提案请在本仓库开 Issue、提 PR，并在经过不同模型或不同智能体的评审之后再合并（禁止自我批准）
 - **这本手册自己就是按这个流程更新的** — WIP 四字段声明 → worktree → 跨模型评审 → 带完成记录的 PR。条文的新增与修订，全都走过这条路
 - 详细流程见 [CONTRIBUTING.md](CONTRIBUTING.md)
+
+在许可证之前，向这套做法的参考来源道一声谢。
+
+---
+
+<a id="acknowledgements"></a>
+
+## 致谢
+
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 一个开源的自主智能体框架。它的贡献接受准则（Contribution Rubric）与 CI 门禁结构给了我们很多启发，R 拒收准则层（docs/09）和 templates/ci 的设计部分参考了它。逐文件的来源记录在 [templates/ci/NOTICE.md](templates/ci/NOTICE.md)。
 
 使用条件，做成了最宽松的形式。
 
