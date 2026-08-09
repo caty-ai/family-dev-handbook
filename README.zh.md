@@ -385,7 +385,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 致谢
 
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 一个开源的自主智能体框架。它的贡献接受准则（Contribution Rubric）与 CI 门禁结构给了我们很多启发，R 拒收准则层（docs/09）和 templates/ci 的设计部分参考了它。逐文件的来源记录在 [templates/ci/NOTICE.md](templates/ci/NOTICE.md)。
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 一个开源的自主智能体框架。它的贡献接受准则（Contribution Rubric）与 CI 门禁结构给了我们很多启发，R 拒收准则层（docs/09）和 templates/ci 的设计部分参考了它。templates/ci 中含有来自该项目的文件（改编 2 个、原样复制 1 个）——逐文件的来源记录在 [templates/ci/NOTICE.md](templates/ci/NOTICE.md)。
 
 使用条件，做成了最宽松的形式。
 

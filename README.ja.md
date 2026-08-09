@@ -383,7 +383,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 謝辞
 
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 公開されている自律エージェントのフレームワークです。その貢献受け入れ基準（Contribution Rubric）と CI ゲートの構成には多くの学びがあり、R 却下ルーブリック層（docs/09）と templates/ci の設計にあたって一部参考にさせていただきました。ファイル単位の由来は [templates/ci/NOTICE.md](templates/ci/NOTICE.md) にまとめています。
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 公開されている自律エージェントのフレームワークです。その貢献受け入れ基準（Contribution Rubric）と CI ゲートの構成には多くの学びがあり、R 却下ルーブリック層（docs/09）と templates/ci の設計にあたって一部参考にさせていただきました。templates/ci には同プロジェクト由来のファイル（翻案2本・そのままのコピー1本）を含みます — ファイル単位の由来は [templates/ci/NOTICE.md](templates/ci/NOTICE.md) にまとめています。
 
 使う条件は、いちばんゆるい形にしてあります。
 

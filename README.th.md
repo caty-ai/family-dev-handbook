@@ -385,7 +385,7 @@ flowchart TD
 
 ## กิตติกรรมประกาศ
 
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research, MIT) — เฟรมเวิร์กเอเจนต์อัตโนมัติแบบโอเพนซอร์ส เกณฑ์รับผลงาน (Contribution Rubric) และโครงสร้างด่านตรวจ CI ของโปรเจกต์นี้ให้บทเรียนกับเราอย่างมาก และเราได้อ้างอิงบางส่วนในการออกแบบชั้นเกณฑ์การปฏิเสธ R (docs/09) กับ templates/ci ที่มาระดับไฟล์บันทึกไว้ที่ [templates/ci/NOTICE.md](templates/ci/NOTICE.md)
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research, MIT) — เฟรมเวิร์กเอเจนต์อัตโนมัติแบบโอเพนซอร์ส เกณฑ์รับผลงาน (Contribution Rubric) และโครงสร้างด่านตรวจ CI ของโปรเจกต์นี้ให้บทเรียนกับเราอย่างมาก และเราได้อ้างอิงบางส่วนในการออกแบบชั้นเกณฑ์การปฏิเสธ R (docs/09) กับ templates/ci โดยใน templates/ci มีไฟล์ที่มาจากโปรเจกต์นี้ (ดัดแปลง 2 ไฟล์ และคัดลอกตามต้นฉบับ 1 ไฟล์) — ที่มาระดับไฟล์บันทึกไว้ที่ [templates/ci/NOTICE.md](templates/ci/NOTICE.md)
 
 เงื่อนไขการใช้งาน ถูกทำให้หลวมที่สุดเท่าที่จะเป็นไปได้
 

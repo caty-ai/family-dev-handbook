@@ -385,7 +385,7 @@ Before the license, one thank-you to the project this work drew on.
 
 ## Acknowledgements
 
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research, MIT) — an open-source autonomous agent framework. Its contribution rubric and CI gate structure taught us a lot, and we drew on parts of them when designing the R rejection-rubric layer (docs/09) and templates/ci. Per-file provenance is recorded in [templates/ci/NOTICE.md](templates/ci/NOTICE.md).
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research, MIT) — an open-source autonomous agent framework. Its contribution rubric and CI gate structure taught us a lot, and we drew on parts of them when designing the R rejection-rubric layer (docs/09) and templates/ci — which includes files derived from the project (two adapted, one verbatim copy). Per-file provenance is recorded in [templates/ci/NOTICE.md](templates/ci/NOTICE.md).
 
 The terms of use are as loose as they get.
 
