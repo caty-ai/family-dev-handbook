@@ -1,9 +1,9 @@
 > **机器翻译。**日文原文（[issue-template.md](../../../templates/issue-template.md)）是正本 — 本页与原文不一致时，以日文为准。
 
-# Issue / 通道评论 模板
+# Issue / 车道评论 模板
 
-各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜08）只保留最小 MUST 条款，细节放在此处。
-EPIC Issue 与 Epic 通道专属的格式（检查点表・Epic 日志・轻量门禁记录・Epic 终止）见 [epic-template.md](epic-template.md)（E 系列）。Epic 内的子 Issue 直接沿用本页格式。
+各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜09）只保留最小的 MUST 条文，细节放在这里。
+EPIC Issue 与 Epic 车道专属的格式（检查点表・Epic 日志・轻量门禁记录・Epic 终结）见 [epic-template.md](epic-template.md)（E 系列）。Epic 内部的子 Issue 照搬本页的格式。
 
 ## Issue 正文（L1-2）
 
@@ -35,7 +35,7 @@ EPIC Issue 与 Epic 通道专属的格式（检查点表・Epic 日志・轻量�
 <!-- 先に終わっているべき Issue / PR。なければ削除 -->
 ```
 
-## WIP 评论（L0-1 — 着手时贴到 Issue 上。4 个字段全部必填）
+## WIP 评论（L0-1 — 着手时发到 Issue。4个字段全部必须）
 
 ```markdown
 🔒 WIP (<agent名> session, YYYY-MM-DD): <何をするか1行>
@@ -48,11 +48,11 @@ Files to touch:
 Branch: fix/<issue>-<slug> (worktree)
 ```
 
-- 缺少 4 个字段（agent / date / Files to touch / Branch）中任意一个的 WIP，锁定无效（L0-1）
-- 无法预测时写 `Files to touch: UNKNOWN` = 仅限串行（L0-2）
-- 预计沉默会超过 72h 的通道，需在正文中明确写出**带理由**的更长 staleness 窗口（L0-3 的例外声明。事后延长可用新评论使其可见）
+- 缺少4个字段（agent / date / Files to touch / Branch）中任一个的 WIP，锁定无效（L0-1）
+- 无法预测时写 `Files to touch: UNKNOWN` = 只能串行（L0-2）
+- 预计沉默时间会超过 72h 的车道，需在正文中**附理由**明确写出更长的 staleness 窗口（L0-3 的例外声明。事后延长可用新评论使其可见）
 
-## HOLD 评论（L1-5 — 5 个字段全部必填）
+## HOLD 评论（L1-5 — 5个字段全部必须）
 
 ```markdown
 ⏸ HOLD (<agent名>, YYYY-MM-DD): <保留する理由1行>
@@ -65,7 +65,7 @@ lock disposition: retained until review-by | released   <!-- 無言は HOLD 無�
 remaining work / successor: <残作業 or 引き継ぎ先>
 ```
 
-## 终止状态评论（L1-4 — MERGED / SUPERSEDED / ABANDONED）
+## 终结状态评论（L1-4 — MERGED / SUPERSEDED / ABANDONED）
 
 ```markdown
 🏁 <MERGED|SUPERSEDED|ABANDONED> (<agent名>, YYYY-MM-DD): <1行>
@@ -73,7 +73,7 @@ remaining work / successor: <残作業 or 引き継ぎ先>
 evidence / successor: <PR リンク・後継 Issue・打ち切りの証拠（L1-6）>
 ```
 
-## TAKEOVER 评论（L0-3 — 接手 stale 通道）
+## TAKEOVER 评论（L0-3 — 接手 stale 车道）
 
 ```markdown
 🔁 TAKEOVER (<agent名>, YYYY-MM-DD)
@@ -82,11 +82,11 @@ stale WIP: <引用（宣言者・日付・最終更新からの経過時間）>
 resume checklist: <L0-9 チェック結果コメントへのリンク or 本文に併記>
 ```
 
-紧随其后要贴出新的 WIP 评论（上述格式）。
+紧接着发布新的 WIP 评论（上述格式）。
 
-## RELEASE / HANDED-OFF 评论（L0-3 — 锁的生命周期评论，不代表通道状态）
+## RELEASE / HANDED-OFF 评论（L0-3 — 锁定的生命周期评论。不是车道状态）
 
-只有**锁的所有者（WIP 的 agent）**才能发布。除此之外解除锁的唯一途径是 stale + TAKEOVER。
+只有**锁定所有者（WIP 中的 agent）**才能发布。他人解锁的途径只有 stale + TAKEOVER。
 
 ```markdown
 🔓 RELEASE (<agent名>, YYYY-MM-DD): <ロックを手放す理由1行。レーン状態は L1-4 のコメントで別途宣言>
@@ -98,7 +98,7 @@ resume checklist: <L0-9 チェック結果コメントへのリンク or 本文�
 handoff note: <続きの入口・残作業へのポインタ>   <!-- 引き継ぎ先は書き込み前に L0-9 を実施 -->
 ```
 
-## 恢复检查清单评论（L0-9 — 恢复・交接・TAKEOVER 首次写入之前）
+## 复位检查清单 评论（L0-9 — 恢复・交接・TAKEOVER 的首次写入之前）
 
 ```markdown
 ✅ Resume check (<agent名>, YYYY-MM-DD)
@@ -110,9 +110,9 @@ handoff note: <続きの入口・残作業へのポインタ>   <!-- 引き継�
 4. Done when: handoff 時から変更なし | 変更あり → <対応>
 ```
 
-固定为 4 项，不得增加（L0-9）。
+固定为4项。不要增加（L0-9）。
 
-## 完成记录（L1-7 — 贴在 PR 正文中的 merge 门禁）
+## 完成记录（L1-7 — 贴在 PR 正文中的合并门禁）
 
 ```markdown
 ## 完了記録 (Completion record)
@@ -137,4 +137,4 @@ git diff --stat origin/main...<候補SHA>: <出力 or 要約>
 宣言ファイル集合との差分: なし | <差分と説明>   <!-- diff にあって宣言にないファイルは blocking -->
 ```
 
-修正需另行发布替换记录，并重新开启评审（L1-8）。不允许悄悄编辑。
+订正需新发布一份差替记录并重新打开复审（L1-8）。不做无声的编辑。
