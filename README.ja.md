@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ flowchart TB
 
 ## 使うのに必要なもの
 
-このリポジトリはドキュメントだけでできています。インストールするプログラムはありません。
+このリポジトリの条文はドキュメントだけでできています。このリポジトリ自体にインストールするプログラムはありません（[templates/ci/](templates/ci/) に、各リポへ配布して使う型 — YAML とスクリプト — を含みます）。
 
 | 必要なもの | 対応 |
 |---|---|
-| 実行するランタイム（Node / Python など） | 不要（ドキュメントのみ・インストール作業なし） |
+| 実行するランタイム（Node / Python など） | 不要（条文は docs のみ。templates/ci に配布用の型（YAML+スクリプト）を含む） |
 | バージョン管理 | ✅ git |
 | 作業の記録場所 | ✅ GitHub の Issue / Pull Request |
 | AI エージェント | ✅ 常時読み込まれる設定ファイル（`CLAUDE.md` / `AGENTS.md` / システムプロンプトなど）を持つものなら種類を問わない |
@@ -303,6 +303,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
+| [templates/ci/](templates/ci/) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -385,6 +386,6 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 <div align="center">
 
-**ドキュメントのみ** ｜ **ランタイム不要** ｜ **git と Issue / PR だけで動く**
+**条文はドキュメントのみ** ｜ **ランタイム不要** ｜ **git と Issue / PR だけで動く**
 
 </div>

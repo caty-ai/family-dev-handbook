@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ flowchart TB
 
 ## สิ่งที่ต้องมีก่อนใช้งาน
 
-รีโปนี้ประกอบด้วยเอกสารล้วน ๆ ไม่มีโปรแกรมให้ติดตั้ง
+ตัวบทของรีโปนี้ประกอบด้วยเอกสารล้วน ๆ ไม่มีโปรแกรมให้ติดตั้งสำหรับตัวรีโปเอง (ใน [templates/ci/](templates/ci/) มีเทมเพลตด่านตรวจสำหรับแจกจ่าย — YAML และสคริปต์ — ไว้คัดลอกไปใช้ในรีโปของคุณ)
 
 | สิ่งที่ต้องมี | สถานะ |
 |---|---|
-| รันไทม์ (Node, Python ฯลฯ) | ไม่จำเป็น — มีแต่เอกสาร ไม่ต้องติดตั้งอะไร |
+| รันไทม์ (Node, Python ฯลฯ) | ไม่จำเป็น — ตัวบทมีแต่เอกสาร ส่วน templates/ci มีเทมเพลตด่านตรวจสำหรับแจกจ่าย (YAML + สคริปต์) |
 | ระบบควบคุมเวอร์ชัน | ✅ git |
 | ที่สำหรับบันทึกงาน | ✅ Issue / Pull Request ของ GitHub |
 | เอเจนต์ AI | ✅ ตัวไหนก็ได้ ขอเพียงมีไฟล์ตั้งค่าที่ถูกโหลดตลอดเวลา (`CLAUDE.md` / `AGENTS.md` / system prompt ฯลฯ) |
@@ -305,6 +305,7 @@ flowchart TD
 | [templates/epic-template.md](templates/epic-template.md) | เทมเพลต Epic และตารางจุดตรวจของมนุษย์ |
 | [templates/brief-template.md](templates/brief-template.md) | เทมเพลตบรีฟการมอบหมาย (โครงสร้างสามชั้นและแนวทางการเขียน) |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | เทมเพลต “แผนที่ความปลอดภัยของการทำคู่ขนาน” สำหรับวางใน `ARCHITECTURE.md` ของแต่ละรีโป |
+| [templates/ci/](templates/ci/) | ชุดเทมเพลตด่านตรวจของเครื่อง — test+lint / ตรวจจับ secret / ขนาด PR / ปฏิเสธ PR ประวัติขาด / ด่านยืนยันโดยมนุษย์สำหรับความเสี่ยงสูง / ตัวรวมรายงาน (มีคู่มือติดตั้งแนบ) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | ขั้นตอนการมีส่วนร่วม (Issue-first / การประกาศ WIP / บทสรุปของบันทึกการเสร็จสิ้น) |
 
 สุดท้าย ขอพูดสั้น ๆ ว่าคู่มือเล่มนี้มาจากไหน และถูกใช้อยู่ที่ใด
@@ -389,6 +390,6 @@ flowchart TD
 
 <div align="center">
 
-**เอกสารล้วน** ｜ **ไม่ต้องมีรันไทม์** ｜ **ทำงานได้ด้วย git กับ Issue / PR เท่านั้น**
+**ตัวบทเป็นเอกสารล้วน** ｜ **ไม่ต้องมีรันไทม์** ｜ **ทำงานได้ด้วย git กับ Issue / PR เท่านั้น**
 
 </div>

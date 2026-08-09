@@ -1,0 +1,78 @@
+# 基本門番②: secret 漏れ検知 (gitleaks)
+#
+# 守るもの: PR の追加コミットに秘密情報 (API キー・トークン・秘密鍵) が入って main に届かないこと。
+# 配り方: このファイルを .github/workflows/ へコピー。差し替え必須箇所なし (バージョン pin は # CUSTOMIZE 外)。
+#
+# 設計姿勢 (handbook docs/05・docs/09 R-6):
+# - gitleaks-action は使わない (Organization リポで有償キーが要る)。MIT の gitleaks バイナリを
+#   バージョン pin + SHA256 検証つきで直接実行する — 秘密検知ゲートが未検証バイナリを実行時取得する形にしない。
+# - 走査範囲が解決できない・空になったら赤 (FP-6: 空集合からゲート判定を導出しない)。
+# - 設定の自己緩和封じ: gitleaks は無指定だとスキャン対象リポルートの .gitleaks.toml を自動検出する。
+#   PR が自分の秘密を allowlist に足して green にできてしまうため、設定は base (main) 側から取り出して固定する。
+# - --redact 必須 (検知した秘密そのものを CI ログに残さない)。
+# 運用注記: 秘密は commit 前に止めるのが本線 (ローカル hook)・CI は最後の網。
+#   一度 push した秘密は必ず rotate する — CI の赤が消えても秘密が無効化されたことにはならない。
+# 型の正本: caty-ai/family-dev-handbook templates/ci/
+
+name: gitleaks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitleaks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0 # 浅い checkout は「diff が解決できず変更ゼロ扱い → 緑」の最悪 fail-open になる
+          persist-credentials: false
+
+      - name: Download gitleaks (pinned + SHA256 verified)
+        run: |
+          set -euo pipefail
+          # バージョンと SHA256 は型の固定値 (# CUSTOMIZE 外)。更新は handbook 側の改訂で行う。
+          GITLEAKS_VERSION="8.30.1"
+          GITLEAKS_SHA256="551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+          curl -sSL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks version
+
+      - name: Scan PR commit range
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          # 範囲解決の fail-closed: base/head の存在確認と merge-base 解決に失敗したら赤。
+          git rev-parse --verify "origin/${BASE_REF}" >/dev/null || {
+            echo "::error::base ref origin/${BASE_REF} not found — range unresolved, failing closed."; exit 1; }
+          git rev-parse --verify HEAD >/dev/null || {
+            echo "::error::HEAD not found — range unresolved, failing closed."; exit 1; }
+          # base.sha 直参照にしない: PR open 時点の固定値は main が進むと実 merge-base とずれる。
+          BASE=$(git merge-base "origin/${BASE_REF}" HEAD) || {
+            echo "::error::merge-base failed — range unresolved, failing closed."; exit 1; }
+          [ -n "$BASE" ] || { echo "::error::empty merge-base — failing closed."; exit 1; }
+          COUNT=$(git rev-list --count "${BASE}..HEAD")
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::commit range ${BASE}..HEAD is empty — nothing to scan means 'cannot judge', failing closed (FP-6)."
+            exit 1
+          fi
+          # 設定の自己緩和封じ: 設定は base (main) 側から固定。main に無ければ設定なしで実行。
+          CONFIG_ARGS=()
+          if git cat-file -e "origin/${BASE_REF}:.gitleaks.toml" 2>/dev/null; then
+            git show "origin/${BASE_REF}:.gitleaks.toml" > /tmp/gitleaks-base-config.toml
+            CONFIG_ARGS=(--config /tmp/gitleaks-base-config.toml)
+            echo "using .gitleaks.toml from origin/${BASE_REF} (PR-side config changes are intentionally ignored)"
+          fi
+          ./gitleaks git --no-banner --redact "${CONFIG_ARGS[@]}" --log-opts="${BASE}..HEAD"

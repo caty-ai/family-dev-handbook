@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ flowchart TB
 
 ## 使用它需要什么
 
-这个仓库只由文档组成。没有任何程序需要安装。
+这个仓库的条文只由文档组成。仓库本身没有任何程序需要安装（[templates/ci/](templates/ci/) 中含有分发用的门禁模板 — YAML 与脚本 — 供复制到各仓库使用）。
 
 | 需要的东西 | 情况 |
 |---|---|
-| 运行时（Node、Python 等） | 不需要 — 只有文档，无需安装 |
+| 运行时（Node、Python 等） | 不需要 — 条文只有文档；templates/ci 含分发用的门禁模板（YAML+脚本） |
 | 版本管理 | ✅ git |
 | 记录工作的地方 | ✅ GitHub 的 Issue / Pull Request |
 | AI 智能体 | ✅ 只要它有一个常驻加载的配置文件（`CLAUDE.md` / `AGENTS.md` / 系统提示词等），什么产品都可以 |
@@ -305,6 +305,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
+| [templates/ci/](templates/ci/) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献的流程（Issue-first / WIP 声明 / 完成记录的摘要） |
 
 最后，用一句话说说这本手册从哪里来、在哪里被使用。
@@ -389,6 +390,6 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 <div align="center">
 
-**只有文档** ｜ **无需运行时** ｜ **只靠 git 和 Issue / PR 就能运转**
+**条文只有文档** ｜ **无需运行时** ｜ **只靠 git 和 Issue / PR 就能运转**
 
 </div>

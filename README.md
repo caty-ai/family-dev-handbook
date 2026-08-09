@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.8.0-blue)
-![type](https://img.shields.io/badge/type-docs--only-blue)
+![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -145,11 +145,11 @@ Before asking whether it works, ask what it costs to try. The answer is: almost 
 
 ## What you need
 
-This repository is documentation only. There is no program to install.
+The rules in this repository are documentation only. There is nothing to install for the repository itself ([templates/ci/](templates/ci/) contains distributable gate templates — YAML plus scripts — that you copy into your own repos).
 
 | What | Status |
 |---|---|
-| A runtime (Node, Python, …) | Not needed — docs only, nothing to install |
+| A runtime (Node, Python, …) | Not needed — the rules are docs only; templates/ci holds distributable gate templates (YAML + scripts) |
 | Version control | ✅ git |
 | A place to record work | ✅ GitHub Issues / Pull Requests |
 | AI agents | ✅ Any agent with an always-loaded config file (`CLAUDE.md`, `AGENTS.md`, a system prompt, …) |
@@ -305,6 +305,7 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | The "parallel-safety map" template for each repository's `ARCHITECTURE.md` |
+| [templates/ci/](templates/ci/) | The machine-gate template set — test+lint / secret scan / PR size / unrelated-history rejection / high-risk human-review gate / report assembler (deployment guide included) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (Issue-first / WIP declaration / completion record, in brief) |
 
 One last note on where this handbook comes from and where it is used.
@@ -389,6 +390,6 @@ The documents under `docs/` are written in Japanese, and this English README is 
 
 <div align="center">
 
-**Docs only** ｜ **No runtime** ｜ **Runs on git and Issues / PRs alone**
+**Rules are docs only** ｜ **No runtime** ｜ **Runs on git and Issues / PRs alone**
 
 </div>
