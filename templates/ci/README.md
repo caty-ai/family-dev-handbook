@@ -50,7 +50,7 @@
 
 - **required checks 未登録** — 門番は赤を出すが merge は止まらない。手順 6 の機械確認まで終えて「展開済み」
 - **fetch-depth** — 履歴を使う門番（gitleaks / pr-size / history-check / review-labels）は `fetch-depth: 0` が必須（型に焼き込み済み・浅くすると「diff 解決不能 → 緑」の fail-open になる）
-- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除は**作者が単独で起こせるイベント（synchronize / reopened / ready_for_review、pr-size は edited も）の run では常に無効**で、緑に戻せるのは triage 権限者しか起こせない labeled イベントだけ — 作者単独の承認持ち回しは fork でも成立しない。ラベル付与・剥がし（write）は 403 で警告になる（可視化の劣化のみ）。**残余**: 剥がせない古いラベルが triage 権限者の別ラベル操作（labeled / unlabeled の run）で再び有効に見える経路は残る — 共有クレデンシャル環境ではこの線引き自体が identity 分離（機械的保証の前提）待ちであり、このゲートの「可視化+監査」位置づけの範囲内。厳密な SHA 束縛が要る場合は方式2（タイムライン3条件 AND）へ
+- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除は**作者が単独で起こせるイベント（synchronize / reopened / ready_for_review、pr-size は edited も）の run では常に無効**で、緑に戻せるのは triage 権限者しか起こせないイベント（labeled / unlabeled）だけ — 作者単独の承認持ち回しは fork でも成立しない。ラベル付与・剥がし（write）は 403 で警告になる（可視化の劣化のみ）。**残余**: 剥がせない古いラベルが triage 権限者の別ラベル操作（labeled / unlabeled の run）で再び有効に見える経路は残る — 共有クレデンシャル環境ではこの線引き自体が identity 分離（機械的保証の前提）待ちであり、このゲートの「可視化+監査」位置づけの範囲内。厳密な SHA 束縛が要る場合は方式2（タイムライン3条件 AND）へ
 - **`pull_request_target` は使わない** — untrusted コードに write トークンを渡す典型的脆弱形（全門番 `pull_request` トリガ）
 - **gitleaks の赤を消しても秘密は無効化されない** — 一度 push した秘密は必ず rotate する。本線は commit 前のローカル hook・CI は最後の網。検知の許容（allowlist）は base 側 `.gitleaks.toml` だけが効く — PR 側の設定・`.gitleaksignore`・inline `gitleaks:allow` は無効化してある（自己緩和封じ）
 - **承認後の push で承認が無効になるのは仕様** — 承認（`risk-reviewed` / `size-exempt`）は「オーナーが見た head SHA」に束縛される。無効化はゲート自身のイベント判定で行われ、ラベル剥がしジョブは可視化のための衛生（「剥がしは機械・貼るのは人間」）

@@ -17,7 +17,7 @@
 # - 高リスク領域の定義の正本は handbook docs/06 (再定義しない)。本ファイルはパスへの写像だけを持つ。
 # - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: ゲート自身のイベント判定 —
 #   作者が単独で起こせるイベント (synchronize / reopened / ready_for_review) の run では承認ラベルを
-#   無効として赤にし、緑に戻せるのは triage 権限者しか起こせない labeled イベントだけにする。
+#   無効として赤にし、緑に戻せるのは triage 権限者しか起こせないイベント (labeled / unlabeled) だけにする。
 #   ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は可視化のための衛生で、判定はその成否に
 #   依存しない。代替 = 方式2 (タイムライン3条件 AND・末尾コメント参照)。
 # - 確認者名簿は base (main) 側の .github/risk-reviewers.txt から読む。PR head から読んではならない —
@@ -93,8 +93,9 @@ jobs:
           check_category() {
             NAME="$1"; VAL="$2"
             STRIPPED="$(echo "${VAL}" | tr -d '[:space:]')"
-            if [ "$STRIPPED" = "__DECLARE_ME__" ]; then
-              echo "::error::${NAME} is still the placeholder. Declare paths for this category, or declare 'none' explicitly — an undeclared category must not silently pass (fail-closed)."
+            # 空文字・空白のみも「宣言なし」— none という明示宣言か、実パスのどちらかを必須にする。
+            if [ -z "$STRIPPED" ] || [ "$STRIPPED" = "__DECLARE_ME__" ]; then
+              echo "::error::${NAME} is empty or still the placeholder. Declare paths for this category, or declare 'none' explicitly — an undeclared category must not silently pass (fail-closed)."
               exit 1
             fi
             if [ "$STRIPPED" != "none" ]; then
@@ -197,9 +198,9 @@ jobs:
           # 承認の head SHA 束縛はイベント種別で行う (剥がしジョブの成功に依存しない):
           # synchronize (新 push)・reopened (閉鎖中の push を挟みうる)・ready_for_review (draft⇄ready の
           # 往復は PR 作者が単独で起こせる) では、承認ラベルの有無にかかわらず赤 — 「新しい head /
-          # 作者起点の再評価は未承認」。オーナーがラベルを貼り (直し) た labeled イベントの run でのみ
-          # 承認が効く。ラベル剥がし (書き込み) が 403 になる fork PR でも、承認を緑に戻せるイベント
-          # (labeled / unlabeled) は triage 権限者にしか起こせないため、作者単独の承認持ち回しは成立しない。
+          # 作者起点の再評価は未承認」。承認がラベル現在値で再評価されるのは labeled / unlabeled の run
+          # (どちらも triage 権限者にしか起こせない) に限られる。ラベル剥がし (書き込み) が 403 になる
+          # fork PR でも、作者単独の承認持ち回しは成立しない。
           if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ] || [ "$EVENT_ACTION" = "ready_for_review" ]; then
             echo "::error::new head SHA (event: ${EVENT_ACTION}) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
             echo ""

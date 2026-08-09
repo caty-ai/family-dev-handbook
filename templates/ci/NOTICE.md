@@ -6,7 +6,7 @@
 
 | ファイル | 区分 | 取得元 |
 |---|---|---|
-| `history-check.yml` | **翻案**（standalone 化のみ・検知ロジックと事故実録コメントは原文維持） | [.github/workflows/history-check.yml](https://github.com/NousResearch/hermes-agent/blob/main/.github/workflows/history-check.yml) |
+| `history-check.yml` | **翻案**（standalone 化+checkout を PR head SHA に固定・検知ロジックと事故実録コメントは原文維持） | [.github/workflows/history-check.yml](https://github.com/NousResearch/hermes-agent/blob/main/.github/workflows/history-check.yml) |
 | `review-labels.yml` | **翻案**（standalone 化・検知統合・ラベル語彙と承認判定を家庭版に変更） | [.github/workflows/review-labels.yml](https://github.com/NousResearch/hermes-agent/blob/main/.github/workflows/review-labels.yml) |
 | `scripts/assemble_review_comment.py` | **そのまま**（冒頭の出典ヘッダ追記のみ・本体差分ゼロ） | [scripts/ci/assemble_review_comment.py](https://github.com/NousResearch/hermes-agent/blob/main/scripts/ci/assemble_review_comment.py) |
 | `test-lint.yml` / `gitleaks.yml` / `pr-size.yml` / `risk-reviewers.txt.example` / `check-required-checks.sh` / `README.md` | **新規**（本リポ設計。設計思想の一部は hermes-agent の Contribution Rubric / CI 構成の調査に基づく） | — |
