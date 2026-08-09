@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.8.0-blue)
+![version](https://img.shields.io/badge/version-v0.9.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -349,7 +349,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.8.0** (2026-08-09). It adds the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (an adaptation of the Contribution Rubric from NousResearch/hermes-agent, MIT).
+The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. Parts are adapted from NousResearch/hermes-agent (MIT).
+
+- **v0.8.0** (2026-08-09) — the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (an adaptation of the Contribution Rubric from NousResearch/hermes-agent, MIT).
 
 - **v0.7.1** (2026-08-07) — a wording follow-up aligning the scope enumeration of upstream review (`L1-9`, [docs/02](docs/02-issue-loop.md)) with the size system (L / H / Epic = the heavy side)
 - **v0.7.0** (2026-08-07) — the size criteria (`L2-1` extension, [docs/01](docs/01-milestone-loop.md)): definition table plus three axes, round up when in doubt
