@@ -62,10 +62,12 @@ jobs:
           [ -n "$BASE" ] || { echo "::error::empty merge-base — failing closed."; exit 1; }
 
           # 免除ラベル (size-exempt): 付いていれば green だが、黙って通さず明示する (FP-5)。
-          # 束縛はイベント種別で行う: synchronize (新 push)・reopened の run では、ラベルが
-          # 残っていても免除を無効化する (剥がしジョブの成功に依存しない)。オーナーが貼り直すと
-          # labeled イベントで再評価される。
-          if [ "$EVENT_ACTION" != "synchronize" ] && [ "$EVENT_ACTION" != "reopened" ]; then
+          # 束縛はイベント種別で行う: synchronize (新 push)・reopened・ready_for_review・edited
+          # (いずれも PR 作者が単独で起こせる) の run では、ラベルが残っていても免除を無効化する
+          # (剥がしジョブの成功に依存しない)。免除が効くのはオーナーが貼った labeled イベント起点の
+          # 再評価のみ。オーナーが貼り直すと labeled イベントで再評価される。
+          case "$EVENT_ACTION" in synchronize|reopened|ready_for_review|edited) AUTHOR_EVENT=1 ;; *) AUTHOR_EVENT=0 ;; esac
+          if [ "$AUTHOR_EVENT" -eq 0 ]; then
             LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
               echo "::error::label fetch failed — cannot judge exemption, failing closed (FP-6)."; exit 1; }
             if grep -Fxq 'size-exempt' <<<"$LABELS"; then

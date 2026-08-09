@@ -15,8 +15,11 @@
 #
 # 設計姿勢 (handbook docs/05・docs/06・docs/09):
 # - 高リスク領域の定義の正本は handbook docs/06 (再定義しない)。本ファイルはパスへの写像だけを持つ。
-# - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: 新しい push (synchronize) で
-#   ラベルを機械的に剥がす (「剥がしは機械・貼るのは人間」)。代替 = 方式2 (末尾コメント参照)。
+# - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: ゲート自身のイベント判定 —
+#   作者が単独で起こせるイベント (synchronize / reopened / ready_for_review) の run では承認ラベルを
+#   無効として赤にし、緑に戻せるのは triage 権限者しか起こせない labeled イベントだけにする。
+#   ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は可視化のための衛生で、判定はその成否に
+#   依存しない。代替 = 方式2 (タイムライン3条件 AND・末尾コメント参照)。
 # - 確認者名簿は base (main) 側の .github/risk-reviewers.txt から読む。PR head から読んではならない —
 #   「PR が名簿に自分を足して自分で通す」循環が開く。名簿不在・空・プレースホルダ = 赤。
 # - ゲート判定は read 権限で完結し fork でも必ず赤/緑を出す。ラベル付与・剥がしの書き込みは
@@ -183,11 +186,12 @@ jobs:
           fi
 
           # 承認の head SHA 束縛はイベント種別で行う (剥がしジョブの成功に依存しない):
-          # synchronize (新 push) と reopened (閉鎖中の push を挟みうる) では、承認ラベルの有無に
-          # かかわらず赤 — 「新しい head は未承認」。オーナーが再確認してラベルを貼り直すと
-          # labeled イベントで再評価されて緑になる。これにより fork PR (剥がし 403) でも、
-          # 同一 run 内の gate と剥がしの並列レースでも、承認の持ち回しは成立しない。
-          if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ]; then
+          # synchronize (新 push)・reopened (閉鎖中の push を挟みうる)・ready_for_review (draft⇄ready の
+          # 往復は PR 作者が単独で起こせる) では、承認ラベルの有無にかかわらず赤 — 「新しい head /
+          # 作者起点の再評価は未承認」。オーナーがラベルを貼り (直し) た labeled イベントの run でのみ
+          # 承認が効く。ラベル剥がし (書き込み) が 403 になる fork PR でも、承認を緑に戻せるイベント
+          # (labeled / unlabeled) は triage 権限者にしか起こせないため、作者単独の承認持ち回しは成立しない。
+          if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ] || [ "$EVENT_ACTION" = "ready_for_review" ]; then
             echo "::error::new head SHA (event: ${EVENT_ACTION}) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
             echo ""
             echo "touched high-risk files:"
