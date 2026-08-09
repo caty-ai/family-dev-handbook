@@ -184,14 +184,14 @@ Do not change the handbook-revision value.
 
 ### Do it yourself
 
-1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 50 lines of text
+1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 45 lines of text
 2. Paste the whole thing into a config file that is always loaded
 3. On the first line, rewrite `owner` and `last-verified` for yourself and today. Leave `handbook-revision` untouched
 4. On the second line, rewrite `正本:` to the URL of this repository (or of your fork, if you forked it)
 
 That is the whole installation. What you pasted is eight families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
 
-If you change your mind, delete those 50-odd lines and you are back where you started. Nothing else is touched.
+If you change your mind, delete those 45-odd lines and you are back where you started. Nothing else is touched.
 
 Repository-side preparation (the parallel-safety map, Issue templates, protecting main) is described in [docs/04](docs/04-adoption.md).
 
