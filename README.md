@@ -40,6 +40,7 @@ It addresses them by moving judgment out of human attentiveness and into a mecha
 - [The Caty AI family](#ecosystem)
 - [Development status](#status)
 - [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ---
@@ -339,7 +340,7 @@ Part of the **Caty AI family** — open tools for running a family of AI agents.
 
 This handbook is complete on its own. No external service, no sibling repository, and no particular memory infrastructure is required. All you need is git, Issues / PRs, and parties that follow the rules. The same goes for every repository in the table — each stands alone, combining them is optional, and using exactly one of them is a valid way to use them.
 
-Cross-agent general norms (such as how far fail-posture reaches) are owned on the family-os side; **only the wording of the human-to-agent collaboration protocol belongs to this handbook**. General norms are never newly created here.
+Cross-agent general norms (such as how far fail-posture reaches) are owned on the family-os side; **this handbook owns only the human-to-agent collaboration protocol — its clauses, plus the distributable templates (templates/) that help enforce them**. General norms are never newly created here.
 
 Here is where things stand, and where they are going.
 
@@ -349,9 +350,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. Parts are adapted from NousResearch/hermes-agent (MIT).
+The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).
 
-- **v0.8.0** (2026-08-09) — the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (an adaptation of the Contribution Rubric from NousResearch/hermes-agent, MIT).
+- **v0.8.0** (2026-08-09) — the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (drawing in part on the Contribution Rubric of [Hermes Agent](https://github.com/NousResearch/hermes-agent), MIT).
 
 - **v0.7.1** (2026-08-07) — a wording follow-up aligning the scope enumeration of upstream review (`L1-9`, [docs/02](docs/02-issue-loop.md)) with the size system (L / H / Epic = the heavy side)
 - **v0.7.0** (2026-08-07) — the size criteria (`L2-1` extension, [docs/01](docs/01-milestone-loop.md)): definition table plus three axes, round up when in doubt
@@ -375,6 +376,16 @@ The way in for proposals sits on the same rules.
 - Open an Issue in this repository, send a PR, get it reviewed by a different model or a different agent, then merge (self-approval is not allowed)
 - **This handbook is maintained under its own rules** — WIP declaration with four fields → worktree → cross-model review → a PR carrying a completion record. Every clause added or amended has gone through that same path
 - The full flow is in [CONTRIBUTING.md](CONTRIBUTING.md)
+
+Before the license, one thank-you to the project this work drew on.
+
+---
+
+<a id="acknowledgements"></a>
+
+## Acknowledgements
+
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research, MIT) — an open-source autonomous agent framework. Its contribution rubric and CI gate structure taught us a lot, and we drew on parts of them when designing the R rejection-rubric layer (docs/09) and templates/ci — which includes files derived from the project (two adapted, one verbatim copy). Per-file provenance is recorded in [templates/ci/NOTICE.md](templates/ci/NOTICE.md).
 
 The terms of use are as loose as they get.
 

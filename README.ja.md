@@ -40,6 +40,7 @@
 - [Caty AI ファミリー](#ecosystem)
 - [開発ステータス](#status)
 - [コントリビュート](#contributing)
+- [謝辞](#acknowledgements)
 - [ライセンス](#license)
 
 ---
@@ -337,7 +338,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 このハンドブックは単体で完結します。外部サービスも、姉妹リポジトリも、特定の記憶基盤も必要ありません。必要なのは git と Issue / PR、そしてルールを守る主体だけです。表の各リポジトリも同じように単独で使えます — 組み合わせは任意で、どれか1つだけを使っても成立します。
 
-エージェント横断の一般規範（fail-posture の適用範囲など）のオーナーは family-os 側にあり、**人間とエージェントの協働プロトコルの文言だけがこのハンドブックの担当**です。一般規範をここに新設することはしません。
+エージェント横断の一般規範（fail-posture の適用範囲など）のオーナーは family-os 側にあり、このハンドブックの担当は**人間とエージェントの協働プロトコル — 条文と、その執行を助ける配布用の型（templates/）— だけ**です。一般規範をここに新設することはしません。
 
 現在地とこれからです。
 
@@ -347,9 +348,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。一部は NousResearch/hermes-agent（MIT）の翻案です。
+現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
 
-- **v0.8.0**（2026-08-09） — R 却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（NousResearch/hermes-agent の Contribution Rubric（MIT）の翻案）。
+- **v0.8.0**（2026-08-09） — R 却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（[Hermes Agent](https://github.com/NousResearch/hermes-agent) の Contribution Rubric を一部参考にしています）。
 
 - **v0.7.1**（2026-08-07） — 上流レビュー（`L1-9`・[docs/02](docs/02-issue-loop.md)）の対象列挙をサイズ体系（L / H / Epic = 重い側）へ揃える文言追従
 - **v0.7.0**（2026-08-07） — サイズ判別基準（`L2-1` 拡張・[docs/01](docs/01-milestone-loop.md)）。定義表と3軸・迷ったら重い側
@@ -373,6 +374,16 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 - 変更提案はこのリポジトリに Issue を立て、PR を出し、別モデルまたは別エージェントのレビューを受けてから merge します（self-approve は禁止です）
 - **このハンドブック自身がこの手順で更新されています** — WIP 4フィールド宣言 → worktree → クロスモデルレビュー → 完了記録つき PR。条文の追加も改定も、すべてこの手順を通っています
 - 詳しい流れは [CONTRIBUTING.md](CONTRIBUTING.md) へ
+
+最後に、この形の元になったプロジェクトへ、ひとことお礼を。
+
+---
+
+<a id="acknowledgements"></a>
+
+## 謝辞
+
+- [Hermes Agent](https://github.com/NousResearch/hermes-agent)（Nous Research・MIT） — 公開されている自律エージェントのフレームワークです。その貢献受け入れ基準（Contribution Rubric）と CI ゲートの構成には多くの学びがあり、R 却下ルーブリック層（docs/09）と templates/ci の設計にあたって一部参考にさせていただきました。templates/ci には同プロジェクト由来のファイル（翻案2本・そのままのコピー1本）を含みます — ファイル単位の由来は [templates/ci/NOTICE.md](templates/ci/NOTICE.md) にまとめています。
 
 使う条件は、いちばんゆるい形にしてあります。
 
