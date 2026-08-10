@@ -65,7 +65,9 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           # 文字クラス ([[:space:]])・tr・sed を決定論にする。LC_ALL=C だと全角空白 (U+3000)
           # が空白と分類されず、行内空白の赤検査をすり抜けて 0 マッチの静かな緑になる (実測)。
-          LANG: C.UTF-8
+          # LANG でなく LC_ALL を pin する — LC_ALL は全 LC_* と LANG に優先し、runner 側の
+          # export に上書きされない (R3 3席収束)。
+          LC_ALL: C.UTF-8
         run: |
           set -euo pipefail
           # 高リスク領域のパス写像 (定義の正本は handbook docs/06 — ここは写像だけ)。
