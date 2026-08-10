@@ -92,9 +92,9 @@ jobs:
           # 該当が無いカテゴリは none と明示宣言する。どちらか一方でも __DECLARE_ME__ のまま
           # (宣言なし) なら赤 — 「書き忘れたカテゴリだけ静かに fail-open」をカテゴリ単位で
           # 許さない (fail-closed)。
-          RISK_PATHS_BILLING='__DECLARE_ME__'   # 課金・支出 (例: **/billing/**) — 該当なしなら none
-          RISK_PATHS_OUTBOUND='__DECLARE_ME__'  # 対外公開・対人送信 (例: **/publish/**) — 該当なしなら none
-          RISK_PATHS_GATES='__DECLARE_ME__'     # 門番の実体 (test/lint が呼ぶリポ固有スクリプト・設定。例: scripts/readme-check/**) — DEFAULT の Makefile/scripts/ci/** で足りるなら none
+          RISK_PATHS_BILLING='none'   # 課金・支出コードなし (#25 で明示宣言)
+          RISK_PATHS_OUTBOUND='none'  # 対外送信コードなし (#25 で明示宣言)
+          RISK_PATHS_GATES='scripts/readme-check/**'  # vendored README 検査器 = 唯一の内容ゲートの実体 (#25/#28)
 
           RISK_PATHS_REPO=''
           check_category() {
