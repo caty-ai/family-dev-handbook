@@ -85,6 +85,8 @@ jobs:
             ':(exclude)*.lock'
             ':(exclude)package-lock.json'
             ':(exclude)i18n/**'
+            # readme-craft skill 正本からのバイト同一 vendoring (#25) — レビュー対象は同一性であって行数ではない
+            ':(exclude)scripts/readme-check/**'
           )
           TOTAL=$(git diff -M -C --numstat "${BASE}...HEAD" -- . "${EXCLUDES[@]}" \
             | awk '$1 != "-" && $2 != "-" { total += $1 + $2 } END { print total + 0 }')

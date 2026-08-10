@@ -81,13 +81,20 @@ jobs:
             **/auth/**
             **/migrations/**
             **/*migration*
+            Makefile
+            **/Makefile
+            scripts/ci/**
           '
+          # Makefile / scripts/ci/** = 門番のコマンド定義面。test-lint.yml が呼ぶ実体を
+          # 1ファイル PR で無力化する経路 (make test を true 化等) を人間確認の対象に入れる
+          # (handbook#28・icase 照合なので makefile 等の大小変種も **/Makefile が拾う)。
           # CUSTOMIZE (宣言必須・カテゴリ別): このリポ固有のパスをカテゴリごとに列挙する。
           # 該当が無いカテゴリは none と明示宣言する。どちらか一方でも __DECLARE_ME__ のまま
           # (宣言なし) なら赤 — 「書き忘れたカテゴリだけ静かに fail-open」をカテゴリ単位で
           # 許さない (fail-closed)。
           RISK_PATHS_BILLING='__DECLARE_ME__'   # 課金・支出 (例: **/billing/**) — 該当なしなら none
           RISK_PATHS_OUTBOUND='__DECLARE_ME__'  # 対外公開・対人送信 (例: **/publish/**) — 該当なしなら none
+          RISK_PATHS_GATES='__DECLARE_ME__'     # 門番の実体 (test/lint が呼ぶリポ固有スクリプト・設定。例: scripts/readme-check/**) — DEFAULT の Makefile/scripts/ci/** で足りるなら none
 
           RISK_PATHS_REPO=''
           check_category() {
@@ -104,6 +111,7 @@ jobs:
           }
           check_category RISK_PATHS_BILLING "$RISK_PATHS_BILLING"
           check_category RISK_PATHS_OUTBOUND "$RISK_PATHS_OUTBOUND"
+          check_category RISK_PATHS_GATES "$RISK_PATHS_GATES"
 
           git rev-parse --verify "origin/${BASE_REF}" >/dev/null || {
             echo "::error::base ref not found — failing closed (FP-6)."; exit 1; }

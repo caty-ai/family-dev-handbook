@@ -286,7 +286,7 @@ All of the rule text lives under `docs/`. Here is the index.
 
 ## Deeper documentation
 
-The files below are Japanese (canonical). A machine-translated English mirror of docs/ and templates/ lives in [i18n/en/](i18n/README.md) — where they disagree, the Japanese text wins.
+The files below are Japanese (canonical). A machine-translated English mirror of docs/ and templates/ lives in [i18n/](i18n/README.md) — where they disagree, the Japanese text wins.
 
 | File | Content |
 |---|---|
