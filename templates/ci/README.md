@@ -28,7 +28,7 @@
 4. `# CUSTOMIZE` を埋める:
    - `test-lint.yml` — テスト/lint コマンド（**未設定のままだと赤で落ち続ける = 仕様**）
    - `pr-size.yml` — サイズ計測の除外パターン
-   - `review-labels.yml` — **高リスク領域のリポ固有パスをカテゴリ別に宣言（`RISK_PATHS_BILLING` = 課金・支出 / `RISK_PATHS_OUTBOUND` = 対外公開・対人送信 / `RISK_PATHS_GATES` = 門番の実体＝test/lint が呼ぶリポ固有スクリプト・設定）。「該当なし」でもカテゴリごとに `none` の明示宣言まで必須**（いずれかが `__DECLARE_ME__` のままなら赤）
+   - `review-labels.yml` — **高リスク領域のリポ固有パスをカテゴリ別に宣言（`RISK_PATHS_BILLING` = 課金・支出 / `RISK_PATHS_OUTBOUND` = 対外公開・対人送信 / `RISK_PATHS_GATES` = 門番の実体＝test/lint が呼ぶリポ固有スクリプト・設定 / `RISK_PATHS_AUTH` = 認証・権限境界）。「該当なし」でもカテゴリごとに `none` の明示宣言まで必須**（いずれかが `__DECLARE_ME__` のままなら赤）。AUTH は既定網の `**/auth/**` が「認証コードは auth/ ディレクトリにある」配置前提のため常設 — フラット配置（`app/auth.py` 等）のリポは実パスを列挙し、auth/ 配下に集約済みのリポだけ `none` と書く
 5. branch protection の required status checks に各門番の check 名（`test` / `lint` / `gitleaks` / `history-check` / `risk-review-gate`）を登録する。**`pr-size` は既定で required に含めない**（可視化ゲート・required 化は各リポの判断）
 6. **`check-required-checks.sh` を実行して登録を機械確認する**:
    ```bash
@@ -43,12 +43,15 @@
 | `test-lint.yml` | `# CUSTOMIZE` ×2（test / lint コマンド） | `make test` / `make lint`（Makefile 不在 = 赤） |
 | `gitleaks.yml` | なし（バージョン pin + SHA256 は型の固定値・更新は handbook 改訂で） | gitleaks v8.30.1 |
 | `pr-size.yml` | 除外パターン / `MAX_LINES` | lockfile・`i18n/**` 除外 / 250 行 |
-| `review-labels.yml` | `RISK_PATHS_BILLING` / `RISK_PATHS_OUTBOUND` / `RISK_PATHS_GATES`（カテゴリ別・宣言必須） | 各 `__DECLARE_ME__`（= 赤） |
+| `review-labels.yml` | `RISK_PATHS_BILLING` / `RISK_PATHS_OUTBOUND` / `RISK_PATHS_GATES` / `RISK_PATHS_AUTH`（カテゴリ別・宣言必須） | 各 `__DECLARE_ME__`（= 赤） |
 | `check-required-checks.sh` | `EXPECTED`（required に登録した check 名） | 5 門番（pr-size 除く） |
 
 ## 落とし穴
 
 - **required checks 未登録** — 門番は赤を出すが merge は止まらない。手順 6 の機械確認まで終えて「展開済み」
+- **展開検証のダミー secret に bare な AWS access key ID（AKIA+16桁）を使わない** — gitleaks v8.30.1 の既定ルールでは access key ID 単体は検知されず、「門番が壊れている」ように見える偽陰性になる。検知確認済みフィクスチャ（例: 切り詰めた PEM 秘密鍵ブロック）を使う。仕込みはサーバーサイドコミット（contents API）推奨 — ローカルの secret 検知フックと手元 commit がデッドロックするため
+- **test/lint の充て先は「対象0件で緑」にならない形に** — 対象を数えて0件なら赤（型の Makefile 例は非空ガード焼き込み済み。`# CUSTOMIZE` でコマンドを差し替える時もこの性質を保つ — 対象 glob が空振りすると「全部通った」と「何も検査していない」が同じ緑になる）
+- **シェルスクリプトの lint 充て先は `*.sh` glob だけにしない** — 拡張子なし（shebang のみ）のスクリプトが漏れる。shebang スキャン（例: `grep -rl '^#!.*sh' --exclude-dir=.git`）を併用して対象を組み立てる
 - **fetch-depth** — 履歴を使う門番（gitleaks / pr-size / history-check / review-labels）は `fetch-depth: 0` が必須（型に焼き込み済み・浅くすると「diff 解決不能 → 緑」の fail-open になる）
 - **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除は**作者が単独で起こせるイベント（synchronize / reopened / ready_for_review、pr-size は edited も）の run では常に無効**で、緑に戻せるのは triage 権限者しか起こせないイベント（labeled / unlabeled）だけ — 作者単独の承認持ち回しは fork でも成立しない。ラベル付与・剥がし（write）は 403 で警告になる（可視化の劣化のみ）。**残余**: 剥がせない古いラベルが triage 権限者の別ラベル操作（labeled / unlabeled の run）で再び有効に見える経路は残る — 共有クレデンシャル環境ではこの線引き自体が identity 分離（機械的保証の前提）待ちであり、このゲートの「可視化+監査」位置づけの範囲内。厳密な SHA 束縛が要る場合は方式2（タイムライン3条件 AND）へ
 - **`pull_request_target` は使わない** — untrusted コードに write トークンを渡す典型的脆弱形（全門番 `pull_request` トリガ）

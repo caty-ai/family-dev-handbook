@@ -89,29 +89,50 @@ jobs:
           # 1ファイル PR で無力化する経路 (make test を true 化等) を人間確認の対象に入れる
           # (handbook#28・icase 照合なので makefile 等の大小変種も **/Makefile が拾う)。
           # CUSTOMIZE (宣言必須・カテゴリ別): このリポ固有のパスをカテゴリごとに列挙する。
-          # 該当が無いカテゴリは none と明示宣言する。どちらか一方でも __DECLARE_ME__ のまま
-          # (宣言なし) なら赤 — 「書き忘れたカテゴリだけ静かに fail-open」をカテゴリ単位で
-          # 許さない (fail-closed)。
+          # 該当が無いカテゴリは none と明示宣言する (大小文字は問わない)。どれか一つでも
+          # __DECLARE_ME__ のまま (宣言なし) なら赤 — 「書き忘れたカテゴリだけ静かに fail-open」を
+          # カテゴリ単位で許さない (fail-closed)。
           RISK_PATHS_BILLING='__DECLARE_ME__'   # 課金・支出 (例: **/billing/**) — 該当なしなら none
           RISK_PATHS_OUTBOUND='__DECLARE_ME__'  # 対外公開・対人送信 (例: **/publish/**) — 該当なしなら none
           RISK_PATHS_GATES='__DECLARE_ME__'     # 門番の実体 (test/lint が呼ぶリポ固有スクリプト・設定。例: scripts/readme-check/**) — DEFAULT の Makefile/scripts/ci/** で足りるなら none
+          # AUTH が DEFAULT に **/auth/** を持ちながら常設カテゴリでもある理由 (#31): その glob は
+          # 「認証コードは auth/ ディレクトリにある」という配置前提で、フラット配置 (app/auth.py・
+          # app/apple_signin.py 等) のリポでは 0 ファイルにマッチし、認証高リスク面がまるごと網外に
+          # なる。配置前提を型に埋めず、リポごとの明示宣言 (fail-closed) に乗せる。
+          RISK_PATHS_AUTH='__DECLARE_ME__'      # 認証・権限境界 (例: app/auth*.py **/token*.py) — 認証コードが auth/ ディレクトリ配下に集約済み (DEFAULT の **/auth/** が実ファイルを拾う) なら none
 
           RISK_PATHS_REPO=''
           check_category() {
             NAME="$1"; VAL="$2"
             STRIPPED="$(echo "${VAL}" | tr -d '[:space:]')"
+            # none / プレースホルダの照合は小文字化してから — 'None' 等の表記ゆれを厳密比較で
+            # 取り逃すと「0ファイルにマッチする死にパターン」として黙って素通りする (#32)。
+            FOLDED="$(echo "${STRIPPED}" | tr '[:upper:]' '[:lower:]')"
             # 空文字・空白のみも「宣言なし」— none という明示宣言か、実パスのどちらかを必須にする。
-            if [ -z "$STRIPPED" ] || [ "$STRIPPED" = "__DECLARE_ME__" ]; then
+            if [ -z "$STRIPPED" ] || [ "$FOLDED" = "__declare_me__" ]; then
               echo "::error::${NAME} is empty or still the placeholder. Declare paths for this category, or declare 'none' explicitly — an undeclared category must not silently pass (fail-closed)."
               exit 1
             fi
-            if [ "$STRIPPED" != "none" ]; then
+            if [ "$FOLDED" != "none" ]; then
               RISK_PATHS_REPO="${RISK_PATHS_REPO}${VAL}"$'\n'
             fi
           }
           check_category RISK_PATHS_BILLING "$RISK_PATHS_BILLING"
           check_category RISK_PATHS_OUTBOUND "$RISK_PATHS_OUTBOUND"
           check_category RISK_PATHS_GATES "$RISK_PATHS_GATES"
+          check_category RISK_PATHS_AUTH "$RISK_PATHS_AUTH"
+
+          # 死にパターン検知 (LC-5: 検知→警告・自動では赤にしない): 宣言パターンが HEAD の
+          # 1ファイルにも解決しない場合、リネーム・配置変更で写像が乖離した兆候 — 「存在しない
+          # 敵を守れているように見える」まさに #31 の形。ログの警告で人間の判断に回す。
+          while IFS= read -r pat; do
+            pat="$(echo "$pat" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+            [ -n "$pat" ] || continue
+            RESOLVED=$(git ls-files -- ":(glob,icase)${pat}") || RESOLVED=""
+            if [ -z "$RESOLVED" ]; then
+              echo "::warning::declared risk pattern '${pat}' matches 0 tracked files at HEAD — possible dead pattern. Update the category declaration (a stale mapping silently uncovers the area)."
+            fi
+          done <<< "${RISK_PATHS_REPO}"
 
           git rev-parse --verify "origin/${BASE_REF}" >/dev/null || {
             echo "::error::base ref not found — failing closed (FP-6)."; exit 1; }
