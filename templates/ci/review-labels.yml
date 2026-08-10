@@ -63,6 +63,9 @@ jobs:
         name: Match changed files against risk paths
         env:
           BASE_REF: ${{ github.base_ref }}
+          # 文字クラス ([[:space:]])・tr・sed を決定論にする。LC_ALL=C だと全角空白 (U+3000)
+          # が空白と分類されず、行内空白の赤検査をすり抜けて 0 マッチの静かな緑になる (実測)。
+          LANG: C.UTF-8
         run: |
           set -euo pipefail
           # 高リスク領域のパス写像 (定義の正本は handbook docs/06 — ここは写像だけ)。
@@ -143,16 +146,29 @@ jobs:
               line="$(echo "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
               [ -n "$line" ] || continue
               case "$line" in
+                '#'*)
+                  # コメント行は宣言の中では未対応 — 空白の有無で挙動が割れる (空白ありは
+                  # 空白検査・空白なしは死にパターン化) のを許さず、正しい理由で赤にする。
+                  echo "::error::${NAME} contains a comment line ('${line}') — comments are not supported inside category declarations; remove it (fail-closed)."
+                  exit 1
+                  ;;
                 *[[:space:]]*)
                   echo "::error::${NAME} line '${line}' contains internal whitespace — declare one pattern per line (a space-separated list becomes ONE literal-space pathspec matching 0 files = silent fail-open). Use glob ? for a path that really contains a space."
                   exit 1
                   ;;
               esac
-              LINE_FOLDED="$(echo "$line" | tr '[:upper:]' '[:lower:]')"
-              case "$LINE_FOLDED" in
-                *declare_me*)
-                  echo "::error::${NAME} contains a placeholder-like line ('${line}') — remove it and declare real paths or 'none' (fail-closed)."
-                  exit 1
+              # プレースホルダ検査は / も . も含まない行だけに掛ける — 実パターンは区切りか
+              # 拡張子を持つ (app/declare_member.py 等の実在パスを誤って赤にしない)。
+              case "$line" in
+                */*|*.*) : ;;
+                *)
+                  LINE_FOLDED="$(echo "$line" | tr '[:upper:]' '[:lower:]')"
+                  case "$LINE_FOLDED" in
+                    *declare_me*)
+                      echo "::error::${NAME} contains a placeholder-like line ('${line}') — remove it and declare real paths or 'none' (fail-closed)."
+                      exit 1
+                      ;;
+                  esac
                   ;;
               esac
             done <<< "${VAL}"
@@ -170,14 +186,16 @@ jobs:
           while IFS= read -r pat; do
             pat="$(echo "$pat" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
             [ -n "$pat" ] || continue
-            if RESOLVED=$(git ls-files -- ":(glob,icase)${pat}" 2>&1); then
+            # stderr は空判定に混ぜない — 成功時の stderr が「0マッチなのに生きて見える」形で
+            # 死にパターン警告を黙らせる経路を作らない (エラー詳細は失敗時に再実行で表示)。
+            if RESOLVED=$(git ls-files -- ":(glob,icase)${pat}" 2>/dev/null); then
               if [ -z "$RESOLVED" ]; then
                 echo "::warning::declared risk pattern '${pat}' matches 0 tracked files at HEAD — possible dead pattern. Update the category declaration (a stale mapping silently uncovers the area)."
               fi
             else
               # 解決失敗は「死にパターン」でなく構文不正 — 誤診しない (診断を分ける)。
               # この後の diff 照合ループが同じパターンで fail-closed に落とす。
-              printf '%s\n' "$RESOLVED"
+              git ls-files -- ":(glob,icase)${pat}" 2>&1 >/dev/null | sed 's/^/  /' || true
               echo "::warning::declared risk pattern '${pat}' could not be resolved as a pathspec (git error above) — fix the declaration syntax; the diff-matching step will fail closed on it."
             fi
           done <<< "${RISK_PATHS_REPO}"
