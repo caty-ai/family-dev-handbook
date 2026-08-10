@@ -19,3 +19,5 @@ test:
 # lint: 各ファイル単体の整合 (相対リンク実在・アンカー解決・placeholder・見出し階層) — fail-closed
 lint:
 	@set -e; for f in $(LINT_TARGETS); do $(CHECK) inspect --no-work $$f; done
+
+# ci-verify #25: risk-path touch (verification only, never merge)
