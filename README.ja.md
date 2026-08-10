@@ -146,7 +146,7 @@ flowchart TB
 
 ## 使うのに必要なもの
 
-このリポジトリの条文はドキュメントだけでできています。このリポジトリ自体にインストールするプログラムはありません（[templates/ci/](templates/ci/) に、各リポへ配布して使う型 — YAML とスクリプト — を含みます）。
+このリポジトリの条文はドキュメントだけでできています。このリポジトリ自体にインストールするプログラムはありません（[templates/ci/](templates/ci/README.md) に、各リポへ配布して使う型 — YAML とスクリプト — を含みます）。
 
 | 必要なもの | 対応 |
 |---|---|
@@ -284,7 +284,7 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 ## もっと詳しく
 
-docs と templates の機械翻訳版（English / 简体中文 / ไทย）は [i18n/](i18n/) にあります — 正本は日本語で、食い違えば日本語が正です。
+docs と templates の機械翻訳版（English / 简体中文 / ไทย）は [i18n/](i18n/README.md) にあります — 正本は日本語で、食い違えば日本語が正です。
 
 | ファイル | 内容 |
 |---|---|
@@ -304,7 +304,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
-| [templates/ci/](templates/ci/) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
+| [templates/ci/](templates/ci/README.md) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -348,7 +348,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
+現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/README.md)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
 
 - **v0.8.0**（2026-08-09） — R 却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（[Hermes Agent](https://github.com/NousResearch/hermes-agent) の Contribution Rubric を一部参考にしています）。
 

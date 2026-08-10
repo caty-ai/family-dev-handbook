@@ -146,7 +146,7 @@ Before asking whether it works, ask what it costs to try. The answer is: almost 
 
 ## What you need
 
-The rules in this repository are documentation only. There is nothing to install for the repository itself ([templates/ci/](templates/ci/) contains distributable gate templates — YAML plus scripts — that you copy into your own repos).
+The rules in this repository are documentation only. There is nothing to install for the repository itself ([templates/ci/](templates/ci/README.md) contains distributable gate templates — YAML plus scripts — that you copy into your own repos).
 
 | What | Status |
 |---|---|
@@ -286,7 +286,7 @@ All of the rule text lives under `docs/`. Here is the index.
 
 ## Deeper documentation
 
-The files below are Japanese (canonical). A machine-translated English mirror of docs/ and templates/ lives in [i18n/en/](i18n/en/) — where they disagree, the Japanese text wins.
+The files below are Japanese (canonical). A machine-translated English mirror of docs/ and templates/ lives in [i18n/en/](i18n/README.md) — where they disagree, the Japanese text wins.
 
 | File | Content |
 |---|---|
@@ -306,7 +306,7 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | The "parallel-safety map" template for each repository's `ARCHITECTURE.md` |
-| [templates/ci/](templates/ci/) | The machine-gate template set — test+lint / secret scan / PR size / unrelated-history rejection / high-risk human-review gate / report assembler (deployment guide included) |
+| [templates/ci/](templates/ci/README.md) | The machine-gate template set — test+lint / secret scan / PR size / unrelated-history rejection / high-risk human-review gate / report assembler (deployment guide included) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute (Issue-first / WIP declaration / completion record, in brief) |
 
 One last note on where this handbook comes from and where it is used.
@@ -350,7 +350,7 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).
+The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/README.md)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).
 
 - **v0.8.0** (2026-08-09) — the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (drawing in part on the Contribution Rubric of [Hermes Agent](https://github.com/NousResearch/hermes-agent), MIT).
 

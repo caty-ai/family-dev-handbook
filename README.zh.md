@@ -146,7 +146,7 @@ flowchart TB
 
 ## 使用它需要什么
 
-这个仓库的条文只由文档组成。仓库本身没有任何程序需要安装（[templates/ci/](templates/ci/) 中含有分发用的门禁模板 — YAML 与脚本 — 供复制到各仓库使用）。
+这个仓库的条文只由文档组成。仓库本身没有任何程序需要安装（[templates/ci/](templates/ci/README.md) 中含有分发用的门禁模板 — YAML 与脚本 — 供复制到各仓库使用）。
 
 | 需要的东西 | 情况 |
 |---|---|
@@ -286,7 +286,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 更深入的文档
 
-下列文件为日文（正本）。docs/ 与 templates/ 的简体中文机器翻译镜像在 [i18n/zh/](i18n/zh/) — 与日文不一致时，以日文为准。
+下列文件为日文（正本）。docs/ 与 templates/ 的简体中文机器翻译镜像在 [i18n/zh/](i18n/README.md) — 与日文不一致时，以日文为准。
 
 | 文件 | 内容 |
 |---|---|
@@ -306,7 +306,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
-| [templates/ci/](templates/ci/) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
+| [templates/ci/](templates/ci/README.md) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献的流程（Issue-first / WIP 声明 / 完成记录的摘要） |
 
 最后，用一句话说说这本手册从哪里来、在哪里被使用。
@@ -350,7 +350,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。
+当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/README.md)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。
 
 - **v0.8.0**（2026-08-09） — 拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 的 Contribution Rubric，MIT）。
 
