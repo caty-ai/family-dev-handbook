@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.0-blue)
+![version](https://img.shields.io/badge/version-v0.9.2-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -350,7 +350,11 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.9.0**（2026-08-10）。新增了机器门禁模板一套（[templates/ci/](templates/ci/README.md)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。
+当前版本是 **v0.9.2**（2026-08-11）——机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷在模板层面堵上了：①新增认证/权限边界常设分类 `RISK_PATHS_AUTH`（默认网中的 `**/auth/**` 预设了“认证代码放在 auth/ 目录下”这一前提，扁平结构的仓库因此让整个认证面漏在网外——现在改为必须显式声明，否则 fail-closed）②`none` 声明的大小写强化与声明行健全性检查（空格分隔的多个模式、注释行、残留占位符均判红）+ 失效模式告警 ③把落地验证的坑点补写进 templates/ci 的 README（已确认可检测的 fixture、堵住“目标 0 件也判绿”、并配合 shebang 扫描）。改版经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库。
+
+- **v0.9.1**（2026-08-10・未打 tag・仅模板层面的改版） — 新增常设分类 `RISK_PATHS_GATES`，并把 Makefile / `scripts/ci/**` 加入默认网（来自 v0.9.0 落地验证的反馈）
+
+- **v0.9.0**（2026-08-10） — 新增了机器门禁模板一套（[templates/ci/](templates/ci/README.md)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。
 
 - **v0.8.0**（2026-08-09） — 拒收准则层（`R-1`–`R-6`，[docs/09](docs/09-rejection-rubric.md)）——相对于规定“怎么推进”的 L 层，这是规定“接受什么、拒绝什么”的意图层。不经人判断就关闭提案，只允许三个机械上黑白分明的理由；一切价值判断都由 owner 专属决定。它还把欢迎的贡献六条、做得再好也要拒收的七条、前提验证的四个模式、放置阶梯六级、以及“被破坏的方针升格为 check”写成了条文（部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 的 Contribution Rubric，MIT）。
 

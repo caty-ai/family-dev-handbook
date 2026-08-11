@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.0-blue)
+![version](https://img.shields.io/badge/version-v0.9.2-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -348,7 +348,10 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.9.0**（2026-08-10）。機械の門番テンプレ一式（[templates/ci/](templates/ci/README.md)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
+現行バージョンは **v0.9.2**（2026-08-11）。機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂です — 初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました: ①認証・権限境界の常設カテゴリ `RISK_PATHS_AUTH` を新設（既定網の `**/auth/**` は「認証コードは auth/ ディレクトリにある」という配置前提で、フラット配置のリポでは認証面がまるごと網外になっていた — 宣言必須の fail-closed へ）②`none` 宣言の大小文字硬化と宣言行の健全性検査（空白区切りの複数パターン・コメント行・プレースホルダ残骸はすべて赤）+ 死にパターン警告 ③展開検証の落とし穴を templates/ci の README に追記（検知確認済みフィクスチャ・「対象0件で緑」封じ・shebang スキャン併用）。改訂は多席レビュー4ラウンド（3席全 GO）を経て、展開済みリポへ同期しています。
+
+- **v0.9.1**（2026-08-10・タグなし・型のみの改訂） — `RISK_PATHS_GATES` 常設カテゴリの新設と、既定網への Makefile / `scripts/ci/**` の追加（v0.9.0 の展開検証からの還流）
+- **v0.9.0**（2026-08-10） — 機械の門番テンプレ一式（[templates/ci/](templates/ci/README.md)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
 
 - **v0.8.0**（2026-08-09） — R 却下ルーブリック層（`R-1`〜`R-6`・[docs/09](docs/09-rejection-rubric.md)）が加わりました — 「どう進めるか」（L 層）に対して「何を受け入れ・何を断るか」を定める意図の層です。人間の判断なしに閉じてよいのは機械的に白黒がつく3理由だけで、価値判断による却下はオーナー専決。歓迎する貢献6箇条・よくできていても断るもの7箇条・前提検証の4パターン・置き場所のはしご6段・「破られた方針は check に昇格」を条文にしています（[Hermes Agent](https://github.com/NousResearch/hermes-agent) の Contribution Rubric を一部参考にしています）。
 
