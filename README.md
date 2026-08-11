@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.0-blue)
+![version](https://img.shields.io/badge/version-v0.9.2-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -350,7 +350,11 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.9.0** (2026-08-10). It adds the machine-gate template set ([templates/ci/](templates/ci/README.md)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).
+The current version is **v0.9.2** (2026-08-11) — a hardening revision of the machine-gate template set ([templates/ci/](templates/ci/README.md)). It closes, at the template level, three "silently green" defects surfaced by real-world feedback from the first deployment (3 repos): (1) a new standing category `RISK_PATHS_AUTH` for the auth/permission boundary — the default net's `**/auth/**` assumed auth code lives under an `auth/` directory, so repos with a flat layout had their entire auth surface sitting outside the net; it now requires an explicit declaration and fails closed; (2) case hardening for the `none` declaration plus a sanity check on declaration lines (space-separated multiple patterns, comment lines, and leftover placeholders are all flagged red), plus dead-pattern warnings; (3) deployment-verification pitfalls added to the templates/ci README (a detection-confirmed fixture, blocking a false green when zero targets match, and combining with a shebang scan). The revision went through 4 rounds of multi-seat review (all 3 seats GO) and has been synced out to the already-deployed repos.
+
+- **v0.9.1** (2026-08-10, untagged, template-only revision) — a new standing category `RISK_PATHS_GATES`, plus adding Makefile / `scripts/ci/**` to the default net (feedback from the v0.9.0 deployment verification)
+
+- **v0.9.0** (2026-08-10) — It adds the machine-gate template set ([templates/ci/](templates/ci/README.md)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).
 
 - **v0.8.0** (2026-08-09) — the rejection-rubric layer (`R-1`–`R-6`, [docs/09](docs/09-rejection-rubric.md)) — where the L layers define *how to proceed*, this intent layer defines *what gets accepted and what gets declined*. Only three mechanically clear-cut reasons allow closing without a human; every value judgment is reserved for the owner. It also codifies six kinds of welcome contributions, seven things declined even when well-built, four premise-verification patterns, a six-rung placement ladder, and "a broken policy gets promoted to a check" (drawing in part on the Contribution Rubric of [Hermes Agent](https://github.com/NousResearch/hermes-agent), MIT).
 
