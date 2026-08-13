@@ -52,6 +52,7 @@ PR 本文に**完了記録**を貼る（[様式](templates/issue-template.md)）
 - **Done when → PASS / FAIL / 理由付き N/A** の対応表 + インライン証拠
 - **宣言 vs 実 diff の照合**（`git diff --stat origin/main...<SHA>` — 宣言にないファイルは blocking）
 - **identity check**（implementer と reviewer の別モデル / 別エージェントの明記）
+- **CI 状態**（green / 赤の例外は T-4 の成立条件4点すべて必須）
 
 merge 後は Issue を close し、各導入先のローカル要約（CLAUDE.md 等）を追従させる（owner-applies）。
 

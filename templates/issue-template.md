@@ -1,6 +1,6 @@
 # Issue / レーンコメント テンプレート
 
-各契約（rule ID）のフィールドスキーマの正本。本文側（docs/01〜03・05〜09）は最小 MUST 文のみを持ち、詳細はここに置く。
+各契約（rule ID）のフィールドスキーマの正本。本文側（docs/01〜03・05〜10）は最小 MUST 文のみを持ち、詳細はここに置く。
 EPIC Issue と Epic レーン固有の様式（チェックポイント表・Epic ログ・ライトゲート記録・Epic 終端）は [epic-template.md](epic-template.md)（E 系）。Epic 内の子 Issue は本ページの様式をそのまま使う。
 
 ## Issue 本文（L1-2）
@@ -119,7 +119,12 @@ candidate SHA: <commit SHA>   <!-- レビュー時点の PR head と一致。変
 implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
-CI: green | red（既知・無関係 — Issue #<n> 参照）   <!-- 赤のまま merge 禁止（T-4）。例外は既知無関係の赤 + Issue 参照 + オーナー専決のみ -->
+CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない -->
+<!-- red の場合のみ、以下の4点すべて必須（T-4 — 1つでも欠ければ例外不成立）:
+     failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
+     無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>
+     既知 Issue: #<n>（LC-1 退場トリガー付き）
+     owner 承認: <オーナー本人の PR コメント等、実在を第三者が確認できる形。本文記述のみは不成立（FP-8）> -->
 
 ### Done when → 結果
 
