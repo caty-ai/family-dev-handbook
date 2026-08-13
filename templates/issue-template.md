@@ -119,8 +119,8 @@ candidate SHA: <commit SHA>   <!-- レビュー時点の PR head と一致。変
 implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
-CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない -->
-<!-- red の場合のみ、以下の4点すべて必須（T-4 — 1つでも欠ければ例外不成立）:
+CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない。N/A は CI が当該変更を検査しない場合に限る（CI が走る変更は非コードでも N/A 不可） -->
+<!-- red の場合は、以下の4点をコメントの外に転記して埋める（コメントのままは未記入扱い = blocking。1点でも欠ければ例外不成立 — T-4）:
      failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
      無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>
      既知 Issue: #<n>（LC-1 退場トリガー付き）
