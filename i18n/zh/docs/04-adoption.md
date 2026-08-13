@@ -12,7 +12,7 @@
 
 - **带版本刻印的紧凑摘要，唯一 owner 是本页面（docs/04）**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）是 owner-applies —— 由干事 Agent 提出建议，各运行时的 owner 自行贴入
 - 下游本地摘要的覆盖，**允许比正本更严格，禁止比正本更宽松**（tighten only）。该原则的跨 Agent 通用规范 owner 是 family-os 的 operations-policy（config trust 节 —— 参见 [README](../../../README.zh.md) 的"Caty AI ファミリー"节）。本页面是该协作协议的应用。若在没有 sister projects 的情况下导入，直接套用 tighten-only 原则即可
-- 摘要不誊写正文，而是以 **rule ID + 一行姿态**来引用。ID 的定义正文在 docs/01〜03・05〜09，注释样式的字段模式在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- 摘要不誊写正文，而是以 **rule ID + 一行姿态**来引用。ID 的定义正文在 docs/01〜03・05〜10，注释样式的字段模式在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## 各 Agent 的集成位置
 
@@ -31,9 +31,9 @@
 将以下内容原样贴入各 Agent 的常驻上下文：
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-09 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-14 / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜09、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -76,6 +76,13 @@ R 却下ルーブリック: R-1 自動却下は3理由のみ（main 済を行で
   価値判断の却下はオーナー専決・迷ったら閉じない / R-2 歓迎6箇条（クラス全体修正・端は拡張腰は保守・宣言リファクタ歓迎=宣言と照合は緩まない等） /
   R-3 良品でも断る7箇条（執行は常にオーナー専決） / R-4 前提検証4パターン+「行を指させないなら前提未検証」 /
   R-5 置き場所はしご6段・最小の段・新リポはオーナー承認・同種3つで共通受け口 / R-6 方針は check で強制・2回破られたら起票・ゲートは fail-closed
+T テスト&CI基準: T-1 コードを含む新規リポは作成時にテストランナー+CI（test を gate・型検査ある言語は typecheck も）整備・
+  テスト0本でも枠を先に張る・既存リポは次にコードを触るレーンで同時整備（opportunistic・棚卸しレーンは立てない）・非コードリポは理由付き N/A /
+  T-2 サイズ M/L/H（Epic 子は子の重さ）のバグ修正 PR は再現テスト（fix 前赤・fix 後緑）同梱が既定・S は免除・
+  同梱不能の理由は3類型（環境依存/外部サービス依存/再現コスト過大=オーナー承認）・類型外はオーナー専決を PR に1行記録 /
+  T-3 コード変更を含む委譲ブリーフの実装チェックに「追加・変更したテストと実行結果」を標準項目化・追加なしは閉じた列挙（T-3）の理由つき報告 /
+  T-4 CI 赤のまま merge 禁止・例外は既知無関係の赤のみ（base 再現+赤の identity+LC-1 期限つき Issue 参照+実在検証できるオーナー専決の4条件すべて必須）・
+  flaky は含めない・CI 不在は green ではない・N/A は CI が当該変更を検査しない場合のみ・参照無き赤・検証できない例外は例外にならない
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
@@ -86,6 +93,7 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 1. 在 `ARCHITECTURE.md` 中新建"并行安全地图"章节（[模板](../templates/architecture-parallel-map.md)）
 2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
 3. 全员遵守避免直接 push main 的运作方式（能设置 branch protection 的话就设置）
+4. 整备测试运行器 + CI workflow，并注册到 required status checks（[T-1](10-test-ci-baseline.md)；类型见 [templates/ci/](../templates/ci/README.md)。非代码仓库在 Issue 中记录一行理由付 N/A）
 
 ## 角色分工由各 Agent 自行决定
 

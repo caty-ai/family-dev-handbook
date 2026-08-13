@@ -70,6 +70,7 @@ A PR may only be merged when a **completion record** ([template](../templates/is
 3. State the **candidate commit SHA** explicitly — it must match the PR head at review time (if it changes before merge, that's a superseding record per L1-8)
 4. Cross-check the declared file set against `git diff --stat origin/main...<candidate SHA>` (a file in the diff but not in the list is blocking — [L0-6](03-git-protocol.md))
 5. Link the identities of implementer and reviewer, confirming **the model or agent differs** (L1-3)
+6. **State the CI status** — don't merge while it's red. The sole exception condition for a known, unrelated red is [T-4](10-test-ci-baseline.md)
 
 **Evidence exists before the claim does.** Success that only exists locally is not completion.
 
@@ -108,7 +109,7 @@ The seat counts in this table apply to **implementation review that clears a mer
 
 ## Definition of done
 
-- Tests and lint pass
+- Tests and lint pass (the sole explicit exception is [T-4](10-test-ci-baseline.md))
 - The PR carrying an L1-7 completion record is merged, and the Issue is closed
 - **The online repo is the up-to-date source of truth** (it doesn't end with results that only exist locally)
 - If work spans multiple sessions, the entry point for continuing (what to do next) is left in an Issue comment or a handoff

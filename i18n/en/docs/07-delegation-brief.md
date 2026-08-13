@@ -16,6 +16,8 @@ A request for a substantive delegation (one involving implementation, modificati
 
 Reason: handing over the spec alone makes "it's done" unverifiable. By handing over, **at the point of delegation**, what counts as done (self-verification) and what to scrutinize (review criteria), the deliverable can be judged by evidence rather than by claim (the same direction as [L1-7](02-issue-loop.md)).
 
+Note: a brief that includes a code change must include, in its Implementation Check, **"tests added or changed, and their results" as a standard item** ([T-3](10-test-ci-baseline.md). If no test was added, report the reason per T-3's closed enumeration).
+
 ## B-2 Applicability — When In Doubt, Include It
 
 - **Mandatory**: delegations involving implementation, modification, or generation. Include it even at size S, as long as the output stays in the repository

@@ -7,7 +7,7 @@
 ![Family Dev Handbook — five lanes passing through gates and merging into one](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.2-blue)
+![version](https://img.shields.io/badge/version-v0.10.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -185,16 +185,16 @@ Do not change the handbook-revision value.
 
 ### Do it yourself
 
-1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 45 lines of text
+1. Open the "distribution summary block" in [docs/04](docs/04-adoption.md) — it is about 50 lines of text
 2. Paste the whole thing into a config file that is always loaded
 3. On the first line, rewrite `owner` and `last-verified` for yourself and today. Leave `handbook-revision` untouched
 4. On the second line, rewrite `正本:` to the URL of this repository (or of your fork, if you forked it)
 
-That is the whole installation. What you pasted is eight families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
+That is the whole installation. What you pasted is nine families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`, `T-1`–`T-4`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
 
-If you change your mind, delete those 45-odd lines and you are back where you started. Nothing else is touched.
+If you change your mind, delete those 50-odd lines and you are back where you started. Nothing else is touched.
 
-Repository-side preparation (the parallel-safety map, Issue templates, protecting main) is described in [docs/04](docs/04-adoption.md).
+Repository-side preparation (the parallel-safety map, Issue templates, protecting main, a test runner + CI) is described in [docs/04](docs/04-adoption.md).
 
 Something is probably still nagging at you before you paste. Here are the answers.
 
@@ -246,7 +246,7 @@ That single diagram is one clause, `L2-4`. The map of everything else is below.
 
 ## The full rule map
 
-The rules fall into eight families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
+The rules fall into nine families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
 
 | Family | What it decides | Rule IDs | Text |
 |---|---|---|---|
@@ -258,6 +258,7 @@ The rules fall into eight families, and every one of them carries an ID that doe
 | **B** Delegation brief | How a single delegation becomes a contract | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** Lifecycle | When and how what you put down leaves | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** Rejection rubric | What gets accepted and what gets declined | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
+| **T** Test & CI baseline | How proof of correctness is accumulated | `T-1`–`T-4` | [docs/10](docs/10-test-ci-baseline.md) |
 
 Two clauses matter most for whether any of this actually works. One is the **FP** watchword, "if you cannot verify it, go serial — fail-open never means *passed*" — a declaration that even where you deliberately choose to let something through unverified, that can never be read as having been confirmed. The other is the **single definition of high-risk territory**. Work that touches it always stops for a human, and its review seats increase (publishing, spending money, irreversible operations, and permission boundaries are the kind of thing it covers — read the canonical text for the exact line). So that the definition never lives in two places, its only canonical home is [docs/06](docs/06-epic-lane.md).
 
@@ -302,6 +303,7 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B delegation brief — the contract carried by the prompt each time work is handed to a subagent (`B-1`–`B-5`) |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC workspace lifecycle — the layer that turns departure into a contract; the numbers in exit conditions live in local settings (`LC-1`–`LC-5`) |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R rejection rubric — the intent layer for what gets accepted and what gets declined: the three auto-decline reasons, welcome/decline criteria, premise verification, the placement ladder, and promoting policies to checks (`R-1`–`R-6`) |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T test & CI baseline — initial setup, the regression-test default, the brief-format hookup, fail-closed merge. An appendix carries a non-normative runner cheat sheet (`T-1`–`T-4`) |
 | [templates/issue-template.md](templates/issue-template.md) | Issue template and every lane comment format (WIP / HOLD / termination / TAKEOVER / resume check / completion record) |
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
@@ -350,8 +352,9 @@ Here is where things stand, and where they are going.
 
 ## Development status
 
-The current version is **v0.9.2** (2026-08-11) — a hardening revision of the machine-gate template set ([templates/ci/](templates/ci/README.md)). It closes, at the template level, three "silently green" defects surfaced by real-world feedback from the first deployment (3 repos): (1) a new standing category `RISK_PATHS_AUTH` for the auth/permission boundary — the default net's `**/auth/**` assumed auth code lives under an `auth/` directory, so repos with a flat layout had their entire auth surface sitting outside the net; it now requires an explicit declaration and fails closed; (2) case hardening for the `none` declaration plus a sanity check on declaration lines (space-separated multiple patterns, comment lines, and leftover placeholders are all flagged red), plus dead-pattern warnings; (3) deployment-verification pitfalls added to the templates/ci README (a detection-confirmed fixture, blocking a false green when zero targets match, and combining with a shebang scan). The revision went through 4 rounds of multi-seat review (all 3 seats GO) and has been synced out to the already-deployed repos.
+The current version is **v0.10.0** (2026-08-14). The test & CI baseline layer (`T-1`–`T-4`, [docs/10](docs/10-test-ci-baseline.md)) has been added — the layer that turns "a repository keeps proving its own correctness through tests and CI" into a minimal, written contract. A new repository that contains code sets up a test runner + CI at creation time (the harness gets staked out even with zero tests yet; an existing repo sets it up the next time a lane touches its code), a bug-fix PR at size M / L / H comes with a reproduction test by default (red before the fix, green after — undeliverable cases are a closed enumeration plus owner sign-off), a delegation brief that touches code standardizes "tests added or changed, and their results" as a Self-verification item, and merging while CI is red is prohibited (the only exception is a known-and-unrelated red that satisfies all four conditions: base reproduces it, the red's identity is bound, an Issue with an exit-by reference exists, and owner sign-off is verifiable by a third party). The starting point was [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9) — real-world evidence where an external review flagged "zero tests" as the biggest reliability gap, and introducing a test suite plus fail-closed CI made the finding itself disappear.
 
+- **v0.9.2** (2026-08-11) — a hardening revision of the machine-gate template set ([templates/ci/](templates/ci/README.md)). It closes, at the template level, three "silently green" defects surfaced by real-world feedback from the first deployment (3 repos) (a new standing category `RISK_PATHS_AUTH`, case hardening for the `none` declaration plus a sanity check on declaration lines, deployment-verification pitfalls added to the templates/ci README). Went through 4 rounds of multi-seat review (all 3 seats GO), and has been synced out to the already-deployed repos
 - **v0.9.1** (2026-08-10, untagged, template-only revision) — a new standing category `RISK_PATHS_GATES`, plus adding Makefile / `scripts/ci/**` to the default net (feedback from the v0.9.0 deployment verification)
 
 - **v0.9.0** (2026-08-10) — It adds the machine-gate template set ([templates/ci/](templates/ci/README.md)) — six standalone gates (test+lint, secret scan, PR size, unrelated-history rejection, high-risk human-review gate, report assembler) you deploy by copying into a repo. Every gate fails closed on unresolved or unconfigured state, and approvals are bound to the head SHA. The design drew in part on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (MIT — see [Acknowledgements](#acknowledgements)).

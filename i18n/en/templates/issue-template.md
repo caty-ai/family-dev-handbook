@@ -2,7 +2,7 @@
 
 # Issue / Lane Comment Templates
 
-The canonical field schema for each contract (rule ID). The body text (docs/01–03, 05–09) carries only minimal MUST statements; the details live here.
+The canonical field schema for each contract (rule ID). The body text (docs/01–03, 05–10) carries only minimal MUST statements; the details live here.
 The EPIC Issue and the formats specific to the Epic lane (checkpoint table, Epic log, light-gate record, Epic termination) live in [epic-template.md](epic-template.md) (E series). Child Issues within an Epic use this page's formats as-is.
 
 ## Issue body (L1-2)
@@ -121,6 +121,12 @@ candidate SHA: <commit SHA>   <!-- レビュー時点の PR head と一致。変
 implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
+CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない。N/A は CI が当該変更を検査しない場合に限る（CI が走る変更は非コードでも N/A 不可） -->
+<!-- red の場合は、以下の4点をコメントの外に転記して埋める（コメントのままは未記入扱い = blocking。1点でも欠ければ例外不成立 — T-4）:
+     failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
+     無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>
+     既知 Issue: #<n>（LC-1 退場トリガー付き）
+     owner 承認: <オーナー本人の PR コメント等、実在を第三者が確認できる形。本文記述のみは不成立（FP-8）> -->
 
 ### Done when → 結果
 
