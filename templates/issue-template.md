@@ -119,6 +119,7 @@ candidate SHA: <commit SHA>   <!-- レビュー時点の PR head と一致。変
 implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
+CI: green | red（既知・無関係 — Issue #<n> 参照）   <!-- 赤のまま merge 禁止（T-4）。例外は既知無関係の赤 + Issue 参照 + オーナー専決のみ -->
 
 ### Done when → 結果
 

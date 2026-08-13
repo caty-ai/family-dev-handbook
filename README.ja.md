@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.2-blue)
+![version](https://img.shields.io/badge/version-v0.10.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -188,7 +188,7 @@ handbook-revision の値は書き換えないでください。
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は8系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-4`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
 やめたくなったら、貼った45行ほどを消すだけで元に戻ります。ほかのファイルには触りません。
 
@@ -244,7 +244,7 @@ flowchart TD
 
 ## ルールの全体像
 
-ルールは8系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
+ルールは9系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
 
 | 系統 | 決めること | rule ID | 本文 |
 |---|---|---|---|
@@ -256,6 +256,7 @@ flowchart TD
 | **B** 委譲ブリーフ | 1回の委譲をどう契約にするか | `B-1`〜`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** ライフサイクル | 置いた物をいつ・どう退場させるか | `LC-1`〜`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 却下ルーブリック | 何を受け入れ・何を断るか | `R-1`〜`R-6` | [docs/09](docs/09-rejection-rubric.md) |
+| **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-4` | [docs/10](docs/10-test-ci-baseline.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -300,6 +301,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委譲ブリーフ — サブエージェントへ仕事を1回渡すときの依頼文の契約（`B-1`〜`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC ワークスペース・ライフサイクル — 置いた物の退場を契約にする層・退場条件の数値はローカル正本（`LC-1`〜`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 却下ルーブリック — 何を受け入れ・何を断るかの意図の層。自動却下の3理由・歓迎/却下の判断基準・前提検証・置き場所のはしご・check 昇格（`R-1`〜`R-6`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge。付録に非規範のランナー早見表（`T-1`〜`T-4`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
@@ -348,8 +350,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.9.2**（2026-08-11）。機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂です — 初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました: ①認証・権限境界の常設カテゴリ `RISK_PATHS_AUTH` を新設（既定網の `**/auth/**` は「認証コードは auth/ ディレクトリにある」という配置前提で、フラット配置のリポでは認証面がまるごと網外になっていた — 宣言必須の fail-closed へ）②`none` 宣言の大小文字硬化と宣言行の健全性検査（空白区切りの複数パターン・コメント行・プレースホルダ残骸はすべて赤）+ 死にパターン警告 ③展開検証の落とし穴を templates/ci の README に追記（検知確認済みフィクスチャ・「対象0件で緑」封じ・shebang スキャン併用）。改訂は多席レビュー4ラウンド（3席全 GO）を経て、展開済みリポへ同期しています。
+現行バージョンは **v0.10.0**（2026-08-14）。テスト & CI 基準層（`T-1`〜`T-4`・[docs/10](docs/10-test-ci-baseline.md)）が加わりました — リポジトリが自分の正しさをテストと CI で証明し続けるための最低限を条文にした層です。新規リポは作成時にテストランナー + CI を整備（テスト0本でも枠を先に張る・既存リポは次に触るレーンで整備）、サイズ M 以上のバグ修正は再現テスト同梱が既定（同梱できない理由は列挙式）、委譲ブリーフの実装チェックに「追加・変更したテストと実行結果」を標準項目化、そして CI 赤のままの merge を禁止（既知無関係の赤だけが Issue 参照 + オーナー専決の例外）。出発点は [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9) — 外部レビューが「テスト0本」を最大の信頼性欠陥として指摘し、テストスイート + fail-closed CI の導入で指摘そのものが消えた実測です。
 
+- **v0.9.2**（2026-08-11） — 機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂。初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました（`RISK_PATHS_AUTH` 常設カテゴリ新設・`none` 宣言の大小文字硬化と宣言行の健全性検査・展開検証の落とし穴を README に追記）。多席レビュー4ラウンド（3席全 GO）
 - **v0.9.1**（2026-08-10・タグなし・型のみの改訂） — `RISK_PATHS_GATES` 常設カテゴリの新設と、既定網への Makefile / `scripts/ci/**` の追加（v0.9.0 の展開検証からの還流）
 - **v0.9.0**（2026-08-10） — 機械の門番テンプレ一式（[templates/ci/](templates/ci/README.md)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
 
