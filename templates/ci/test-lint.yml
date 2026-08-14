@@ -10,8 +10,11 @@
 # - set -euo pipefail 必須・`|| true` でゲート判定を飲み込むこと禁止。
 # - test は ubuntu と macOS の両方で走らせる (handbook #54)。開発機は全員 macOS で、
 #   Linux 単独の CI は BSD/GNU のコマンド挙動差 (sed/grep/date/`--`/`\r`) を構造的に見逃すため。
-#   private リポへ配る場合のみ: macOS 分は課金レート10倍のため、owner 判断で
-#   `test-macos` に `if: github.event_name == 'push'` を付けて main への push 時限定にしてよい。
+#   private リポへ配る場合のみ: macOS 分は課金レート10倍のため、owner 判断で main への
+#   push 時限定にしてよい。ただし必ずセットで行う: `on:` に `push: branches: [main]` を追加し、
+#   かつ `test-macos` に `if: github.event_name == 'push'` を付ける。この型は素では
+#   `on: pull_request` のみなので、if だけ付けると常に skipped＝「置いただけ」の穴になる (FP-5)。
+#   注意: workflow 単位で必須化する ruleset のリポでは、job 追加はそのまま必須チェックに加わる。
 # 型の正本: caty-ai/family-dev-handbook templates/ci/
 
 name: Test + Lint
