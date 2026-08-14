@@ -104,7 +104,7 @@ The long version: [why systems are kept simple](docs/why-simple-systems.md).
 
 ## What you get
 
-The problem is split across three layers, each closed a different way. The upper layers *prevent* accidents; the lower layer *detects and contains* them.
+The problem is split across three layers, each closed a different way. The upper layers *prevent* accidents; the lower layer *detects and contains* them. And as of v0.10.0, a foundation sits beneath the three — **T, the test & CI baseline** — so that not only "how work proceeds" but "proof that the artifact is correct" is under contract.
 
 Three words from the diagram, up front. A **lane** is the flow of work belonging to one Issue. **WIP** is a declaration that work is in progress. A **soft lock** is the promise that nobody else touches those files while the declaration stands.
 
@@ -123,7 +123,10 @@ flowchart TB
     subgraph L0["L0 — prevent physical collisions in git"]
         C1["Isolate with a worktree"] --> C2["WIP declaration, four fields<br/>= soft lock, expires in 72h"] --> C3["main is merge-only<br/>one at a time: rebase → re-verify"]
     end
-    L2 --> L1 --> L0
+    subgraph T["T — accumulate proof of correctness"]
+        D1["Stake out tests + CI<br/>at repo creation"] --> D2["Bug fixes ship with<br/>a reproduction test"] --> D3["No merging on red CI<br/>verified exceptions only"]
+    end
+    L2 --> L1 --> L0 --> T
 ```
 
 - 🚦 **Decide parallelism before anyone starts**
@@ -137,6 +140,10 @@ flowchart TB
 - 🔒 **Contain physical collisions through how you use git**
 
   One session = one Issue = one branch = one worktree (the git feature that splits a single repository into several working folders). main is merge-only. An active lane counts as a soft lock only while its four fields are declared, and it expires on its own after 72 hours.
+
+- 🧪 **Accumulate proof of correctness in tests and CI**
+
+  A repository that contains code carries a CI harness from the day it is created, and a bug fix merges together with a reproduction test for that bug (red before the fix, green after). Merging while CI is red is prohibited — the only thing that passes is a known, unrelated red that satisfies every verification condition. Instead of "it should work", the proof keeps piling up.
 
 Before asking whether it works, ask what it costs to try. The answer is: almost nothing.
 
