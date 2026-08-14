@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.10.0-blue)
+![version](https://img.shields.io/badge/version-v0.11.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -359,8 +359,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.10.0**（2026-08-14）——新增了测试与 CI 基准层（`T-1`–`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。这一层把“仓库如何持续用测试与 CI 证明自身的正确性”这一最低限度写成了条文：包含代码的新仓库在创建时即整备测试运行器 + CI（即使测试为 0 个也先把框架搭好；已有仓库在下一次触碰代码的车道中整备），尺寸 M / L / H 的 bug 修复默认同梱复现测试（fix 前变红・fix 后变绿，无法同梱的理由走闭合列举 + owner 专属决定），包含代码变更的委托简报的实现检查中把“新增/变更的测试及其运行结果”列为标准项目，并且禁止在 CI 变红的状态下 merge（例外仅限于同时满足 base 复现、红色的 identity、带期限的 Issue 引用、可被第三方核实的 owner 专属决定这 4 个条件的已知且无关的红）。出发点是 [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)——外部评审把“零测试”指出为最大的可信度缺陷，引入测试套件 + fail-closed CI 之后，这条指摘本身就消失了的实测案例。
+当前版本是 **v0.11.0**（2026-08-15）——评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员逐个进行**：生效数据由本仓库中每位成员一条的 pinned Issue 持有，未到生效日的成员按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
 
+- **v0.10.0**（2026-08-14） — 测试与 CI 基准层（`T-1`–`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。包含代码的新仓库在创建时整备测试运行器 + CI・尺寸 M / L / H 的 bug 修复默认同梱复现测试・委托简报把“新增/变更的测试及其运行结果”列为标准项目・禁止在 CI 红的状态下 merge（例外仅限满足 4 条件的已知无关的红）。出发点是 [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷用模板层面堵上了（新增常设分类 `RISK_PATHS_AUTH`・`none` 声明的大小写强化与声明行健全性检查・把落地验证的坑点补写进 README）。经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库
 - **v0.9.1**（2026-08-10・未打 tag・仅模板层面的改版） — 新增常设分类 `RISK_PATHS_GATES`，并把 Makefile / `scripts/ci/**` 加入默认网（来自 v0.9.0 落地验证的反馈）
 
