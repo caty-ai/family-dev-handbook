@@ -2,7 +2,7 @@
 
 # Issue / 车道评论 模板
 
-各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜09）只保留最小的 MUST 条文，细节放在这里。
+各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜10）只保留最小的 MUST 条文，细节放在这里。
 EPIC Issue 与 Epic 车道专属的格式（检查点表・Epic 日志・轻量门禁记录・Epic 终结）见 [epic-template.md](epic-template.md)（E 系列）。Epic 内部的子 Issue 照搬本页的格式。
 
 ## Issue 正文（L1-2）
@@ -121,6 +121,12 @@ candidate SHA: <commit SHA>   <!-- レビュー時点の PR head と一致。変
 implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
+CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない。N/A は CI が当該変更を検査しない場合に限る（CI が走る変更は非コードでも N/A 不可） -->
+<!-- red の場合は、以下の4点をコメントの外に転記して埋める（コメントのままは未記入扱い = blocking。1点でも欠ければ例外不成立 — T-4）:
+     failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
+     無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>
+     既知 Issue: #<n>（LC-1 退場トリガー付き）
+     owner 承認: <オーナー本人の PR コメント等、実在を第三者が確認できる形。本文記述のみは不成立（FP-8）> -->
 
 ### Done when → 結果
 

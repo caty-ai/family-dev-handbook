@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.9.2-blue)
+![version](https://img.shields.io/badge/version-v0.10.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -185,16 +185,16 @@ handbook-revision 的值请不要改动。
 
 ### 自己动手装
 
-1. 打开 [docs/04](docs/04-adoption.md) 里的“分发用摘要块”（大约 45 行文本）
+1. 打开 [docs/04](docs/04-adoption.md) 里的“分发用摘要块”（大约 50 行文本）
 2. 整块粘贴进一个常驻加载的配置文件
 3. 把第一行的 `owner` 和 `last-verified` 改成你自己和今天的日期。`handbook-revision` 原样保留
 4. 把第二行的 `正本:` 改成本仓库的 URL（如果你 fork 了，就填你 fork 的地址）
 
-要粘贴的就这些。里面只有八套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
+要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-4`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
 
-想停用的话，把粘进去的那 45 行左右删掉就回到原样。其他文件一概不碰。
+想停用的话，把粘进去的那 50 行左右删掉就回到原样。其他文件一概不碰。
 
-仓库这一侧的准备（并行安全地图、Issue 模板、保护 main）写在 [docs/04](docs/04-adoption.md)。
+仓库这一侧的准备（并行安全地图、Issue 模板、保护 main、测试运行器 + CI）写在 [docs/04](docs/04-adoption.md)。
 
 在粘贴之前，你心里大概还有几个疙瘩。先在这里回答。
 
@@ -246,7 +246,7 @@ flowchart TD
 
 ## 规则全景
 
-规则分为八套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
+规则分为九套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
 
 | 体系 | 决定什么 | rule ID | 正文 |
 |---|---|---|---|
@@ -258,6 +258,7 @@ flowchart TD
 | **B** 委派简报 | 一次委派如何成为契约 | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** 生命周期 | 放下的东西何时、如何退场 | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 拒收准则 | 接受什么、拒绝什么 | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
+| **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-4` | [docs/10](docs/10-test-ci-baseline.md) |
 
 其中有两条特别左右成效。一条是 **FP** 的口号“无法验证就串行。fail-open 不等于‘通过’”——它宣告的是：即便你有意选择在无法确认时放行，那也绝不能被读成“已确认”。另一条是**高风险领域的单一定义**，碰到这里的工作一定要停下来等人确认，评审席位也会增加（对外发布、计费、不可逆操作、权限边界之类都算。准确的界线请看正本）。为了不让同一个定义存在于两个地方，正本只放在 [docs/06](docs/06-epic-lane.md) 这一处。
 
@@ -302,6 +303,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委派简报 — 每次把工作交给子智能体时，提示词所承载的契约（`B-1`–`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC 工作区生命周期 — 把“退场”变成契约的层；退场条件的数值以本地设置为正本（`LC-1`–`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 拒收准则 — 决定接受什么、拒绝什么的意图层：自动拒收的三个理由、欢迎/拒收的判断标准、前提验证、放置阶梯、把方针升格为 check（`R-1`–`R-6`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge。附录为非规范性的运行器速查表（`T-1`–`T-4`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue 模板与全部车道评论格式（WIP / HOLD / 终结 / TAKEOVER / 恢复检查 / 完成记录） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
@@ -350,8 +352,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.9.2**（2026-08-11）——机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷在模板层面堵上了：①新增认证/权限边界常设分类 `RISK_PATHS_AUTH`（默认网中的 `**/auth/**` 预设了“认证代码放在 auth/ 目录下”这一前提，扁平结构的仓库因此让整个认证面漏在网外——现在改为必须显式声明，否则 fail-closed）②`none` 声明的大小写强化与声明行健全性检查（空格分隔的多个模式、注释行、残留占位符均判红）+ 失效模式告警 ③把落地验证的坑点补写进 templates/ci 的 README（已确认可检测的 fixture、堵住“目标 0 件也判绿”、并配合 shebang 扫描）。改版经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库。
+当前版本是 **v0.10.0**（2026-08-14）——新增了测试与 CI 基准层（`T-1`–`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。这一层把“仓库如何持续用测试与 CI 证明自身的正确性”这一最低限度写成了条文：包含代码的新仓库在创建时即整备测试运行器 + CI（即使测试为 0 个也先把框架搭好；已有仓库在下一次触碰代码的车道中整备），尺寸 M / L / H 的 bug 修复默认同梱复现测试（fix 前变红・fix 后变绿，无法同梱的理由走闭合列举 + owner 专属决定），包含代码变更的委托简报的实现检查中把“新增/变更的测试及其运行结果”列为标准项目，并且禁止在 CI 变红的状态下 merge（例外仅限于同时满足 base 复现、红色的 identity、带期限的 Issue 引用、可被第三方核实的 owner 专属决定这 4 个条件的已知且无关的红）。出发点是 [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)——外部评审把“零测试”指出为最大的可信度缺陷，引入测试套件 + fail-closed CI 之后，这条指摘本身就消失了的实测案例。
 
+- **v0.9.2**（2026-08-11） — 机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷用模板层面堵上了（新增常设分类 `RISK_PATHS_AUTH`・`none` 声明的大小写强化与声明行健全性检查・把落地验证的坑点补写进 README）。经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库
 - **v0.9.1**（2026-08-10・未打 tag・仅模板层面的改版） — 新增常设分类 `RISK_PATHS_GATES`，并把 Makefile / `scripts/ci/**` 加入默认网（来自 v0.9.0 落地验证的反馈）
 
 - **v0.9.0**（2026-08-10） — 新增了机器门禁模板一套（[templates/ci/](templates/ci/README.md)）——测试+lint / 密钥检测 / PR 体积上限 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器共六道门禁，复制进仓库即可使用的 standalone 型。所有门禁在无法验证或未配置时一律变红（fail-closed），批准与 head SHA 绑定。设计上部分参考了 [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT — 见[致谢](#acknowledgements)）。

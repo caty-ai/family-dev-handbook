@@ -52,12 +52,13 @@ PR 本文に**完了記録**を貼る（[様式](templates/issue-template.md)）
 - **Done when → PASS / FAIL / 理由付き N/A** の対応表 + インライン証拠
 - **宣言 vs 実 diff の照合**（`git diff --stat origin/main...<SHA>` — 宣言にないファイルは blocking）
 - **identity check**（implementer と reviewer の別モデル / 別エージェントの明記）
+- **CI 状態**（green / 赤の例外は T-4 の成立条件4点すべて必須）
 
 merge 後は Issue を close し、各導入先のローカル要約（CLAUDE.md 等）を追従させる（owner-applies）。
 
 ## スコープの注意
 
-- 契約本文（docs/01〜03・05〜09 の rule ID つきルール）の変更は影響が大きい。**rule ID は安定 ID** — 番号の振り直し・意味の変更は原則しない（追加は末尾番号）
+- 契約本文（docs/01〜03・05〜10 の rule ID つきルール）の変更は影響が大きい。**rule ID は安定 ID** — 番号の振り直し・意味の変更は原則しない（追加は末尾番号）
 - エージェント横断の一般規範（fail-posture / stop-precedence 等）は本リポのスコープ外（[docs/05](docs/05-fail-posture.md) 冒頭の規範オーナー分担を参照）。ここには**人間⇔エージェント協働プロトコルの文言**だけを置く
 - 条文は役割語（オーナー / エージェント / レビュー席 / 各家 など）で書き、固有名・内部パス・非公開リポ名を書かない
 
