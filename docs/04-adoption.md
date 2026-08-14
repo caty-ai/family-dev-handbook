@@ -29,7 +29,7 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-14 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-15 / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
 この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
@@ -43,8 +43,8 @@ L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予�
   L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
   証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
   L1-9 サイズ L/H/Epic（=L2-1 の重い側・アーキ・要件含む）は実装着手前に異種レビュー（S/M 単発Issueには課さない） /
-  L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録 /
-  L1-11 席数 S/M=異種2・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT
+  L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録・実名カタログ=データ層（handbook外・非規範=法とメンバー設定を上書きできない）・抽選/代打は異系統必須（記録された6フィールド例外のみ可）・名指しパネルの同系統は記録つきcorrelated-seatsのみ適法（レビュー記録に明記・無明記=席数未達） /
+  L1-11 席数 S/M=異種3（発効はメンバー（家）ごと・発効データ=正本リポの pinned Issue 3フィールド・発効前は旧床2で適法・**Issue無し/フィールド欠落=発効前を主張できず床3**）・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT（対象はレーンのみ・家への無期限適用禁止）
 L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /
   L0-2 宣言外は触らない・UNKNOWN=直列 / L0-3 stale=72h・引き取りは TAKEOVER+再開チェック+新WIP宣言 /
   L0-4 1セッション=1Issue=1branch=1worktree / L0-5 main マージ専用 /

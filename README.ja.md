@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.10.0-blue)
+![version](https://img.shields.io/badge/version-v0.11.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -357,8 +357,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.10.0**（2026-08-14）。テスト & CI 基準層（`T-1`〜`T-4`・[docs/10](docs/10-test-ci-baseline.md)）が加わりました — リポジトリが自分の正しさをテストと CI で証明し続けるための最低限を条文にした層です。コードを含む新規リポは作成時にテストランナー + CI を整備（テスト0本でも枠を先に張る・既存リポは次にコードを触るレーンで整備）、サイズ M / L / H のバグ修正は再現テスト（fix 前に赤・fix 後に緑）の同梱が既定（同梱できない理由は閉じた列挙 + オーナー専決）、コード変更を含む委譲ブリーフの実装チェックに「追加・変更したテストと実行結果」を標準項目化、そして CI 赤のままの merge を禁止（例外は base 再現・赤の identity・期限つき Issue 参照・実在検証できるオーナー専決の4条件を満たす既知無関係の赤のみ）。出発点は [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9) — 外部レビューが「テスト0本」を最大の信頼性欠陥として指摘し、テストスイート + fail-closed CI の導入で指摘そのものが消えた実測です。
+現行バージョンは **v0.11.0**（2026-08-15）。レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）です。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化です（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
 
+- **v0.10.0**（2026-08-14） — テスト & CI 基準層（`T-1`〜`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。コードを含む新規リポは作成時にテストランナー + CI を整備・サイズ M / L / H のバグ修正は再現テスト同梱が既定・委譲ブリーフに「追加・変更したテストと実行結果」を標準項目化・CI 赤のままの merge 禁止（例外は4条件を満たす既知無関係の赤のみ）。出発点は [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂。初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました（`RISK_PATHS_AUTH` 常設カテゴリ新設・`none` 宣言の大小文字硬化と宣言行の健全性検査・展開検証の落とし穴を README に追記）。多席レビュー4ラウンド（3席全 GO）を経て、展開済みリポへ同期済み
 - **v0.9.1**（2026-08-10・タグなし・型のみの改訂） — `RISK_PATHS_GATES` 常設カテゴリの新設と、既定網への Makefile / `scripts/ci/**` の追加（v0.9.0 の展開検証からの還流）
 - **v0.9.0**（2026-08-10） — 機械の門番テンプレ一式（[templates/ci/](templates/ci/README.md)）が加わりました — テスト+lint / secret 検知 / PR サイズ上限 / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器の6門番を、対象リポへコピーして置くだけの standalone 型として配ります。全ゲートは検証不能・未設定のとき赤（fail-closed）・承認は head SHA に束縛。設計にあたり [Hermes Agent](https://github.com/NousResearch/hermes-agent)（MIT）を一部参考にさせていただきました（→ [謝辞](#acknowledgements)）。
