@@ -1,0 +1,468 @@
+{
+  "vectors_version": "v1",
+  "law_anchor": "family-dev-handbook v0.11.0 — docs/02 (L1-9 / L1-10 / L1-11), docs/05 (FP-7)",
+  "id_convention": "実名モデル ID を含まない (L1-10)。抽象語彙: モデル= model-a/model-b/…、系統= family-a/…、実装 writer= model-w (family-w)、メンバー= member-a。",
+  "kinds": {
+    "panel": "席構成の適法性を判定する。expect = {required_seats, lawful, failure_class}",
+    "seat_wait": "SEAT-WAIT 宣言の有効性を判定する。expect = {valid}",
+    "record": "レビュー記録の形式要件を判定する。expect = {valid}"
+  },
+  "failure_classes": {
+    "underseated": "席数未達 (数えられない席・無記録の同系統着席・無承認の降格を含む — L1-10/L1-11)",
+    "invalid-seat-wait": "SEAT-WAIT 宣言が必須3点を欠く・対象がレーンでない (L1-11)",
+    "invalid-record": "レビュー記録の必須項目欠落 (L1-10)"
+  },
+  "vectors": [
+    {
+      "id": "V01",
+      "slug": "sm-floor3-effective-requires-3",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "S/M 床3 発効済みの家: 異種3席で適法。"
+    },
+    {
+      "id": "V02",
+      "slug": "sm-floor3-pre-effect-old-floor-2",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": false},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 2, "lawful": true, "failure_class": null},
+      "notes": "発効データ (owner/発効日 or 立ち上げ完了条件/LC-1) が pinned Issue に記録済みで未発効の家: 旧床の異種2席で適法。旧床は記録された発効データを指せる場合にのみ主張できる猶予。"
+    },
+    {
+      "id": "V03",
+      "slug": "sm-floor3-no-pinned-issue-fp7",
+      "kind": "panel",
+      "rule_ids": ["L1-11", "FP-7"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "absent", "effective": null},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "pinned Issue が無い家は「発効前」を主張できない (FP-7: 記録の欠落は権限が縮む方向) — 床3が適用され、2席は未達。"
+    },
+    {
+      "id": "V04",
+      "slug": "sm-floor3-pinned-missing-field-fp7",
+      "kind": "panel",
+      "rule_ids": ["L1-11", "FP-7"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "missing_fields", "effective": null},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "3フィールドを欠く pinned Issue は発効データにならない — V03 と同じく床3。"
+    },
+    {
+      "id": "V05",
+      "slug": "high-risk-overrides-size-m",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": true,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 5, "lawful": false, "failure_class": "underseated"},
+      "notes": "高リスク領域はサイズ判定より優先 — M でも5席。3席は未達。"
+    },
+    {
+      "id": "V06",
+      "slug": "high-risk-5-distinct-lawful",
+      "kind": "panel",
+      "rule_ids": ["L1-10", "L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "H",
+        "high_risk": true,
+        "member_floor3": null,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"},
+          {"model": "model-d", "lineage": "family-d"},
+          {"model": "model-e", "lineage": "family-e"}
+        ]
+      },
+      "expect": {"required_seats": 5, "lawful": true, "failure_class": null},
+      "notes": "高リスク: 相互異種・writer 異種の5席で適法。"
+    },
+    {
+      "id": "V07",
+      "slug": "downgrade-owner-approved-counts",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "L",
+        "high_risk": false,
+        "member_floor3": null,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-1"},
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-2", "downgrade": {"owner_approval": true, "noted_in_review_record": true}},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "異種席が物理確保できない家の降格手続き: 同一モデル・別エージェント + オーナー明示承認 + 記録への明記 → 席に数えてよい。"
+    },
+    {
+      "id": "V08",
+      "slug": "downgrade-unapproved-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "L",
+        "high_risk": false,
+        "member_floor3": null,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-1"},
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-2", "downgrade": {"owner_approval": false, "noted_in_review_record": true}},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "無承認の降格は席数未達と同じ。"
+    },
+    {
+      "id": "V09",
+      "slug": "seat-wait-three-fields-valid",
+      "kind": "seat_wait",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "seat_wait": {"target": "lane", "fields_present": ["owner", "missing_seats", "retry_by"]}
+      },
+      "expect": {"valid": true},
+      "notes": "補充・降格でも未達 → 担当 Issue へのコメントで owner / 不足席 / 再試行期日の3点 → 有効な SEAT-WAIT。"
+    },
+    {
+      "id": "V10",
+      "slug": "seat-wait-missing-retry-invalid",
+      "kind": "seat_wait",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "seat_wait": {"target": "lane", "fields_present": ["owner", "missing_seats"]}
+      },
+      "expect": {"valid": false},
+      "notes": "3点を欠く SEAT-WAIT は無効。"
+    },
+    {
+      "id": "V11",
+      "slug": "seat-wait-on-member-invalid",
+      "kind": "seat_wait",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "seat_wait": {"target": "member", "fields_present": ["owner", "missing_seats", "retry_by"]}
+      },
+      "expect": {"valid": false},
+      "notes": "SEAT-WAIT の対象はレーンのみ — メンバー（家）そのものへの無期限 SEAT-WAIT は不可。メンバー単位の「まだ満たせない」は per-member 発効データで表す。"
+    },
+    {
+      "id": "V12",
+      "slug": "correlated-seats-recorded-lawful",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"], "scope_covers_lane": true},
+        "review_record": {"cites_correlated_seats": true, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "名指しパネルの同系統ペア (model-a / model-c が同じ family-a): 6フィールドの correlated-seats 記録 + レビュー記録への適用明記 → 適法。"
+    },
+    {
+      "id": "V13",
+      "slug": "correlated-seats-uncited-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"], "scope_covers_lane": true},
+        "review_record": {"cites_correlated_seats": false, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "記録は存在してもレビュー記録に適用の明記がない — 明記のない同系統着席は席数未達と同じ。"
+    },
+    {
+      "id": "V14",
+      "slug": "correlated-seats-missing-field-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "date", "writer_condition"], "scope_covers_lane": true},
+        "review_record": {"cites_correlated_seats": true, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "approved_by を欠く例外レコードは無効 (フィールドを欠くフラグは無効) — 同系統着席は救済されない。"
+    },
+    {
+      "id": "V15",
+      "slug": "machine-path-pairwise-distinct-lawful",
+      "kind": "panel",
+      "rule_ids": ["L1-10", "L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "machine",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "抽選・代打など機械経路: 相互異系統 (pairwise-distinct lineage) を満たす → 適法。"
+    },
+    {
+      "id": "V16",
+      "slug": "machine-path-lineage-overlap-no-exception",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "machine",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": false, "fields_present": [], "scope_covers_lane": false}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "機械経路の系統重なりは「相互異系統 or 記録された例外」の必須要件に違反 — 例外記録なしは席数未達扱い。"
+    },
+    {
+      "id": "V17",
+      "slug": "machine-path-recorded-exception-lawful",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "machine",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"], "scope_covers_lane": true},
+        "review_record": {"cites_correlated_seats": true, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "機械経路でも6フィールドの記録された例外 (scope がレーンを覆う) + 適用明記があれば適法。名指しパネルの correlated-seats フラグと同一のレコード型。"
+    },
+    {
+      "id": "V18",
+      "slug": "writer-model-seat-not-countable",
+      "kind": "panel",
+      "rule_ids": ["L1-10", "L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-w", "lineage": "family-w"},
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "実装 writer と同一モデルの席は「writer と異なるモデル」要件に反し数えられない (降格手続きの適用がない限り) — 実質2席で未達。"
+    },
+    {
+      "id": "V19",
+      "slug": "duplicate-model-two-agents-count-one",
+      "kind": "panel",
+      "rule_ids": ["L1-10", "L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-1"},
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-2"},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "同一モデルの別エージェント2席は異種2席ではない (降格手続きの承認・明記なし) — 異種としては2席で未達。"
+    },
+    {
+      "id": "V20",
+      "slug": "designer-not-a-seat",
+      "kind": "panel",
+      "rule_ids": ["L1-10", "L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "role_conflict": "designer"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "審査対象を設計・実装した者 (オーケストレーター含む) は席に数えない — 実質2席で未達。"
+    },
+    {
+      "id": "V21",
+      "slug": "upstream-l-requires-lh-panel",
+      "kind": "panel",
+      "rule_ids": ["L1-9", "L1-11"],
+      "given": {
+        "review_stage": "upstream",
+        "size": "L",
+        "high_risk": false,
+        "member_floor3": null,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
+      "notes": "サイズ L/H/Epic は実装着手前の上流レビューに L/H 体制 (異種3席)。"
+    },
+    {
+      "id": "V22",
+      "slug": "upstream-epic-high-risk-requires-5",
+      "kind": "panel",
+      "rule_ids": ["L1-9", "L1-11"],
+      "given": {
+        "review_stage": "upstream",
+        "size": "Epic",
+        "high_risk": true,
+        "member_floor3": null,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 5, "lawful": false, "failure_class": "underseated"},
+      "notes": "高リスク領域を含む Epic の上流レビューは5席 — 3席は未達。"
+    },
+    {
+      "id": "V23",
+      "slug": "review-record-missing-requested-actual",
+      "kind": "record",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_record": {"cites_correlated_seats": null, "requested_actual_present": false}
+      },
+      "expect": {"valid": false},
+      "notes": "レビュー記録には requested / actual model を必ず残す — 欠く記録は監査要件を満たさない。"
+    }
+  ]
+}
