@@ -8,14 +8,18 @@
 
 | ファイル | 内容 |
 |---|---|
-| `vectors-v1.json` | ベクタ集 v1（23本・JSON・依存ゼロで読める） |
+| `vectors-v1.json` | ベクタ集 v1（30本・JSON・依存ゼロで読める） |
 | `README.md` | 本書（流し方・スキーマ意味論） |
+
+v1 のカバー範囲: L1-10 / L1-11 / FP-7 の席決定条項、および **L1-9 は席数条項のみ**（上流レビューの実施検証不能時の fail-closed、S/M への上流非適用は v1 のベクタ対象外 — 条文で直接検証する）。
 
 ## ベクタの構造
 
 各ベクタ = `{id, slug, kind, rule_ids, given, expect, notes}`。
 
 - **kind**: `panel`（席構成の適法性）/ `seat_wait`（SEAT-WAIT 宣言の有効性）/ `record`（レビュー記録の形式要件）。
+- **given の形は kind ごとに違う**: `panel` は given 直下にフラット、`seat_wait` は `given.seat_wait` 配下、`record` は `given.review_record` 配下のみ。
+- **省略キーと3値の意味論はファイル冒頭の `given_semantics` ブロックが正**（要点: `exception_record`・`seats[].downgrade`・`seats[].agent`・`seats[].role_conflict` の省略=不在（フラグ偽）。`review_record` の省略のみ主張対象外 — panel の lawful は席構成の関数で、requested/actual の記録要件は kind=record が別途検証。`member_floor3.effective` は true/false/null の3値で**入力事実として与える**（発効日から導出させない）。`distinct_lineages_available` は降格の適用要件の入力事実で、省略時=「席数以上が起動可能」）。
 - **given** の主なフィールド（`panel`）:
   - `review_stage`: `merge`（実装レビュー）/ `upstream`（L1-9 上流レビュー）
   - `size`: S / M / L / H / Epic（判別基準の正本は L2-1）
@@ -23,13 +27,15 @@
   - `member_floor3`: S/M 床3の per-member 発効状態。`pinned_issue`: `complete`（3フィールド記録済み）/ `missing_fields` / `absent`、`effective`: 発効済みか。S/M 以外では `null`（床3は S/M のみの概念）
   - `writer`: 実装 writer のモデルと系統
   - `selection_path`: `named_panel`（オーナー名指し固定）/ `machine`（抽選・代打など機械選出）
-  - `seats`: 席の列挙。`agent`（同一モデル別エージェントの区別）、`downgrade`（L1-11 降格手続き: `owner_approval` / `noted_in_review_record`）、`role_conflict`（`designer` 等 — 審査対象を設計・実装した者）を持ちうる
+  - `distinct_lineages_available`: その家で起動可能なモデル系統の数（降格手続きの適用要件「席数未満」の判定入力）
+  - `seats`: 席の列挙。`agent`（同一モデル別エージェントの区別）、`downgrade`（L1-11 降格手続き: `owner_approval` / `noted_in_review_record`）、`role_conflict`（`designer` / `implementer` / `orchestrator` — 審査対象を設計・実装した者とオーケストレーター）を持ちうる
   - `exception_record`: L1-10 の同系統例外レコード（correlated-seats フラグ/機械経路の記録された例外 — **同一のレコード型**）。`fields_present` は `scope / pair / reason / approved_by / date / writer_condition` の部分集合、`scope_covers_lane` は scope が当該レーンを覆うか
   - `review_record`: `cites_correlated_seats`（適用の明記）/ `requested_actual_present`（requested/actual model の記録）
 - **expect**:
   - `panel`: `required_seats`（この状況で法が要求する席数）/ `lawful` / `failure_class`（`underseated` ほか — ファイル冒頭の `failure_classes` 参照）
-  - `seat_wait` / `record`: `valid`
+  - `seat_wait` / `record`: `valid` / `failure_class`（無効時は `invalid-seat-wait` / `invalid-record`）
 - **notes**: 根拠条文の要約（日本語）。判定に使うのは `rule_ids` の条文本体。
+- 上流（L1-9）ベクタの `writer`: 実装着手前で writer 未選出のセレクタは null に写像してよい（v1 の上流ベクタで writer は判定の決定因ではない）。
 
 ## メンバー側での流し方（adapter パターン）
 
@@ -54,4 +60,4 @@ python3 -c "import json; d=json.load(open('vectors-v1.json')); print(len(d['vect
 
 ## LC-1（退場トリガー）
 
-ベクタ版は対応する条文改訂（本書の law_anchor）に従属する。席数・手続きを変える条文改訂が merge されたら、同一リリース内でベクタの追補版を出すか、出せない理由を Issue に残す（法とベクタの乖離は「静かに古い法を検証し続ける」劣化窓になる）。
+ベクタ版は対応する条文改訂（`vectors-v1.json` の `law_anchor`）に従属する。席数・手続きを変える条文改訂が merge されたら、同一リリース内でベクタの追補版を出すか、出せない理由を Issue に残す（法とベクタの乖離は「静かに古い法を検証し続ける」劣化窓になる）。

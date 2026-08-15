@@ -4,13 +4,21 @@
   "id_convention": "実名モデル ID を含まない (L1-10)。抽象語彙: モデル= model-a/model-b/…、系統= family-a/…、実装 writer= model-w (family-w)、メンバー= member-a。",
   "kinds": {
     "panel": "席構成の適法性を判定する。expect = {required_seats, lawful, failure_class}",
-    "seat_wait": "SEAT-WAIT 宣言の有効性を判定する。expect = {valid}",
-    "record": "レビュー記録の形式要件を判定する。expect = {valid}"
+    "seat_wait": "SEAT-WAIT 宣言の有効性を判定する。expect = {valid, failure_class}",
+    "record": "レビュー記録の形式要件を判定する。expect = {valid, failure_class}"
   },
   "failure_classes": {
-    "underseated": "席数未達 (数えられない席・無記録の同系統着席・無承認の降格を含む — L1-10/L1-11)",
+    "underseated": "席数未達 (数えられない席・無記録の同系統着席・不適法な降格を含む — L1-10/L1-11)",
     "invalid-seat-wait": "SEAT-WAIT 宣言が必須3点を欠く・対象がレーンでない (L1-11)",
     "invalid-record": "レビュー記録の必須項目欠落 (L1-10)"
+  },
+  "given_semantics": {
+    "omitted_keys": "exception_record / seats[].downgrade / seats[].agent / seats[].role_conflict の省略は「不在」(present:false 相当・フラグ偽) と同義。review_record の省略のみ「当該ベクタの主張対象外」— panel の lawful は席構成 (数・異種・writer/設計者の除外・降格・系統・例外レコードと適用明記) の関数であり、requested/actual の記録要件は kind=record が別途検証する",
+    "member_floor3.effective": "3値: true=発効済み / false=発効データ記録済みだが未発効 (旧床を主張できる) / null=発効状態を主張できない (pinned Issue 不在・不備)。effective は入力事実として与える — adapter に発効日から導出させない",
+    "distinct_lineages_available": "その家で起動可能なモデル系統の数 (L1-11 降格手続きの適用要件「起動可能なモデル系統が席数未満」の入力事実)。省略時は「席数以上が起動可能」(降格の適用要件を満たさない) と読む",
+    "exception_record.fields_present": "レコード本文の値解釈 (pair の一致・scope が実際にレーンを覆うか) は given の消化済みフラグ (scope_covers_lane 等) が正 — 本文解釈層は本 suite の検証対象外。writer_condition は法 (L1-10) がフィールド名を列挙するのみで意味論を定めない — adapter 側で法に無い意味を捏造しないこと",
+    "writer_at_upstream": "上流 (L1-9) 段階で writer 未選出の実装は writer を null に写像してよい — v1 の上流ベクタで writer は判定の決定因ではない",
+    "role_conflict": "許容値: designer / implementer / orchestrator (審査対象を設計・実装した者およびオーケストレーター — L1-10 により席に数えない)"
   },
   "vectors": [
     {
@@ -148,6 +156,7 @@
         "size": "L",
         "high_risk": false,
         "member_floor3": null,
+        "distinct_lineages_available": 2,
         "writer": {"model": "model-w", "lineage": "family-w"},
         "selection_path": "named_panel",
         "seats": [
@@ -157,7 +166,7 @@
         ]
       },
       "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
-      "notes": "異種席が物理確保できない家の降格手続き: 同一モデル・別エージェント + オーナー明示承認 + 記録への明記 → 席に数えてよい。"
+      "notes": "降格手続きの適用要件=異種席が物理的に確保できない家 (起動可能な系統2 < 必要3)。そのうえで同一モデル・別エージェント + オーナー明示承認 + 記録への明記 → 席に数えてよい。系統が足りる家の降格は V24。"
     },
     {
       "id": "V08",
@@ -169,6 +178,7 @@
         "size": "L",
         "high_risk": false,
         "member_floor3": null,
+        "distinct_lineages_available": 2,
         "writer": {"model": "model-w", "lineage": "family-w"},
         "selection_path": "named_panel",
         "seats": [
@@ -178,7 +188,7 @@
         ]
       },
       "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
-      "notes": "無承認の降格は席数未達と同じ。"
+      "notes": "適用要件 (系統不足) と記録明記が揃っていても、無承認の降格は席数未達と同じ。明記なしの片落ちは V26。"
     },
     {
       "id": "V09",
@@ -188,7 +198,7 @@
       "given": {
         "seat_wait": {"target": "lane", "fields_present": ["owner", "missing_seats", "retry_by"]}
       },
-      "expect": {"valid": true},
+      "expect": {"valid": true, "failure_class": null},
       "notes": "補充・降格でも未達 → 担当 Issue へのコメントで owner / 不足席 / 再試行期日の3点 → 有効な SEAT-WAIT。"
     },
     {
@@ -199,7 +209,7 @@
       "given": {
         "seat_wait": {"target": "lane", "fields_present": ["owner", "missing_seats"]}
       },
-      "expect": {"valid": false},
+      "expect": {"valid": false, "failure_class": "invalid-seat-wait"},
       "notes": "3点を欠く SEAT-WAIT は無効。"
     },
     {
@@ -210,7 +220,7 @@
       "given": {
         "seat_wait": {"target": "member", "fields_present": ["owner", "missing_seats", "retry_by"]}
       },
-      "expect": {"valid": false},
+      "expect": {"valid": false, "failure_class": "invalid-seat-wait"},
       "notes": "SEAT-WAIT の対象はレーンのみ — メンバー（家）そのものへの無期限 SEAT-WAIT は不可。メンバー単位の「まだ満たせない」は per-member 発効データで表す。"
     },
     {
@@ -367,7 +377,7 @@
         ]
       },
       "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
-      "notes": "実装 writer と同一モデルの席は「writer と異なるモデル」要件に反し数えられない (降格手続きの適用がない限り) — 実質2席で未達。"
+      "notes": "実装 writer と同一モデルの席は「writer と異なるモデル」要件に反し数えられない — 実質2席で未達。writer 同一モデル席と降格手続きの交差は v1 では未裁定・対象外。"
     },
     {
       "id": "V19",
@@ -461,8 +471,153 @@
       "given": {
         "review_record": {"cites_correlated_seats": null, "requested_actual_present": false}
       },
-      "expect": {"valid": false},
+      "expect": {"valid": false, "failure_class": "invalid-record"},
       "notes": "レビュー記録には requested / actual model を必ず残す — 欠く記録は監査要件を満たさない。"
+    },
+    {
+      "id": "V24",
+      "slug": "downgrade-sufficient-lineages-unlawful",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "L",
+        "high_risk": false,
+        "member_floor3": null,
+        "distinct_lineages_available": 4,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-1"},
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-2", "downgrade": {"owner_approval": true, "noted_in_review_record": true}},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "降格手続きは異種席が物理的に確保できない家 (起動可能な系統が席数未満) にのみ許される。系統4 ≥ 必要3 の家では、承認と明記が揃っていても降格は使えない — 同一モデル2席は異種2席ではなく未達。"
+    },
+    {
+      "id": "V25",
+      "slug": "correlated-scope-not-covering-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"], "scope_covers_lane": false},
+        "review_record": {"cites_correlated_seats": true, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "例外は記録された scope の範囲でのみ有効 — 6フィールド完備・適用明記ありでも、scope が当該レーンを覆わない例外レコードは同系統着席を救済しない。"
+    },
+    {
+      "id": "V26",
+      "slug": "downgrade-approved-not-noted-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "review_stage": "merge",
+        "size": "L",
+        "high_risk": false,
+        "member_floor3": null,
+        "distinct_lineages_available": 2,
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-1"},
+          {"model": "model-a", "lineage": "family-a", "agent": "agent-2", "downgrade": {"owner_approval": true, "noted_in_review_record": false}},
+          {"model": "model-b", "lineage": "family-b"}
+        ]
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "降格は3要件の合接 (適用要件=系統不足・オーナー明示承認・レビュー記録への降格の明記)。承認があっても記録への明記を欠く降格は適法にならない。"
+    },
+    {
+      "id": "V27",
+      "slug": "pre-effect-high-risk-still-5",
+      "kind": "panel",
+      "rule_ids": ["L1-11", "FP-7"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": true,
+        "member_floor3": {"pinned_issue": "complete", "effective": false},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"},
+          {"model": "model-c", "lineage": "family-c"}
+        ]
+      },
+      "expect": {"required_seats": 5, "lawful": false, "failure_class": "underseated"},
+      "notes": "高リスク領域はサイズ判定より優先の別軸 — S/M 床3の per-member 発効猶予 (旧床2席) は高リスク5席を引き下げない。発効前の家でも高リスクは5席。"
+    },
+    {
+      "id": "V28",
+      "slug": "named-panel-no-exception-record-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "M",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "named_panel",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": false, "fields_present": [], "scope_covers_lane": false},
+        "review_record": {"cites_correlated_seats": false, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "名指しパネルの同系統は「記録つき correlated-seats フラグがある場合に限り適法」— 例外レコード自体が不在なら未達 (機械経路の V16 と対称)。"
+    },
+    {
+      "id": "V29",
+      "slug": "machine-exception-uncited-underseated",
+      "kind": "panel",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_stage": "merge",
+        "size": "S",
+        "high_risk": false,
+        "member_floor3": {"pinned_issue": "complete", "effective": true},
+        "writer": {"model": "model-w", "lineage": "family-w"},
+        "selection_path": "machine",
+        "seats": [
+          {"model": "model-a", "lineage": "family-a"},
+          {"model": "model-c", "lineage": "family-a"},
+          {"model": "model-b", "lineage": "family-b"}
+        ],
+        "exception_record": {"present": true, "fields_present": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"], "scope_covers_lane": true},
+        "review_record": {"cites_correlated_seats": false, "requested_actual_present": true}
+      },
+      "expect": {"required_seats": 3, "lawful": false, "failure_class": "underseated"},
+      "notes": "「適用したレビュー記録には correlated-seats の適用を明記する — 明記のない同系統着席は席数未達と同じ」は経路を限定しない — 機械経路でも例外レコードがあるだけでは足りず、明記を欠けば未達 (V13 の機械経路版)。"
+    },
+    {
+      "id": "V30",
+      "slug": "review-record-complete-valid",
+      "kind": "record",
+      "rule_ids": ["L1-10"],
+      "given": {
+        "review_record": {"cites_correlated_seats": null, "requested_actual_present": true}
+      },
+      "expect": {"valid": true, "failure_class": null},
+      "notes": "requested / actual model を残した記録は監査要件を満たす (V23 の対照群 — 常に invalid を返す実装の検出用)。correlated-seats 非該当のため cites は null。"
     }
   ]
 }
