@@ -18,6 +18,8 @@
     "distinct_lineages_available": "その家で起動可能なモデル系統の数 (L1-11 降格手続きの適用要件「起動可能なモデル系統が席数未満」の入力事実)。省略時は「席数以上が起動可能」(降格の適用要件を満たさない) と読む",
     "exception_record.fields_present": "レコード本文の値解釈 (pair の一致・scope が実際にレーンを覆うか) は given の消化済みフラグ (scope_covers_lane 等) が正 — 本文解釈層は本 suite の検証対象外。writer_condition は法 (L1-10) がフィールド名を列挙するのみで意味論を定めない — adapter 側で法に無い意味を捏造しないこと",
     "writer_at_upstream": "上流 (L1-9) 段階で writer 未選出の実装は writer を null に写像してよい — v1 の上流ベクタで writer は判定の決定因ではない",
+    "review_record.cites_correlated_seats": "3値: true=適用を明記 / false=明記なし / null=同系統着席が無く correlated-seats 非該当",
+    "distinct_lineages_available_is_input": "distinct_lineages_available も入力事実として与える — fixture 内の writer・席の系統名から adapter が再導出しない (V07 の系統2は「家として起動可能な系統数」の宣言であり、登場する系統ラベルの数え上げではない)",
     "role_conflict": "許容値: designer / implementer / orchestrator (審査対象を設計・実装した者およびオーケストレーター — L1-10 により席に数えない)"
   },
   "vectors": [
@@ -166,7 +168,7 @@
         ]
       },
       "expect": {"required_seats": 3, "lawful": true, "failure_class": null},
-      "notes": "降格手続きの適用要件=異種席が物理的に確保できない家 (起動可能な系統2 < 必要3)。そのうえで同一モデル・別エージェント + オーナー明示承認 + 記録への明記 → 席に数えてよい。系統が足りる家の降格は V24。"
+      "notes": "降格手続きの適用要件=異種席が物理的に確保できない家 (起動可能な系統2 < 必要3)。そのうえで同一モデル・別エージェント + オーナー明示承認 + 記録への明記 → 席に数えてよい。系統が足りる家の降格は V24。名指しパネルの同系統要件 (L1-10) と降格手続きの交差 (降格席に correlated-seats フラグも必要か) は v1 では未裁定・対象外 — 本ベクタは L1-11 降格手続き単独の検証。"
     },
     {
       "id": "V08",
@@ -545,7 +547,7 @@
       "id": "V27",
       "slug": "pre-effect-high-risk-still-5",
       "kind": "panel",
-      "rule_ids": ["L1-11", "FP-7"],
+      "rule_ids": ["L1-11"],
       "given": {
         "review_stage": "merge",
         "size": "M",
@@ -618,6 +620,17 @@
       },
       "expect": {"valid": true, "failure_class": null},
       "notes": "requested / actual model を残した記録は監査要件を満たす (V23 の対照群 — 常に invalid を返す実装の検出用)。correlated-seats 非該当のため cites は null。"
+    },
+    {
+      "id": "V31",
+      "slug": "seat-wait-missing-owner-invalid",
+      "kind": "seat_wait",
+      "rule_ids": ["L1-11"],
+      "given": {
+        "seat_wait": {"target": "lane", "fields_present": ["missing_seats", "retry_by"]}
+      },
+      "expect": {"valid": false, "failure_class": "invalid-seat-wait"},
+      "notes": "owner を欠く SEAT-WAIT も無効 — 必須3点はどの1点を欠いても成立しない (V10 の retry_by 欠落と対)。"
     }
   ]
 }
