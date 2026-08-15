@@ -69,6 +69,7 @@ remaining work / successor: <残作業 or 引き継ぎ先>
 🏁 <MERGED|SUPERSEDED|ABANDONED> (<agent名>, YYYY-MM-DD): <1行>
 
 evidence / successor: <PR リンク・後継 Issue・打ち切りの証拠（L1-6）>
+release: <tag URL | deferred（完了記録どおり） | N/A>   <!-- MERGED のみ。完了記録の release 欄の履行報告（T-5）。vX.Y.Z 宣言レーンは切った annotated タグの URL を貼る -->
 ```
 
 ## TAKEOVER コメント（L0-3 — stale レーンの引き取り）
@@ -120,6 +121,7 @@ implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
 CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない。N/A は CI が当該変更を検査しない場合に限る（CI が走る変更は非コードでも N/A 不可） -->
+release: <vX.Y.Z | deferred（理由 + いつ切るか = LC-1 退場トリガー） | N/A（理由）>   <!-- 出荷相当の merge は必須（T-5）。欄なし = blocking。vX.Y.Z は宣言 — merge 後に annotated タグを main に切り、tag URL は MERGED コメントで履行報告。トリガー無き deferred は無効。deferred 2連続の次の出荷相当 merge では deferred 不可 -->
 <!-- red の場合は、以下の4点をコメントの外に転記して埋める（コメントのままは未記入扱い = blocking。1点でも欠ければ例外不成立 — T-4）:
      failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
      無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>

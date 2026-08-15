@@ -21,7 +21,7 @@
 ```
 Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint green
 → クロスレビュー → 指摘対応 → PR（完了記録 = L1-7 を本文に）
-→ merge → Issue close → 安定点で git tag
+→ merge → Issue close → リリース判断の履行（release 欄 = [T-5](10-test-ci-baseline.md)）
 ```
 
 ## L1-3 クロスレビューの原則
@@ -69,6 +69,7 @@ PR を merge してよいのは、以下を満たす**完了記録**（[テン�
 4. 宣言ファイル集合と `git diff --stat origin/main...<候補SHA>` の照合（diff にあって一覧にないファイルは blocking — [L0-6](03-git-protocol.md)）
 5. 実装者とレビュアーの身元をリンクし、**モデルまたはエージェントが異なる**こと（L1-3）
 6. **CI 状態を記載する** — 赤のまま merge しない。既知・無関係の赤の例外条件（唯一の例外）は [T-4](10-test-ci-baseline.md)
+7. **release 欄を記載する** — 出荷相当の merge は `vX.Y.Z` / `deferred（理由 + LC-1 トリガー）` / `N/A（理由）` の3語彙で判断を記録する。欄の無い完了記録は不備（[T-5](10-test-ci-baseline.md)）
 
 **証拠は主張より先に存在する。** ローカルにしか成功がない状態は完了ではない。
 

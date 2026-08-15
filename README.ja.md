@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.11.0-blue)
+![version](https://img.shields.io/badge/version-v0.12.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -195,7 +195,7 @@ handbook-revision の値は書き換えないでください。
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-4`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-5`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
 やめたくなったら、貼った50行ほどを消すだけで元に戻ります。ほかのファイルには触りません。
 
@@ -263,7 +263,7 @@ flowchart TD
 | **B** 委譲ブリーフ | 1回の委譲をどう契約にするか | `B-1`〜`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** ライフサイクル | 置いた物をいつ・どう退場させるか | `LC-1`〜`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 却下ルーブリック | 何を受け入れ・何を断るか | `R-1`〜`R-6` | [docs/09](docs/09-rejection-rubric.md) |
-| **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-4` | [docs/10](docs/10-test-ci-baseline.md) |
+| **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-5` | [docs/10](docs/10-test-ci-baseline.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -308,7 +308,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委譲ブリーフ — サブエージェントへ仕事を1回渡すときの依頼文の契約（`B-1`〜`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC ワークスペース・ライフサイクル — 置いた物の退場を契約にする層・退場条件の数値はローカル正本（`LC-1`〜`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 却下ルーブリック — 何を受け入れ・何を断るかの意図の層。自動却下の3理由・歓迎/却下の判断基準・前提検証・置き場所のはしご・check 昇格（`R-1`〜`R-6`） |
-| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge。付録に非規範のランナー早見表（`T-1`〜`T-4`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge・リリース既定。付録に非規範のランナー早見表（`T-1`〜`T-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
@@ -357,7 +357,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.11.0**（2026-08-15）。レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）です。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化です（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
+現行バージョンは **v0.12.0**（2026-08-15）。リリース既定の条文追加（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）です。リリースタグはこれまで「安定点で git tag」の一言だけで、切り忘れても何にも引っかからず、セッションが変わると構造的に忘れられていました（実例が繰り返し観測されています）。T-5 は「忘れないようにする」のではなく「**忘れると完了記録（L1-7）が通らない**」形にします — 出荷相当の変更（利用者が動かす挙動・公開 API・配布物・利用者が従う規範が変わる merge）を main に入れるレーンは、完了記録に **release 欄**（`vX.Y.Z` 宣言 / `deferred`（理由 + LC-1 退場トリガー） / `N/A`（理由）の3語彙）を必ず書き、タグは merge 後の main に annotated + SemVer で切って MERGED コメントで履行を報告します。deferred が2回続いたら3回目の出荷相当 merge では切る（R-6 と同型のエスカレーション）。適用は全リポ一律 — 出荷相当が無いリポは自然に N/A になるため、私有スクラッチに実質負荷はありません（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
+
+- **v0.11.0**（2026-08-15） — レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）
 
 - **v0.10.0**（2026-08-14） — テスト & CI 基準層（`T-1`〜`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。コードを含む新規リポは作成時にテストランナー + CI を整備・サイズ M / L / H のバグ修正は再現テスト同梱が既定・委譲ブリーフに「追加・変更したテストと実行結果」を標準項目化・CI 赤のままの merge 禁止（例外は4条件を満たす既知無関係の赤のみ）。出発点は [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂。初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました（`RISK_PATHS_AUTH` 常設カテゴリ新設・`none` 宣言の大小文字硬化と宣言行の健全性検査・展開検証の落とし穴を README に追記）。多席レビュー4ラウンド（3席全 GO）を経て、展開済みリポへ同期済み
