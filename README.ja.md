@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.13.0-blue)
+![version](https://img.shields.io/badge/version-v0.14.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -315,6 +315,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
 | [templates/ci/](templates/ci/README.md) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
 | [templates/conformance/](templates/conformance/README.md) | 席決定の検証ベクタ31本（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）とメンバー側での流し方 |
+| [templates/seat-resolver/](templates/seat-resolver/README.md) | 席決定の参考実装（設定駆動・検証ベクタ31本を全通過・参考例であって必須部品ではない） |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -358,7 +359,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.13.0**（2026-08-15）。条文の改訂はありません — 席決定の**検証ベクタ**（[templates/conformance/](templates/conformance/README.md)）が加わりました。各家のセレクタ（席を決めるプログラム）が、`L1-9` の席数・`L1-10` の異種と系統・`L1-11` の席数スケールと FP-7 に対して**実装非依存で自己採点**できる31本のケース集です。実名モデル ID を含まず（抽象 ID のみ）、条文と食い違えば条文が正（ベクタは導出物）。セレクタが表現できないケースは skip ではなく FAIL と数える fail-closed 運用で、版が変わるときは新ファイルを足して旧版を残します（採用記録が版を指すため）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
+現行バージョンは **v0.14.0**（2026-08-16）。条文の改訂はありません — 席決定の**参考実装**（[templates/seat-resolver/](templates/seat-resolver/README.md)）が加わりました。v0.13.0 で配った検証ベクタ31本を**全通過する、設定駆動のリゾルバ**です。ルール表・モデル語彙・系統・リスク領域・writer をすべて設定から読むので、自分の家の構成に置き換えて使えます（実名モデル ID はコードにも設定例にも含みません）。**参考例であって必須部品ではありません** — 条文はこれを要求せず、使いたい家だけが使います。また**席決定の実装は各家に1つだけ**にしてください（同じ仕組みを複数リポにコピーすると権限と改訂が分裂します）。共有するのは実装ではなく、[templates/conformance/](templates/conformance/README.md) への適合です（[#71](https://github.com/caty-ai/family-dev-handbook/issues/71)）。
+
+- **v0.13.0**（2026-08-15） — 条文の改訂はありません — 席決定の**検証ベクタ**（[templates/conformance/](templates/conformance/README.md)）が加わりました。各家のセレクタ（席を決めるプログラム）が、`L1-9` の席数・`L1-10` の異種と系統・`L1-11` の席数スケールと FP-7 に対して**実装非依存で自己採点**できる31本のケース集です。実名モデル ID を含まず（抽象 ID のみ）、条文と食い違えば条文が正（ベクタは導出物）。セレクタが表現できないケースは skip ではなく FAIL と数える fail-closed 運用で、版が変わるときは新ファイルを足して旧版を残します（採用記録が版を指すため）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
 
 - **v0.12.0**（2026-08-15） — リリース既定の条文追加（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）です。リリースタグはこれまで「安定点で git tag」の一言だけで、切り忘れても何にも引っかからず、セッションが変わると構造的に忘れられていました（実例が繰り返し観測されています）。T-5 は「忘れないようにする」のではなく「**忘れると完了記録（L1-7）が通らない**」形にします — すべての完了記録に **release 欄**（`vX.Y.Z` 宣言 / `deferred`（理由 + 退場トリガー付き Issue） / `N/A`（閉じた3類型の理由）の3語彙）を置き、**出荷相当の変更**（利用者が動かす挙動・公開 API・配布物・利用者が従う規範が変わる merge）は `N/A` を選べません（迷ったら出荷相当）。さらに宣言だけで終わらないよう、**タグを切って URL を載せた MERGED でなければレーンは終端しない**形にしました — 未履行のレーンは終端語彙を持たないまま非アクティブ扱い（`L1-4`）と stale 時計（`L0-3`）の視界に残るので、次のレーンが来ないリポでも切り忘れが可視になります。deferred は再浮上する面（トリガー付き Issue）に置き、2回続いたら3回目の出荷相当 merge では切る（`R-6` と同型のエスカレーション・計数は完了記録の `previous release` で後から検証できます）。適用は全リポ一律 — 出荷相当が無いリポは自然に N/A になるため、私有スクラッチに実質負荷はありません（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
 

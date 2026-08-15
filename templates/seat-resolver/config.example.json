@@ -1,0 +1,109 @@
+{
+  "config_version": 1,
+  "selection_fn_version": 1,
+  "rules_version": 1,
+  "sizes": ["S", "M", "L", "H", "Epic"],
+  "risk_areas": ["risk-a", "risk-b", "risk-c", "risk-d", "risk-e", "risk-f"],
+  "models": ["model-a", "model-b", "model-c", "model-d", "model-e", "model-w", "model-x", "model-y", "model-z"],
+  "model_lineages": {
+    "model-a": "family-a",
+    "model-b": "family-b",
+    "model-c": "family-c",
+    "model-d": "family-d",
+    "model-e": "family-e",
+    "model-w": "family-w",
+    "model-x": "family-w",
+    "model-y": "family-w",
+    "model-z": "family-z"
+  },
+  "excluded_models": ["model-z"],
+  "writer_assumed": "model-w",
+  "same_family_authorization": {
+    "writer": "model-w",
+    "seats": ["model-x", "model-y"]
+  },
+  "floor3": {
+    "sizes": ["S", "M"],
+    "effective": true,
+    "pre_effect_strategy": "small-pre"
+  },
+  "rule_table": {
+    "S": {"absent": "small", "present": "risk"},
+    "M": {"absent": "small", "present": "risk"},
+    "L": {"absent": "large", "present": "risk"},
+    "H": {"absent": "large", "present": "risk"},
+    "Epic": {"absent": "large", "present": "risk"}
+  },
+  "panel_strategies": {
+    "small": {
+      "type": "standing_rotation",
+      "selection_path": "machine",
+      "required": 3,
+      "standing": "model-c",
+      "standing_substitutes": ["model-d", "model-b"],
+      "rotation_pool": ["model-a", "model-d", "model-b", "model-x"],
+      "rotation_count": 2
+    },
+    "small-pre": {
+      "type": "standing_rotation",
+      "selection_path": "machine",
+      "required": 2,
+      "standing": "model-c",
+      "standing_substitutes": ["model-d", "model-b"],
+      "rotation_pool": ["model-a", "model-d", "model-b", "model-x"],
+      "rotation_count": 1
+    },
+    "large": {
+      "type": "fixed",
+      "selection_path": "named_panel",
+      "required": 3,
+      "panel": ["model-a", "model-b", "model-c"],
+      "substitutes": ["model-d"],
+      "substitution_cap": 1
+    },
+    "risk": {
+      "type": "fixed",
+      "selection_path": "named_panel",
+      "required": 5,
+      "panel": ["model-b", "model-c", "model-d", "model-e", "model-y"],
+      "substitutes": [],
+      "substitution_cap": 0
+    }
+  },
+  "correlated_seat_exceptions": [
+    {
+      "scope": ["risk"],
+      "pair": ["model-x", "model-y"],
+      "reason": "Recorded correlated-lineage contingency.",
+      "approved_by": "member-a",
+      "date": "2026-08-16",
+      "writer_condition": "model-w"
+    }
+  ],
+  "downgrade_records": [
+    {
+      "scope": ["large"],
+      "model": "model-a",
+      "agents": ["agent-a-1", "agent-a-2"],
+      "owner_approval": "approval-record-a",
+      "review_notation": "review-record-a"
+    }
+  ],
+  "citations": [
+    "review policy decision A",
+    "review policy exception B",
+    "seat-wait procedure C"
+  ],
+  "notes": {
+    "availability": "Availability reflects roster eligibility and explicit absence flags only; live service state is not probed.",
+    "writer": "The listed same-family seat is authorized only for the configured writer premise; the authorization does not transfer.",
+    "seat_wait": "The lane owner must record continuation, hold, or an approved downgrade when seats remain missing."
+  },
+  "conformance": {
+    "role_conflicts": ["designer", "implementer", "orchestrator"],
+    "downgrade_fields": ["owner_approval", "noted_in_review_record"],
+    "exception_fields": ["scope", "pair", "reason", "approved_by", "date", "writer_condition"],
+    "seat_wait_target": "lane",
+    "seat_wait_fields": ["owner", "missing_seats", "retry_by"]
+  }
+}

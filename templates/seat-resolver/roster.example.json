@@ -1,0 +1,18 @@
+{
+  "roster_version": 1,
+  "models": {
+    "model-a": {"display": "Seat A", "eligible": true},
+    "model-b": {"display": "Seat B", "eligible": true},
+    "model-c": {"display": "Seat C", "eligible": true},
+    "model-d": {"display": "Seat D", "eligible": true},
+    "model-e": {"display": "Seat E", "eligible": true},
+    "model-w": {"display": "Writer seat", "eligible": true},
+    "model-x": {"display": "Seat X", "eligible": true},
+    "model-y": {"display": "Seat Y", "eligible": true},
+    "model-z": {"display": "Excluded seat", "eligible": true}
+  },
+  "catalog": {
+    "path": "/replace/with/an/absolute/catalog/path",
+    "adopted_digest": "REPLACE_WITH_CATALOG_DIGEST"
+  }
+}
