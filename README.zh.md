@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.14.0-blue)
+![version](https://img.shields.io/badge/version-v0.14.1-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -361,11 +361,13 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.14.0**（2026-08-16）。条文没有修订，新增的是席位决定的**参考实现**（[templates/seat-resolver/](templates/seat-resolver/README.md)）——一个**通过 v0.13.0 全部 31 条验证向量**、由配置驱动的选席程序。规则表、模型词汇、系统（lineage）、风险领域与 writer 全部来自配置，因此各团队可以替换成自己的构成（代码与配置示例中都不含实名模型 ID）。它是**参考示例而非必需组件**——条文并不要求它，想用的团队才用。并且请保持**每个团队只有一份选席实现**：把同一机制复制到多个仓库会让权限与修订分裂。家族之间共享的不是实现，而是对 [templates/conformance/](templates/conformance/README.md) 的符合性（[#71](https://github.com/caty-ai/family-dev-handbook/issues/71)）。
+当前版本是 **v0.14.1**（2026-08-16）。条文没有修订——本次订正的是 README（4 种语言）中 v0.12.0 版本历史与 `T-5` 条文不一致之处。未履行的车道（已宣告 `vX.Y.Z` 却没有切 tag 的车道）是「**不会终结，会以 WIP 状态留存**」并挂在 stale 时钟上，而不是按非活跃处理（按非活跃处理的是**缺少 tag URL 的 MERGED**）。同一段中把 `N/A` 的闭合列举写成「3 种类型」，也一并改为 **4 种类型**（含 v0.12.0 加入的 Epic 子→epic）。条文（[docs/10](docs/10-test-ci-baseline.md)）、i18n 镜像与 [docs/04](docs/04-adoption.md) 的摘要一直是正确的，只有 README 被落下了——这正是「摘要层与正本不一致时以正本为准、让摘要跟随」的自我适用（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
+
+- **v0.14.0**（2026-08-16） — 条文没有修订，新增的是席位决定的**参考实现**（[templates/seat-resolver/](templates/seat-resolver/README.md)）——一个**通过 v0.13.0 全部 31 条验证向量**、由配置驱动的选席程序。规则表、模型词汇、系统（lineage）、风险领域与 writer 全部来自配置，因此各团队可以替换成自己的构成（代码与配置示例中都不含实名模型 ID）。它是**参考示例而非必需组件**——条文并不要求它，想用的团队才用。并且请保持**每个团队只有一份选席实现**：把同一机制复制到多个仓库会让权限与修订分裂。家族之间共享的不是实现，而是对 [templates/conformance/](templates/conformance/README.md) 的符合性（[#71](https://github.com/caty-ai/family-dev-handbook/issues/71)）。
 
 - **v0.13.0**（2026-08-15）——条文没有修订，新增的是席位决定的**验证向量**（[templates/conformance/](templates/conformance/README.md)）。这是 31 条用例，可让各团队的选席程序**以与实现无关的方式自我评分**：对照 `L1-9` 的席位数、`L1-10` 的异种与系统（lineage）、`L1-11` 的席数标度以及 FP-7。向量不含实名模型 ID（只用抽象 ID），与条文冲突时以条文为准（向量是导出物）。选席程序无法表达的用例计为 FAIL 而非 skip（fail-closed）；版本变更时新增文件并保留旧版（采用记录指向具体版本）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
 
-- **v0.12.0**（2026-08-15） — 新增了发布既定条文（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）。此前 release tag 只靠「在稳定点打 git tag」这一句话来维系，忘了打也不会触发任何提示，一旦会话切换就会在结构上被遗忘（这种情况被反复观测到）。T-5 采用的思路不是「设法让人记住」，而是「**忘记的话，完成记录（[L1-7](docs/02-issue-loop.md)）就无法通过**」——在所有完成记录中都设置 **release 栏**（三个词汇之一：`vX.Y.Z` 宣告 / `deferred`（理由 + 带退场触发条件的 Issue） / `N/A`（闭合的 3 种类型理由）），**出货级变更**（改变用户会用到的行为・公开 API・发布物・用户须遵循的规范的 merge）不得选择 `N/A`（拿不准就按出货级处理）。为了不让宣告就此止步，还规定**只有在 MERGED 带有已切 tag 的 URL 时车道才会终结**——未履行的车道会同时挂在无终结词汇的非活跃处理（`L1-4`）与 stale 时钟（`L0-3`）的视野中，即便该仓库之后没有新车道进来，忘打 tag 的问题也依旧可见。deferred 被放在会重新浮现的位置（带触发条件的 Issue）上，若连续出现两次，第三次出货级 merge 就必须打 tag（与 `R-6` 同型的升级机制，次数可以通过完成记录中的 `previous release` 事后核验）。执行强度在所有仓库中一致——没有出货级变更的仓库会自然落在 N/A 上，因此私有 scratch 仓库不会有实质负担（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
+- **v0.12.0**（2026-08-15） — 新增了发布既定条文（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）。此前 release tag 只靠「在稳定点打 git tag」这一句话来维系，忘了打也不会触发任何提示，一旦会话切换就会在结构上被遗忘（这种情况被反复观测到）。T-5 采用的思路不是「设法让人记住」，而是「**忘记的话，完成记录（[L1-7](docs/02-issue-loop.md)）就无法通过**」——在所有完成记录中都设置 **release 栏**（三个词汇之一：`vX.Y.Z` 宣告 / `deferred`（理由 + 带退场触发条件的 Issue） / `N/A`（闭合的 4 种类型理由）），**出货级变更**（改变用户会用到的行为・公开 API・发布物・用户须遵循的规范的 merge）不得选择 `N/A`（拿不准就按出货级处理）。为了不让宣告就此止步，还规定**只有在 MERGED 带有已切 tag 的 URL 时车道才会终结**——未履行的车道**不会终结，会以 WIP 状态留存**，因此会挂在 stale 时钟（`L0-3`）上，即便该仓库之后没有新车道进来，忘打 tag 的问题也依旧可见（缺少 tag URL 的 MERGED 属于**不合法格式**，终结不成立，按 `L1-4` 的非活跃处理）。deferred 被放在会重新浮现的位置（带触发条件的 Issue）上，若连续出现两次，第三次出货级 merge 就必须打 tag（与 `R-6` 同型的升级机制，次数可以通过完成记录中的 `previous release` 事后核验）。执行强度在所有仓库中一致——没有出货级变更的仓库会自然落在 N/A 上，因此私有 scratch 仓库不会有实质负担（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
 
 - **v0.11.0**（2026-08-15） — 评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员（团队）逐个进行**：生效数据由各团队的手册正本仓库（fork 的情况下为 fork 侧）中每团队一条的 pinned Issue 持有，未到生效日的团队按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”——没有 3 字段 pinned Issue 的团队不得主张“生效前”状态），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）
 
