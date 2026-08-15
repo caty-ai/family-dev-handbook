@@ -23,7 +23,7 @@ Use the [template](../templates/issue-template.md).
 ```
 Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint green
 → クロスレビュー → 指摘対応 → PR（完了記録 = L1-7 を本文に）
-→ merge → Issue close → 安定点で git tag
+→ merge → リリース判断の履行（[T-5](10-test-ci-baseline.md): vX.Y.Z はタグを切る / deferred・N/A は値の再掲）→ MERGED 宣言 → Issue close
 ```
 
 ## L1-3 Principles of cross-review
@@ -44,6 +44,7 @@ Lane state is declared via a labeled comment on the owning Issue. **The Issue is
 - `STUCK` is **not** a sixth state — it's a trigger condition, and the only legal way out is a valid HOLD (or escalation to a human)
 - A lane with a missing, unknown, or malformed state is **treated as inactive (HOLD-equivalent stance: no writes) pending state repair**. Don't count this lane as "available" in a GO judgment — work that could intersect the declared scope stays serial until repair ([FP-1](05-fail-posture.md)). Don't fabricate a valid HOLD record from malformed input (HOLD's required fields can't be manufactured from malformed input) — the next agent to touch this lane's first obligation is **repairing the state**, not writing ([FP-7](05-fail-posture.md))
 - **A termination / blocker declaration outweighs pressure to continue**. If a blocker appears within the same update, that update's completion claim is void
+- **MERGED carries a release-fulfillment report as a required field** ([T-5](10-test-ci-baseline.md)): a lane that declared `vX.Y.Z` in its completion record **cannot have its termination hold unless the MERGED comment carries the tag URL** (a MERGED lacking the URL is malformed = the inactive treatment described above). `deferred` / `N/A` only need to restate the completion record's value
 
 ## L1-5 HOLD's required fields
 
@@ -71,6 +72,7 @@ A PR may only be merged when a **completion record** ([template](../templates/is
 4. Cross-check the declared file set against `git diff --stat origin/main...<candidate SHA>` (a file in the diff but not in the list is blocking — [L0-6](03-git-protocol.md))
 5. Link the identities of implementer and reviewer, confirming **the model or agent differs** (L1-3)
 6. **State the CI status** — don't merge while it's red. The sole exception condition for a known, unrelated red is [T-4](10-test-ci-baseline.md)
+7. **Every completion record carries a release field** — the value is one of `vX.Y.Z` / `deferred (a reason plus an Issue carrying an LC-1 trigger)` / `N/A (a reason from the closed enumeration)`; a ship-equivalent merge cannot choose `N/A`. A missing field, an empty value, an unedited placeholder, or anything outside the three-word vocabulary is a defect. It also confirms that **the same repo's previous ship-equivalent merge's release declaration has been fulfilled** (the `previous release` field. An unfulfilled `vX.Y.Z` is blocking — [T-5](10-test-ci-baseline.md) settles what counts as "fulfilled")
 
 **Evidence exists before the claim does.** Success that only exists locally is not completion.
 
@@ -116,5 +118,6 @@ The seat counts in this table apply to **implementation review that clears a mer
 
 - Tests and lint pass (the sole explicit exception is [T-4](10-test-ci-baseline.md))
 - The PR carrying an L1-7 completion record is merged, and the Issue is closed
+- **The release decision has been fulfilled** — a lane that declared `vX.Y.Z` is not complete until MERGED carries the URL of an annotated tag on main ([T-5](10-test-ci-baseline.md))
 - **The online repo is the up-to-date source of truth** (it doesn't end with results that only exist locally)
 - If work spans multiple sessions, the entry point for continuing (what to do next) is left in an Issue comment or a handoff
