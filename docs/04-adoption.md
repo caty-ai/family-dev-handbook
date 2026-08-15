@@ -29,7 +29,7 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-15 / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-15 (v0.12.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
 この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
@@ -38,10 +38,11 @@ L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・�
   L2-5 広域Issueは単独実行 / L2-6 ホットスポットは並行安全マップ+分割投資
 L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予測 /
   L1-3 merge レビュー=別モデル or 別エージェント・self-approve 禁止 /
-  L1-4 レーン状態は WIP/HOLD/MERGED/SUPERSEDED/ABANDONED の5語彙・不明状態=非アクティブ扱い /
+  L1-4 レーン状態は WIP/HOLD/MERGED/SUPERSEDED/ABANDONED の5語彙・不明状態=非アクティブ扱い・
+  MERGED は release 履行報告必須（vX.Y.Z 宣言レーンは tag URL 無き MERGED は終端未成立） /
   L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
   L1-6 リトライ有限・尽きたら証拠付き HOLD/ABANDONED / L1-7 merge は完了記録（Done when→PASS/FAIL/理由付きN/A・
-  証拠・候補SHA・diff照合）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
+  証拠・候補SHA・diff照合・CI 状態・release 欄+直前の出荷相当 merge の履行確認）必須 / L1-8 訂正は差し替え記録で（黙った編集禁止） /
   L1-9 サイズ L/H/Epic（=L2-1 の重い側・アーキ・要件含む）は実装着手前に異種レビュー（S/M 単発Issueには課さない） /
   L1-10 席は相互異種+writer異種・設計/実装者は席に数えない・適格モデル名簿はローカル設定・requested/actual記録・実名カタログ=データ層（handbook外・非規範=法とメンバー設定を上書きできない）・抽選/代打は異系統必須（記録された6フィールド例外のみ可）・名指しパネルの同系統は記録つきcorrelated-seatsのみ適法（レビュー記録に明記・無明記=席数未達） /
   L1-11 席数 S/M=異種3（発効はメンバー（家）ごと・発効データ=正本リポの pinned Issue 3フィールド・発効前は旧床2で適法・**Issue無し/フィールド欠落=発効前を主張できず床3**）・L/H=異種3・高リスク領域=5（サイズより優先）・Epic上流=実装着手前L/H・確保不能はオーナー承認の降格 or SEAT-WAIT（対象はレーンのみ・家への無期限適用禁止）
@@ -81,9 +82,12 @@ T テスト&CI基準: T-1 コードを含む新規リポは作成時にテスト
   T-3 コード変更を含む委譲ブリーフの実装チェックに「追加・変更したテストと実行結果」を標準項目化・追加なしは閉じた列挙（T-3）の理由つき報告 /
   T-4 CI 赤のまま merge 禁止・例外は既知無関係の赤のみ（base 再現+赤の identity+LC-1 期限つき Issue 参照+実在検証できるオーナー専決の4条件すべて必須）・
   flaky は含めない・CI 不在は green ではない・N/A は CI が当該変更を検査しない場合のみ・参照無き赤・検証できない例外は例外にならない /
-  T-5 出荷相当の merge（利用者の挙動・公開API・配布物・規範が変わる）は完了記録に release 欄必須（vX.Y.Z 宣言→merge 後 annotated+SemVer タグ・URL は MERGED コメントで履行報告 /
-  deferred=理由+LC-1 トリガー必須 / N/A=理由）・欄なし=L1-7 不備 blocking・リリースノートに検証可能な証拠 URL 1つ以上・署名検証リポは署名タグ必須（鍵 per-repo）他は SHOULD・
-  deferred 2連続の次の出荷相当 merge は deferred 不可・全リポ一律（出荷相当が無ければ自然に N/A）
+  T-5 全完了記録に release 欄必須（vX.Y.Z / deferred / N/A の3語彙）・出荷相当（利用者の挙動・公開API・配布物・規範が変わる）は N/A 不可・迷ったら出荷相当・
+  欄なし/空欄/未編集プレースホルダ/語彙外=blocking・vX.Y.Z はタグを切り URL を載せた MERGED まで終端不成立（未履行レーンは非アクティブ+stale 時計で可視）・
+  deferred は退場トリガー付き Issue 参照必須（失効後の未タグ=未履行の vX.Y.Z と同扱い）・N/A は閉じた3類型（規範なし docs のみ/挙動・API・配布物不変の内部整理/CI・開発配線のみ）+類型外はオーナー専決・
+  完了記録は直前の出荷相当 merge の release 履行も確認（未履行=blocking）・deferred 連続は出荷相当列で数え vX.Y.Z でリセット・2連続の次は deferred 不可・
+  タグは当該 merge が main に残したコミットへ同名 annotated+SemVer・リリースノートに証拠ポインタ1つ以上・署名検証リポは署名タグ必須（鍵 per-repo）他は SHOULD・
+  Epic 子→epic は対象外（N/A・T-5 は epic→main に掛かる）・全リポ一律（出荷相当が無ければ自然に N/A）
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
