@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.11.0-blue)
+![version](https://img.shields.io/badge/version-v0.12.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -314,6 +314,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
 | [templates/ci/](templates/ci/README.md) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
+| [templates/conformance/](templates/conformance/README.md) | 席決定の検証ベクタ31本（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）とメンバー側での流し方 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -357,7 +358,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.11.0**（2026-08-15）。レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）です。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化です（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
+現行バージョンは **v0.12.0**（2026-08-15）。条文の改訂はありません — 席決定の**検証ベクタ**（[templates/conformance/](templates/conformance/README.md)）が加わりました。各家のセレクタ（席を決めるプログラム）が、`L1-9` の席数・`L1-10` の異種と系統・`L1-11` の席数スケールと FP-7 に対して**実装非依存で自己採点**できる31本のケース集です。実名モデル ID を含まず（抽象 ID のみ）、条文と食い違えば条文が正（ベクタは導出物）。セレクタが表現できないケースは skip ではなく FAIL と数える fail-closed 運用で、版が変わるときは新ファイルを足して旧版を残します（採用記録が版を指すため）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
+
+- **v0.11.0**（2026-08-15） — レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）です。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化です（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
 
 - **v0.10.0**（2026-08-14） — テスト & CI 基準層（`T-1`〜`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。コードを含む新規リポは作成時にテストランナー + CI を整備・サイズ M / L / H のバグ修正は再現テスト同梱が既定・委譲ブリーフに「追加・変更したテストと実行結果」を標準項目化・CI 赤のままの merge 禁止（例外は4条件を満たす既知無関係の赤のみ）。出発点は [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 機械の門番テンプレ（[templates/ci/](templates/ci/README.md)）の硬化改訂。初回展開（3リポ）の実測から還流した「静かに緑」の欠陥3件を型で塞ぎました（`RISK_PATHS_AUTH` 常設カテゴリ新設・`none` 宣言の大小文字硬化と宣言行の健全性検査・展開検証の落とし穴を README に追記）。多席レビュー4ラウンド（3席全 GO）を経て、展開済みリポへ同期済み

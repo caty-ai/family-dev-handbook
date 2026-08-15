@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.11.0-blue)
+![version](https://img.shields.io/badge/version-v0.12.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -316,6 +316,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
 | [templates/ci/](templates/ci/README.md) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
+| [templates/conformance/](templates/conformance/README.md) | 席位决定的 31 条验证向量（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）与成员侧的运行方法 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献的流程（Issue-first / WIP 声明 / 完成记录的摘要） |
 
 最后，用一句话说说这本手册从哪里来、在哪里被使用。
@@ -359,7 +360,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.11.0**（2026-08-15）——评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员（团队）逐个进行**：生效数据由各团队的手册正本仓库（fork 的情况下为 fork 侧）中每团队一条的 pinned Issue 持有，未到生效日的团队按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”——没有 3 字段 pinned Issue 的团队不得主张“生效前”状态），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
+当前版本是 **v0.12.0**（2026-08-15）——条文没有修订，新增的是席位决定的**验证向量**（[templates/conformance/](templates/conformance/README.md)）。这是 31 条用例，可让各团队的选席程序**以与实现无关的方式自我评分**：对照 `L1-9` 的席位数、`L1-10` 的异种与系统（lineage）、`L1-11` 的席数标度以及 FP-7。向量不含实名模型 ID（只用抽象 ID），与条文冲突时以条文为准（向量是导出物）。选席程序无法表达的用例计为 FAIL 而非 skip（fail-closed）；版本变更时新增文件并保留旧版（采用记录指向具体版本）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
+
+- **v0.11.0**（2026-08-15） — 评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员（团队）逐个进行**：生效数据由各团队的手册正本仓库（fork 的情况下为 fork 侧）中每团队一条的 pinned Issue 持有，未到生效日的团队按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”——没有 3 字段 pinned Issue 的团队不得主张“生效前”状态），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
 
 - **v0.10.0**（2026-08-14） — 测试与 CI 基准层（`T-1`–`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。包含代码的新仓库在创建时整备测试运行器 + CI・尺寸 M / L / H 的 bug 修复默认同梱复现测试・委托简报把“新增/变更的测试及其运行结果”列为标准项目・禁止在 CI 红的状态下 merge（例外仅限满足 4 条件的已知无关的红）。出发点是 [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷用模板层面堵上了（新增常设分类 `RISK_PATHS_AUTH`・`none` 声明的大小写强化与声明行健全性检查・把落地验证的坑点补写进 README）。经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库
