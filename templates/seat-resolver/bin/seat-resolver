@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Zero-bytecode launcher for the reference resolver."""
+
+import os
+import sys
+
+sys.dont_write_bytecode = True
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+
+from seat_resolver.cli import main
+
+raise SystemExit(main())

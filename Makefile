@@ -11,10 +11,12 @@ LINT_TARGETS := $(READMES) i18n/README.md
 
 .PHONY: test lint
 
-# test: 非空ガード + 4言語 README の構造一致 (見出し階層・コードブロック数・リンク/画像集合) — fail-closed
+# test: 非空ガード + 4言語 README 構造一致 + seat-resolver unit/conformance gates — fail-closed
 test:
 	@set -e; for f in $(LINT_TARGETS); do test -s $$f || { echo "empty README: $$f" >&2; exit 1; }; done
 	$(CHECK) langs README.ja.md README.md README.zh.md README.th.md
+	$(PY) -m unittest discover -s templates/seat-resolver/tests -v
+	$(PY) templates/seat-resolver/bin/run-conformance
 
 # lint: 各ファイル単体の整合 (相対リンク実在・アンカー解決・placeholder・見出し階層) — fail-closed
 lint:
