@@ -21,7 +21,7 @@
 ```
 Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint green
 → クロスレビュー → 指摘対応 → PR（完了記録 = L1-7 を本文に）
-→ merge → リリース判断の履行（タグを切る = [T-5](10-test-ci-baseline.md)）→ MERGED 宣言 → Issue close
+→ merge → リリース判断の履行（[T-5](10-test-ci-baseline.md): vX.Y.Z はタグを切る / deferred・N/A は値の再掲）→ MERGED 宣言 → Issue close
 ```
 
 ## L1-3 クロスレビューの原則
@@ -70,7 +70,7 @@ PR を merge してよいのは、以下を満たす**完了記録**（[テン�
 4. 宣言ファイル集合と `git diff --stat origin/main...<候補SHA>` の照合（diff にあって一覧にないファイルは blocking — [L0-6](03-git-protocol.md)）
 5. 実装者とレビュアーの身元をリンクし、**モデルまたはエージェントが異なる**こと（L1-3）
 6. **CI 状態を記載する** — 赤のまま merge しない。既知・無関係の赤の例外条件（唯一の例外）は [T-4](10-test-ci-baseline.md)
-7. **すべての完了記録に release 欄を置く** — 値は `vX.Y.Z` / `deferred（理由 + LC-1 トリガー付き Issue）` / `N/A（閉じた列挙の理由）` の3語彙のいずれかで、出荷相当の merge は `N/A` を選べない。欄なし・空欄・未編集のプレースホルダ・3語彙以外は不備。あわせて**同一リポの直前の出荷相当 merge の release 宣言が履行済みであること**を確認する（未履行は blocking）（[T-5](10-test-ci-baseline.md)）
+7. **すべての完了記録に release 欄を置く** — 値は `vX.Y.Z` / `deferred（理由 + LC-1 トリガー付き Issue）` / `N/A（閉じた列挙の理由）` の3語彙のいずれかで、出荷相当の merge は `N/A` を選べない。欄なし・空欄・未編集のプレースホルダ・3語彙以外は不備。あわせて**同一リポの直前の出荷相当 merge の release 宣言が履行済みであること**を確認する（`previous release` 欄。未履行の `vX.Y.Z` は blocking・「履行済み」の判定は [T-5](10-test-ci-baseline.md) が閉じる）
 
 **証拠は主張より先に存在する。** ローカルにしか成功がない状態は完了ではない。
 
