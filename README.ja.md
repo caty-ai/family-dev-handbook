@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.12.0-blue)
+![version](https://img.shields.io/badge/version-v0.13.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -314,6 +314,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
 | [templates/ci/](templates/ci/README.md) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
+| [templates/conformance/](templates/conformance/README.md) | 席決定の検証ベクタ31本（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）とメンバー側での流し方 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | コントリビュートの流れ（Issue-first / WIP 宣言 / 完了記録の要約） |
 
 最後に、このハンドブックがどこから来て、どこで使われているかを一言だけ。
@@ -357,7 +358,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.12.0**（2026-08-15）。リリース既定の条文追加（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）です。リリースタグはこれまで「安定点で git tag」の一言だけで、切り忘れても何にも引っかからず、セッションが変わると構造的に忘れられていました（実例が繰り返し観測されています）。T-5 は「忘れないようにする」のではなく「**忘れると完了記録（L1-7）が通らない**」形にします — すべての完了記録に **release 欄**（`vX.Y.Z` 宣言 / `deferred`（理由 + 退場トリガー付き Issue） / `N/A`（閉じた3類型の理由）の3語彙）を置き、**出荷相当の変更**（利用者が動かす挙動・公開 API・配布物・利用者が従う規範が変わる merge）は `N/A` を選べません（迷ったら出荷相当）。さらに宣言だけで終わらないよう、**タグを切って URL を載せた MERGED でなければレーンは終端しない**形にしました — 未履行のレーンは終端語彙を持たないまま非アクティブ扱い（`L1-4`）と stale 時計（`L0-3`）の視界に残るので、次のレーンが来ないリポでも切り忘れが可視になります。deferred は再浮上する面（トリガー付き Issue）に置き、2回続いたら3回目の出荷相当 merge では切る（`R-6` と同型のエスカレーション・計数は完了記録の `previous release` で後から検証できます）。適用は全リポ一律 — 出荷相当が無いリポは自然に N/A になるため、私有スクラッチに実質負荷はありません（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
+現行バージョンは **v0.13.0**（2026-08-15）。条文の改訂はありません — 席決定の**検証ベクタ**（[templates/conformance/](templates/conformance/README.md)）が加わりました。各家のセレクタ（席を決めるプログラム）が、`L1-9` の席数・`L1-10` の異種と系統・`L1-11` の席数スケールと FP-7 に対して**実装非依存で自己採点**できる31本のケース集です。実名モデル ID を含まず（抽象 ID のみ）、条文と食い違えば条文が正（ベクタは導出物）。セレクタが表現できないケースは skip ではなく FAIL と数える fail-closed 運用で、版が変わるときは新ファイルを足して旧版を残します（採用記録が版を指すため）（[#63](https://github.com/caty-ai/family-dev-handbook/issues/63)）。
+
+- **v0.12.0**（2026-08-15） — リリース既定の条文追加（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）です。リリースタグはこれまで「安定点で git tag」の一言だけで、切り忘れても何にも引っかからず、セッションが変わると構造的に忘れられていました（実例が繰り返し観測されています）。T-5 は「忘れないようにする」のではなく「**忘れると完了記録（L1-7）が通らない**」形にします — すべての完了記録に **release 欄**（`vX.Y.Z` 宣言 / `deferred`（理由 + 退場トリガー付き Issue） / `N/A`（閉じた3類型の理由）の3語彙）を置き、**出荷相当の変更**（利用者が動かす挙動・公開 API・配布物・利用者が従う規範が変わる merge）は `N/A` を選べません（迷ったら出荷相当）。さらに宣言だけで終わらないよう、**タグを切って URL を載せた MERGED でなければレーンは終端しない**形にしました — 未履行のレーンは終端語彙を持たないまま非アクティブ扱い（`L1-4`）と stale 時計（`L0-3`）の視界に残るので、次のレーンが来ないリポでも切り忘れが可視になります。deferred は再浮上する面（トリガー付き Issue）に置き、2回続いたら3回目の出荷相当 merge では切る（`R-6` と同型のエスカレーション・計数は完了記録の `previous release` で後から検証できます）。適用は全リポ一律 — 出荷相当が無いリポは自然に N/A になるため、私有スクラッチに実質負荷はありません（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
 
 - **v0.11.0**（2026-08-15） — レビュー席の条文改訂2点（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。① **S / M の席床が異種2席 → 異種3席**に上がりました — 発効は**メンバー（家）ごと**（発効データは正本リポの家ごと pinned Issue が持ち、発効前の家は旧床2席で適法 — **施行ギャップは「日程」であって「違反」ではない**（3フィールドの pinned Issue が無い家は「発効前」を主張できない）。初日から満たせない法を即時全員発効で出さないための形で、SEAT-WAIT の対象はレーンのみと明文化）。② **実名カタログ条項と correlated-seats** — 家族で共有する実名モデルカタログはデータ層としてハンドブックの外に置き、非規範（カタログは法が禁じる席を合法化できず、生存確認できないモデルを使用可能にできない）。席の系統は、機械が選ぶ経路（抽選・代打）では相互異系統または記録された例外が必須、オーナー名指しパネルの同系統着席は記録つき correlated-seats フラグがある場合に限り適法。出発点は MoA ファミリー全体化設計 — 7席×2周の設計レビューと3席 delta 確認を経た v2.1 の条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）
 
