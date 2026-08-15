@@ -110,6 +110,7 @@ The seat counts in this table apply to **implementation review that clears a mer
 - If backfilling or downgrading still falls short, stop at **SEAT-WAIT** (a waiting state before review starts — a distinct term from L1-4's HOLD lane state; L1-5's 5 required fields don't apply, to keep the weekly probe from misdetecting it as a HOLD). Make SEAT-WAIT visible via a comment on the owning Issue, stating three things: **owner / which seats are missing / a retry-by date** (a SEAT-WAIT missing any of the three is invalid). A SEAT-WAIT comment counts as an activity update under [L0-3](03-git-protocol.md) — letting a seat-short lane go stale → TAKEOVER doesn't create more seats, so this surfaces the root cause instead of just advancing the clock
 - **SEAT-WAIT applies to lanes only**: never apply an open-ended SEAT-WAIT to a member (household) — a wait with no owning Issue and no retry-by date cannot satisfy the three points above and escapes visibility. A household-level "not yet able to satisfy" is expressed through the per-member effect data above
 - Adjusting the seat-count numbers can only be done via a PR to the handbook (same treatment as [L0-3](03-git-protocol.md)'s 72h)
+- Self-verification vectors for seat-decision implementations (non-normative, derived from the statutes): [templates/conformance](../../../templates/conformance/README.md)
 
 ## Definition of done
 
