@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.11.0-blue)
+![version](https://img.shields.io/badge/version-v0.12.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -197,7 +197,7 @@ handbook-revision 的值请不要改动。
 3. 把第一行的 `owner` 和 `last-verified` 改成你自己和今天的日期。`handbook-revision` 原样保留
 4. 把第二行的 `正本:` 改成本仓库的 URL（如果你 fork 了，就填你 fork 的地址）
 
-要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-4`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
+要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-5`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
 
 想停用的话，把粘进去的那 50 行左右删掉就回到原样。其他文件一概不碰。
 
@@ -265,7 +265,7 @@ flowchart TD
 | **B** 委派简报 | 一次委派如何成为契约 | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** 生命周期 | 放下的东西何时、如何退场 | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 拒收准则 | 接受什么、拒绝什么 | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
-| **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-4` | [docs/10](docs/10-test-ci-baseline.md) |
+| **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-5` | [docs/10](docs/10-test-ci-baseline.md) |
 
 其中有两条特别左右成效。一条是 **FP** 的口号“无法验证就串行。fail-open 不等于‘通过’”——它宣告的是：即便你有意选择在无法确认时放行，那也绝不能被读成“已确认”。另一条是**高风险领域的单一定义**，碰到这里的工作一定要停下来等人确认，评审席位也会增加（对外发布、计费、不可逆操作、权限边界之类都算。准确的界线请看正本）。为了不让同一个定义存在于两个地方，正本只放在 [docs/06](docs/06-epic-lane.md) 这一处。
 
@@ -310,7 +310,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委派简报 — 每次把工作交给子智能体时，提示词所承载的契约（`B-1`–`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC 工作区生命周期 — 把“退场”变成契约的层；退场条件的数值以本地设置为正本（`LC-1`–`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 拒收准则 — 决定接受什么、拒绝什么的意图层：自动拒收的三个理由、欢迎/拒收的判断标准、前提验证、放置阶梯、把方针升格为 check（`R-1`–`R-6`） |
-| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge。附录为非规范性的运行器速查表（`T-1`–`T-4`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge、发布既定。附录为非规范性的运行器速查表（`T-1`–`T-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue 模板与全部车道评论格式（WIP / HOLD / 终结 / TAKEOVER / 恢复检查 / 完成记录） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
@@ -359,7 +359,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.11.0**（2026-08-15）——评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员（团队）逐个进行**：生效数据由各团队的手册正本仓库（fork 的情况下为 fork 侧）中每团队一条的 pinned Issue 持有，未到生效日的团队按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”——没有 3 字段 pinned Issue 的团队不得主张“生效前”状态），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）。
+当前版本是 **v0.12.0**（2026-08-15）。新增了发布既定条文（`T-5`・[docs/10](docs/10-test-ci-baseline.md)）。此前 release tag 只靠「在稳定点打 git tag」这一句话来维系，忘了打也不会触发任何提示，一旦会话切换就会在结构上被遗忘（这种情况被反复观测到）。T-5 采用的思路不是「设法让人记住」，而是「**忘记的话，完成记录（[L1-7](docs/02-issue-loop.md)）就无法通过**」——在所有完成记录中都设置 **release 栏**（三个词汇之一：`vX.Y.Z` 宣告 / `deferred`（理由 + 带退场触发条件的 Issue） / `N/A`（闭合的 3 种类型理由）），**出货级变更**（改变用户会用到的行为・公开 API・发布物・用户须遵循的规范的 merge）不得选择 `N/A`（拿不准就按出货级处理）。为了不让宣告就此止步，还规定**只有在 MERGED 带有已切 tag 的 URL 时车道才会终结**——未履行的车道会同时挂在无终结词汇的非活跃处理（`L1-4`）与 stale 时钟（`L0-3`）的视野中，即便该仓库之后没有新车道进来，忘打 tag 的问题也依旧可见。deferred 被放在会重新浮现的位置（带触发条件的 Issue）上，若连续出现两次，第三次出货级 merge 就必须打 tag（与 `R-6` 同型的升级机制，次数可以通过完成记录中的 `previous release` 事后核验）。执行强度在所有仓库中一致——没有出货级变更的仓库会自然落在 N/A 上，因此私有 scratch 仓库不会有实质负担（[#64](https://github.com/caty-ai/family-dev-handbook/issues/64)）。
+
+- **v0.11.0**（2026-08-15） — 评审席条文的两项修订（`L1-10` / `L1-11`・[docs/02](docs/02-issue-loop.md)）。其一，**S / M 的席位下限从异种 2 席提高到异种 3 席**——生效**按成员（团队）逐个进行**：生效数据由各团队的手册正本仓库（fork 的情况下为 fork 侧）中每团队一条的 pinned Issue 持有，未到生效日的团队按旧下限 2 席即为合规（施行间隙因此是“日程”而不是“违规”——没有 3 字段 pinned Issue 的团队不得主张“生效前”状态），并明文规定 SEAT-WAIT 只适用于车道。其二，**实名目录条款与 correlated-seats**——家族共享的实名模型目录属于数据层，放在手册之外，且为非规范：目录既不能把法所禁止的席位合法化，也不能让成员无法确认存活的模型变为可用。关于席位的系统（lineage），机器选择的路径（抽签・替补）必须两两异系或有记录在案的例外；owner 点名固定的面板中出现同系席位，仅在有记录的 correlated-seats 标志时合法。出发点是 MoA 家族整体化设计——经过 7 席 ×2 轮设计评审与 3 席 delta 确认后的 v2.1 条文化（[#45](https://github.com/caty-ai/family-dev-handbook/issues/45) / [#57](https://github.com/caty-ai/family-dev-handbook/issues/57)）
 
 - **v0.10.0**（2026-08-14） — 测试与 CI 基准层（`T-1`–`T-4`・[docs/10](docs/10-test-ci-baseline.md)）。包含代码的新仓库在创建时整备测试运行器 + CI・尺寸 M / L / H 的 bug 修复默认同梱复现测试・委托简报把“新增/变更的测试及其运行结果”列为标准项目・禁止在 CI 红的状态下 merge（例外仅限满足 4 条件的已知无关的红）。出发点是 [caty-ai/x-collector#9](https://github.com/caty-ai/x-collector/issues/9)
 - **v0.9.2**（2026-08-11） — 机器门禁模板（[templates/ci/](templates/ci/README.md)）的强化改版。把首次落地（3 个仓库）实测反馈回来的 3 个“悄悄变绿”缺陷用模板层面堵上了（新增常设分类 `RISK_PATHS_AUTH`・`none` 声明的大小写强化与声明行健全性检查・把落地验证的坑点补写进 README）。经过 4 轮多席评审（3 席全部 GO），已同步到已落地的仓库

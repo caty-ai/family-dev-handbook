@@ -69,6 +69,8 @@ remaining work / successor: <残作業 or 引き継ぎ先>
 🏁 <MERGED|SUPERSEDED|ABANDONED> (<agent名>, YYYY-MM-DD): <1行>
 
 evidence / successor: <PR リンク・後継 Issue・打ち切りの証拠（L1-6）>
+release: <tag URL（+ 署名必須リポは「署名: あり | 対象外」） | deferred #n（完了記録どおり） | N/A>
+<!-- MERGED の必須フィールド（T-5 / L1-4）。vX.Y.Z を宣言したレーンは、タグを切って URL を載せるまで MERGED を宣言できない（URL 無き MERGED は不正形式 = 終端未成立）。宣言と異なる版を切った場合は差異と理由を1行 -->
 ```
 
 ## TAKEOVER コメント（L0-3 — stale レーンの引き取り）
@@ -120,6 +122,12 @@ implementer: <agent/model>
 reviewer: <agent/model>
 identity check: <差の軸を明記: 別モデル | 別エージェント>   <!-- merge には実装者と別モデル or 別エージェント必須（L1-3）。空欄は blocking -->
 CI: <green | red | N/A（理由）>   <!-- 赤のまま merge 禁止（T-4）。空欄・未編集のプレースホルダは blocking。CI 不在は green ではない。N/A は CI が当該変更を検査しない場合に限る（CI が走る変更は非コードでも N/A 不可） -->
+release: <vX.Y.Z | deferred（理由 + トリガー付き Issue #n） | N/A（①規範を含まない docs のみ / ②挙動・公開API・配布物を変えない内部整理 / ③CI・開発環境の配線のみ / ④main 未到達の中間 merge=Epic 子→epic / 類型外はオーナー専決1行）>
+<!-- 全完了記録で欄必須（T-5）。空欄・未編集のプレースホルダ・3語彙以外の値は未記入扱い = blocking。出荷相当（挙動・公開API・配布物・利用者が従う規範が変わる）の merge は N/A 不可・迷ったら出荷相当。
+     vX.Y.Z は宣言 — merge 後に当該 merge が main に残したコミットへ annotated タグを切り、tag URL を MERGED コメントに載せるまで MERGED を宣言できない（原則は宣言と同名・版が動いたら MERGED に差異と理由を1行）。
+     deferred は退場トリガー付き Issue 参照が必須（無ければ先に立てる）。トリガー失効後は「切らない特権」を失い、次の出荷相当 merge は vX.Y.Z 必須（失効自体は記録を止めない） -->
+previous release: <直前の出荷相当 merge の release 値 + 履行状態（vX.Y.Z→tag URL | deferred #n（トリガー生存 or 失効） | none（初回））>
+<!-- 全完了記録に置く（T-5）。履行確認（L1-7⑦）と deferred 連続計数の台帳を兼ねる。未履行の vX.Y.Z は blocking。直前が deferred でその previous も deferred なら今回は vX.Y.Z 必須 -->
 <!-- red の場合は、以下の4点をコメントの外に転記して埋める（コメントのままは未記入扱い = blocking。1点でも欠ければ例外不成立 — T-4）:
      failing check: <check 名> / run: <run 識別子> @ <候補SHA> / 観測日付: <YYYY-MM-DD>
      無関係の根拠: <base で同一の赤を再現した記録（インライン抜粋）>
