@@ -33,7 +33,7 @@ Note: a brief that includes a code change must include, in its Implementation Ch
 ## B-4 Front-Load Context — Don't Make Them Go Exploring
 
 - Front-load into the brief any facts the delegate needs (paths, specs, constraints, prohibitions, environment quirks). Don't rely on the delegate to explore for them
-- Reason: exploration results vary by delegate. Read-only seats or sandboxed environments sometimes can't explore at all. Front-loading is the only way to get the same quality of outcome whether the context is fresh or read-only
+- Reason: exploration results vary by delegate. Read-only seats or sandboxed environments sometimes can't explore at all. Also, some runtimes exist where a standing instruction file (AGENTS.md, etc.) goes unread and degrades across the delegation boundary — write any needed conventions inline in the brief body. Front-loading is the only way to get the same quality of outcome whether the context is fresh or read-only
 - When delegating a review, **name the worst-case failure mode explicitly** ("the worst thing this change could do is cause X"). This gives a sharper target than "find bugs"
 - For delegations that need blinding (independent review seats), **don't mix in** other seats' findings or your own prior analysis. What you front-load should be facts, not conclusions
 

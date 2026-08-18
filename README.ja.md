@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.14.1-blue)
+![version](https://img.shields.io/badge/version-v0.15.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -359,7 +359,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.14.1**（2026-08-16）。条文の改訂はありません — README（4言語）の v0.12.0 版歴が `T-5` の条文と食い違っていたのを訂正しました。未履行のレーン（`vX.Y.Z` を宣言したのにタグを切っていないレーン）は「**終端しないまま WIP として残り** stale 時計に乗る」のであって、非アクティブ扱いになるわけではありません（非アクティブ扱いが掛かるのは **tag URL を欠く MERGED** の方）。あわせて、同じ段落で `N/A` の閉じた列挙を「3類型」と書いていたのを **4類型**（v0.12.0 で入った Epic 子→epic を含む）に直しました。条文（[docs/10](docs/10-test-ci-baseline.md)）・i18n ミラー・[docs/04](docs/04-adoption.md) のダイジェストは当初から正しく、README だけが取り残されていた形です — 「要約層と正本が食い違えば正本が正・要約を追従させる」の自己適用にあたります（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
+現行バージョンは **v0.15.0**（2026-08-18）。条文の改訂4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・grok-build ランタイム解析の5席クロスレビューからの還流）。① **後続ラウンドのラチェット禁止**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— round-2 以降で新たに blocking を追加できるのは実証済みの欠陥か未充足のゲート基準のみ。レビューラウンドが進むほど新しい好みが後出し blocking になりレーンが終端しない「ラチェットチャーン」を止める狭い条項です。② **指摘の引用要件**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— path:line を指すか実行ログを引用できない指摘は blocking にできない（non-blocking の懸念は自由）。①がその上に実証要件を重ねる引用水準の「床」の明文化です（二層の制約であり同一水準ではありません）。③ **B-4 に理由1文**（[docs/07](docs/07-delegation-brief.md)）— 常設 instruction ファイルが委譲境界で読まれず劣化する runtime も実在するため、必要な規約はブリーフ本文にインラインで書く。④ **git を触る自動化の衛生1文**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config は毎回 env で明示し、ユーザーの git 状態を読まない・書かない。
+
+- **v0.14.1**（2026-08-16） — 条文の改訂はありません — README（4言語）の v0.12.0 版歴が `T-5` の条文と食い違っていたのを訂正しました。未履行のレーン（`vX.Y.Z` を宣言したのにタグを切っていないレーン）は「**終端しないまま WIP として残り** stale 時計に乗る」のであって、非アクティブ扱いになるわけではありません（非アクティブ扱いが掛かるのは **tag URL を欠く MERGED** の方）。あわせて、同じ段落で `N/A` の閉じた列挙を「3類型」と書いていたのを **4類型**（v0.12.0 で入った Epic 子→epic を含む）に直しました。条文（[docs/10](docs/10-test-ci-baseline.md)）・i18n ミラー・[docs/04](docs/04-adoption.md) のダイジェストは当初から正しく、README だけが取り残されていた形です — 「要約層と正本が食い違えば正本が正・要約を追従させる」の自己適用にあたります（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
 
 - **v0.14.0**（2026-08-16） — 条文の改訂はありません — 席決定の**参考実装**（[templates/seat-resolver/](templates/seat-resolver/README.md)）が加わりました。v0.13.0 で配った検証ベクタ31本を**全通過する、設定駆動のリゾルバ**です。ルール表・モデル語彙・系統・リスク領域・writer をすべて設定から読むので、自分の家の構成に置き換えて使えます（実名モデル ID はコードにも設定例にも含みません）。**参考例であって必須部品ではありません** — 条文はこれを要求せず、使いたい家だけが使います。また**席決定の実装は各家に1つだけ**にしてください（同じ仕組みを複数リポにコピーすると権限と改訂が分裂します）。共有するのは実装ではなく、[templates/conformance/](templates/conformance/README.md) への適合です（[#71](https://github.com/caty-ai/family-dev-handbook/issues/71)）。
 

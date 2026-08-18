@@ -62,6 +62,8 @@ The most common reason a well-made change gets declined isn't quality — it's t
 
 Underlying theme: **verify both the claim and the intent against the codebase before writing, and before merging**. A confirmed reproduction plus a line-level explanation beats a plausible-sounding argument every time. When intent is unclear, it's cheaper to ask than to ship a fix that fights the design.
 
+This evidence bar applies to review-seat findings too: **a finding that can't point to a path:line or quote an execution log cannot be marked blocking** (raising it as a non-blocking concern is fine). For a new blocking finding in a follow-up round, [L1-3](02-issue-loop.md)'s ratchet ban requires demonstration (reproduction or an execution log) **in addition to** this requirement — two layered constraints, not the same bar.
+
 (Concrete examples may be swapped out for each household's own incident records — the examples in this text are illustrative, not normative. When delegating a review, these 4 patterns can be front-loaded as the "name the worst failure mode" angle from [B-4](07-delegation-brief.md).)
 
 ## R-5 The Placement Ladder — Minimize Permanent Surface Area at the Lowest Rung

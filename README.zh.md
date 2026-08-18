@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.14.1-blue)
+![version](https://img.shields.io/badge/version-v0.15.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
 ![status](https://img.shields.io/badge/status-active-brightgreen)
@@ -361,7 +361,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.14.1**（2026-08-16）。条文没有修订——本次订正的是 README（4 种语言）中 v0.12.0 版本历史与 `T-5` 条文不一致之处。未履行的车道（已宣告 `vX.Y.Z` 却没有切 tag 的车道）是「**不会终结，会以 WIP 状态留存**」并挂在 stale 时钟上，而不是按非活跃处理（按非活跃处理的是**缺少 tag URL 的 MERGED**）。同一段中把 `N/A` 的闭合列举写成「3 种类型」，也一并改为 **4 种类型**（含 v0.12.0 加入的 Epic 子→epic）。条文（[docs/10](docs/10-test-ci-baseline.md)）、i18n 镜像与 [docs/04](docs/04-adoption.md) 的摘要一直是正确的，只有 README 被落下了——这正是「摘要层与正本不一致时以正本为准、让摘要跟随」的自我适用（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
+当前版本是 **v0.15.0**（2026-08-18）。条文修订4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・来自 grok-build 运行时解析5席交叉评审的反馈）。① **禁止后续轮次的 ratchet**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— 从第2轮开始，能新增 blocking 的仅限已证实的缺陷或尚未满足的门槛标准。这是一条狭窄的条款，用来阻止"评审轮次越往后，新的偏好就变成后补 blocking，导致车道永远无法终结"的 ratchet churn。② **意见的引用要求**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— 指不出 path:line 或无法引用执行日志的意见不能被标记为 blocking（作为 non-blocking 的担忧提出是自由的）。这是①在其上叠加实证要求的引用水位「地板」的明文化（两层约束，并非同一水位）。③ **B-4 新增理由一句**（[docs/07](docs/07-delegation-brief.md)）— 因为确实存在常设 instruction 文件在委托边界处不被读取而失效的 runtime，所以需要的规约要写进简报正文内联。④ **触碰 git 的自动化卫生一句**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config 每次都要通过 env 显式指定，不读取也不写入用户的 git 状态。
+
+- **v0.14.1**（2026-08-16） — 条文没有修订——本次订正的是 README（4 种语言）中 v0.12.0 版本历史与 `T-5` 条文不一致之处。未履行的车道（已宣告 `vX.Y.Z` 却没有切 tag 的车道）是「**不会终结，会以 WIP 状态留存**」并挂在 stale 时钟上，而不是按非活跃处理（按非活跃处理的是**缺少 tag URL 的 MERGED**）。同一段中把 `N/A` 的闭合列举写成「3 种类型」，也一并改为 **4 种类型**（含 v0.12.0 加入的 Epic 子→epic）。条文（[docs/10](docs/10-test-ci-baseline.md)）、i18n 镜像与 [docs/04](docs/04-adoption.md) 的摘要一直是正确的，只有 README 被落下了——这正是「摘要层与正本不一致时以正本为准、让摘要跟随」的自我适用（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
 
 - **v0.14.0**（2026-08-16） — 条文没有修订，新增的是席位决定的**参考实现**（[templates/seat-resolver/](templates/seat-resolver/README.md)）——一个**通过 v0.13.0 全部 31 条验证向量**、由配置驱动的选席程序。规则表、模型词汇、系统（lineage）、风险领域与 writer 全部来自配置，因此各团队可以替换成自己的构成（代码与配置示例中都不含实名模型 ID）。它是**参考示例而非必需组件**——条文并不要求它，想用的团队才用。并且请保持**每个团队只有一份选席实现**：把同一机制复制到多个仓库会让权限与修订分裂。家族之间共享的不是实现，而是对 [templates/conformance/](templates/conformance/README.md) 的符合性（[#71](https://github.com/caty-ai/family-dev-handbook/issues/71)）。
 

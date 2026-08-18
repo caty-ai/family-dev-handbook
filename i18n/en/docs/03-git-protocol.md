@@ -65,6 +65,8 @@ git fetch → rebase origin/main → 再検証（typecheck / tests）→ merge
 After a merge, promptly rebase other open branches. Never merge two at once.
 **When an adjacent PR merges, any PR waiting in the queue is obligated to rebase + re-verify (rerun typecheck / tests)** — a clean rebase alone doesn't discharge that obligation.
 
+Scripts and automation that touch git must **make identity / config explicit via env every time, and never read or write the user's git state** (don't depend on global / local config, the real index, or HEAD — use a temporary index if needed). This is the structural generalization of the API-merge incident recorded under the executing account's name.
+
 ## L0-8 Keep branches small and short-lived
 
 Long-lived branches turn into rebase hell. A PR held back from merging must state its status via a **HOLD comment** (required fields in [L1-5](02-issue-loop.md)) — don't leave it silently sitting.

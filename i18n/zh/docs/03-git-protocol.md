@@ -65,6 +65,8 @@ git fetch → rebase origin/main → 再検証（typecheck / tests）→ merge
 merge 之后，其他 open 的 branch 应尽快 rebase。不要同时 merge 两个。
 **相邻 PR 被 merge 后，排队等待的 PR 有义务执行 rebase + 重新验证（重新跑 typecheck / tests）** — 仅仅 rebase 通过并不等于履行了这项义务。
 
+触碰 git 的脚本 / 自动化，必须**每次都通过 env 显式指定 identity / config，不读取也不写入用户的 git 状态**（不依赖 global / local config・实际 index・HEAD，需要时使用临时 index）。这是以执行账号名义刻下的 API merge 事故的结构性推广。
+
 ## L0-8 branch 要小而短命
 
 存活过久的 branch 会陷入 rebase 地狱。暂缓合并的 PR 需通过 **HOLD 评论**（必填字段见 [L1-5](02-issue-loop.md)）明确状态，不要默默搁置。
