@@ -63,6 +63,8 @@ git fetch → rebase origin/main → 再検証（typecheck / tests）→ merge
 merge 後、他のオープンブランチは速やかに rebase する。2本同時に merge しない。
 **隣接 PR が merge されたら、キューで待つ PR は rebase + 再検証（typecheck / tests 再実行）の義務を負う** — rebase が通っただけでは義務を果たしたことにならない。
 
+git を触るスクリプト・自動化は、**identity / config を毎回 env で明示し、ユーザーの git 状態を読まない・書かない**（global / local config・実 index・HEAD に依存せず、必要なら一時 index を使う）。実行アカウント名義で刻まれる API マージ事故の構造的一般化。
+
 ## L0-8 ブランチは小さく短命に
 
 長生きしたブランチは rebase 地獄になる。マージ保留する PR は **HOLD コメント**（必須フィールドは [L1-5](02-issue-loop.md)）で状態を明示し、黙って放置しない。

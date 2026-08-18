@@ -65,6 +65,8 @@ git fetch → rebase origin/main → 再検証（typecheck / tests）→ merge
 หลัง merge เสร็จ ให้ rebase branch ที่ยังเปิดอยู่โดยเร็ว ห้าม merge สองอันพร้อมกัน
 **เมื่อ PR ที่อยู่ติดกันถูก merge ไปแล้ว PR ที่รอคิวอยู่มีหน้าที่ต้อง rebase + ตรวจสอบซ้ำ (รัน typecheck / tests ใหม่)** — แค่ rebase ผ่านไม่ถือว่าทำหน้าที่ครบแล้ว
 
+สคริปต์ / automation ที่แตะ git ต้อง**ระบุ identity / config อย่างชัดเจนผ่าน env ทุกครั้ง และไม่อ่าน・ไม่เขียนสถานะ git ของผู้ใช้** (ไม่พึ่งพา global / local config・index จริง・HEAD หากจำเป็นให้ใช้ temporary index) นี่คือการสรุปเชิงโครงสร้างของอุบัติเหตุ API merge ที่ถูกบันทึกในนามบัญชีที่รันงาน
+
 ## L0-8 branch ให้เล็กและอายุสั้น
 
 branch ที่มีอายุยืนจะกลายเป็น rebase hell PR ที่จะ hold การ merge ไว้ต้องระบุสถานะให้ชัดด้วย **คอมเมนต์ HOLD** (ฟิลด์ที่จำเป็นดูที่ [L1-5](02-issue-loop.md)) ห้ามปล่อยทิ้งไว้เงียบๆ

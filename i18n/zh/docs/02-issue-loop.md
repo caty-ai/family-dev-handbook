@@ -32,6 +32,7 @@ Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint gr
 - **通过 merge 的评审，评审者的模型或 Agent 必须与实现者不同**（例：Claude 实现 → GPT/GLM 评审，Codex 实现 → Claude 评审）。即使是同一模型，只要是**不同的 Agent**，merge 就有效。同一模型、同一 Agent，即便是不同会话也不足以支撑 merge——不同会话只能满足 merge 以外的检查点
 - 默认由 Round-1 评审者担任全程评审者。如需更换，需明确宣告，替换的评审者必须**重新评审当前候选的全部内容**（不允许拼接部分评审来 merge）
 - 在 blocking 指出的问题归零之前，反复循环 implementer → reviewer
+- **禁止后续轮次的 ratchet** — 从第2轮开始，能够新增 blocking 的，仅限于**已证实的缺陷（附带复现或执行日志证据）或尚未满足的门槛标准**。不要把新出现的偏好、泛泛之谈、风格上的要求变成后补的 blocking（作为 non-blocking 的意见提出是可以的）。证据水位与 [R-4](09-rejection-rubric.md) 的引用要求方向一致
 - 评审的关注点：正确性 / 边界（是否触碰了范围外的文件）/ 测试的有效性 / 可 revert 性
 
 ## L1-4 通道状态 — 封闭的 5 种状态词汇
