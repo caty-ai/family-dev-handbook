@@ -29,7 +29,7 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-15 (v0.12.0) / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-18 (v0.15.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
 この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
@@ -37,7 +37,7 @@ L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・�
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
   L2-5 広域Issueは単独実行 / L2-6 ホットスポットは並行安全マップ+分割投資
 L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予測 /
-  L1-3 merge レビュー=別モデル or 別エージェント・self-approve 禁止・後続ラウンドの新規 blocking は実証済み欠陥 or 未充足ゲート基準のみ /
+  L1-3 merge レビュー=別モデル or 別エージェント・self-approve 禁止・後続ラウンドの新規 blocking は実証済み欠陥 or 未充足ゲート基準のみ（non-blocking は自由） /
   L1-4 レーン状態は WIP/HOLD/MERGED/SUPERSEDED/ABANDONED の5語彙・不明状態=非アクティブ扱い・
   MERGED は release 履行報告必須（vX.Y.Z 宣言レーンは tag URL 無き MERGED は終端未成立） /
   L1-5 HOLD は owner/reason/review-by/lock disposition/残作業or後継 必須 /
@@ -49,7 +49,7 @@ L1 Issue完遂: L1-1 Issue-first / L1-2 Why・Done when・触るファイル予�
 L0 git: L0-1 被り確認+WIP 4フィールド（agent/date/Files to touch/Branch）=ソフトロック /
   L0-2 宣言外は触らない・UNKNOWN=直列 / L0-3 stale=72h・引き取りは TAKEOVER+再開チェック+新WIP宣言 /
   L0-4 1セッション=1Issue=1branch=1worktree / L0-5 main マージ専用 /
-  L0-6 PR にファイル一覧+diff照合 / L0-7 マージ1本ずつ / L0-8 ブランチ短命・HOLD 明示 /
+  L0-6 PR にファイル一覧+diff照合 / L0-7 マージ1本ずつ・git 自動化は identity/config env 明示・ユーザー git 状態 不読不書 / L0-8 ブランチ短命・HOLD 明示 /
   L0-9 再開・引き継ぎは4点チェックを Issue に投稿してから書く
 B 委譲ブリーフ: B-1 実質的な委譲（実装・修正・生成）は3層必須（実装仕様/実装チェック/レビュー基準・様式は brief-template.md） /
   B-2 読み捨ての調査・短い質問は免除・迷えば付ける / B-3 Issue が正本・ブリーフは導出物（食い違えば Issue を先に直す） /
