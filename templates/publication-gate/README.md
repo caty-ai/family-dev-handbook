@@ -1,0 +1,178 @@
+# templates/publication-gate — 公開前ゲートの配布用 stencil
+
+家族のリポが対外公開用の表示に個人用 URL・公開禁止語・不整合な公開ラベルを残したまま
+merge されるのを、ローカルと CI の同じ検査で止めるための配布用の型。正本は
+`templates/publication-gate/check_publication_gate.py`。導入先では例えば
+`tools/check_publication_gate.py` としてコピーし、リポ固有のポリシーだけをルートの外部ファイルで持つ。
+
+これは公開前の**機械の一次ゲート**であり、人間の公開決裁や多席レビューの代替ではない。
+スクリプトが赤を返すだけでは merge は止まらないため、導入先の CI job を branch protection の
+required status check に登録して初めて「保護済み」と扱う。
+
+## 何を守るか
+
+| 検査 | 守るもの | レジストリなしの挙動 |
+|---|---|---|
+| 外部 denylist | リポ固有の公開禁止語が corpus に残らないこと | 常に検査 |
+| 個人用 URL | `--account-slug` の個人アカウント URL が残らないこと | アカウント profile、slug 下のリポ URL、gist、GitHub Pages の any-hit が1件でも見つかれば赤 |
+| 個人 URL の registry allowlist | 台帳で公開対象と宣言した URL だけを個人用 URL 検査から免除すること | allowlist 検査を skip し、明示的な notice を出す |
+| 公開ラベル | 台帳の対象に公開ラベルが無い状態を残さないこと | 「ラベル欠落」検査を skip し、notice を出す |
+| SVG 状態 | README の表示と台帳の公開状態が食い違わないこと | 検査を skip し、notice を出す |
+| label whitelist の stale | 一時的な例外が台帳変更後も残らないこと | 検査を skip し、notice を出す |
+
+`--registry` は任意。省略した場合も denylist と個人用 URL の検査は実行し、確認不能な
+4検査を黙って緑にせず、それぞれ skip notice を出す。corpus のアンカーは、レジストリ有りなら
+指定した JSON ファイル、無しなら `<root>/README.md` へ fallback する。カレントディレクトリ下の別 README を
+偶然拾って判定の起点にはしない。レジストリなしで `<root>/README.md` も無い場合は、corpus floor を
+確立できないため赤になる。
+
+個人用 URL は URL 候補を解析して host を正規化してから照合する。`github.com/<slug>` に加え、
+`github.com:443/<slug>`、`github.com./<slug>`、`gist.github.com/<slug>`、
+`<slug>.github.io` も対象になる。host の port は無視し、末尾の dot は1個だけ除く。
+`--account-slug` は前後の空白を除いた後、GitHub slug 形の
+`^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$` に一致しなければ設定不備として赤になる。
+
+## 展開手順（コピペ順）
+
+1. checker を導入先へコピーする。配置先はリポの慣例に合わせてよいが、以下では
+   `tools/check_publication_gate.py` とする。
+   ```bash
+   cp templates/publication-gate/check_publication_gate.py <target-repo>/tools/check_publication_gate.py
+   ```
+2. sample denylist を導入先リポのルートへコピーし、実ポリシーに置き換える。
+   `.publication-denylist` は必須で、無い・空のままなら赤になる。
+   ```bash
+   cp templates/publication-gate/fixtures/sample.publication-denylist <target-repo>/.publication-denylist
+   ```
+3. CI に通常検査を配線する。レジストリを持つリポは `--registry` も渡す。
+   ```bash
+   python3 -B tools/check_publication_gate.py \
+     --root . \
+     --account-slug "$PUBLICATION_ACCOUNT_SLUG" \
+     --registry path/to/modules.json
+   ```
+   レジストリを使わないリポは最後の2引数を省略する。機微パターンを CI secret から
+   注入する場合は `--denylist "$PUBLICATION_DENYLIST_PATH"` も渡す。`--registry` を省略しても
+   `--account-slug` は省略できない。個人用 URL 検査は通常実行で常に有効で、slug 未指定は
+   ゲートの設定不備として赤になる。
+4. checker の self-test と導入先のテストを同じ CI job か依存 job で実行し、その status
+   check を branch protection の required に登録する。ローカルでも同じ経路が通るよう
+   Makefile の `test` ターゲットに配線し、導入完了前に実行する。
+   ```bash
+   python3 -B tools/check_publication_gate.py --selftest
+   make test
+   ```
+
+本ハンドブック自身の `make test` も、配布用 checker の `--selftest` を実行する。
+
+## `.publication-denylist` の正確な形式
+
+ファイルは UTF-8 テキスト。1行1ルールで、次の形式だけを受け付ける。
+
+```text
+NAME<TAB>REGEX
+```
+
+- 空行と、**先頭文字**が `#` の行は無視する。`#` の前に空白がある行はコメントではない。
+- 1行目の先頭に UTF-8 BOM があれば、BOM だけを除いてからコメント/ルールとして解釈する。
+- 最初のタブで `NAME` と `REGEX` に分ける。追加の literal tab は列ずれとして拒否するため、
+  正規表現で tab を表したいときは `\t` と書く。
+- `NAME` は空にできず、space/tab/newline などの whitespace を一切含められない。
+  `REGEX` も空にできず、先頭・末尾に whitespace を置けない。whitespace 自体を照合したい場合は
+  `\s` または `[ ]` を明示する。`REGEX` は Python `re` の構文で、
+  `re.IGNORECASE` でコンパイル・照合する。
+- タブの無い行、不正な `NAME`、空または前後 whitespace 付きの `REGEX`、追加の literal tab、
+  コンパイルできない正規表現、UTF-8 として読めないファイルは
+  **malformed = 赤**。
+- `.publication-denylist` 自体の不在と、コメント/空行を除く有効ルール0件はどちらも**赤**。
+
+denylist は検出すべき禁止リテラルを必然的に含む。そのため checker は、スキャン対象から
+既定の `<root>/.publication-denylist`、または `--denylist` で明示したファイルが root 内にある場合は
+そのファイルを**パスで**自己除外する。この path-exclusion は、拡張子 allowlist を廃止して全 regular file を
+読む現在の実装で load-bearing な安全条件である。過去のようにスクリプト内で禁止語を分割文字列にして
+検出をかわすハックは不要。ポリシーと実装を分けたまま、自己検知だけを明示的に除外できる。
+
+検査結果には `denylist rules loaded : N` を必ず表示する。構文上は有効でも決して一致しない正規表現の
+意味的な妥当性は、trusted policy を書く作者の責任としてこの件数とレビューで確認する。
+
+## denylist 自体の公開リスク
+
+denylist を commit すると、そのパターンも公開物になる。導入先は次の3つから方針を選ぶ。
+
+- **(a) 公開安全なパターン記法で書く**: sample の流儀で、パターン文字列自体が秘密を含まない形にする。
+- **(b) 推奨（機微パターン）**: denylist を `.gitignore` に入れ、CI では secret から一時ファイルへ注入し、
+  `--denylist PATH` でそのファイルを指定する。
+- **(c) 公開を明示的に受け入れる**: パターンの公開リスクを評価し、commit する判断を記録する。
+
+B9 移行では、各リポが (a)〜(c) のどれを採ったかをリポごとに選び、移行記録へ残す。
+
+## 任意の `.publication-label-whitelist`
+
+公開ラベルの既知の例外が必要なときだけ、リポルートに作成する。UTF-8、1行1例外で形式は次の通り。
+
+```text
+PATH<TAB>EXACT_LINE
+```
+
+`PATH` と、そのファイル内で許可する `EXACT_LINE` の完全一致だけを免除する。このファイルは
+**言い訳だけを追加する** allowlist であり、新しい問題を検出するポリシーではない。したがって不在時は
+fail-open（免除なしとして継続）でよい。denylist の不存を赤にするのとは非対称だが、意図的な設計である。
+`--registry` が無い場合は whitelist-staleness を判定できないため、その検査は notice 付きで skip する。
+
+## CLI
+
+| 引数 | 必須性 / 既定値 | 意味 |
+|---|---|---|
+| `--root PATH` | 任意、既定 `.` | 検査対象リポのルート。ポリシーファイルと、レジストリ省略時の `README.md` のアンカー |
+| `--account-slug SLUG` | 通常検査で必須、既定なし | 公開物に残してはいけない個人アカウントの slug。未指定は赤 |
+| `--registry PATH` | 任意、既定なし | 公開リポ台帳の JSON ファイル。無い場合は台帳依存の4検査だけを notice 付きで skip |
+| `--denylist PATH` | 任意、既定 `<root>/.publication-denylist` | 外部 denylist。相対パスは root 基準。root 内なら明示指定したファイルもスキャンから path-exclude |
+| `--selftest` | 任意、既定 `false` | 内蔵 fixture で parser・検出・fail posture を検査して終了 |
+
+## スキャン対象と Git の無い環境
+
+Git worktree（root に `.git` entry がある場合）では、`git ls-files --cached --others --exclude-standard`
+が列挙する全 path を publishable corpus とみなす。Git mode では下記ディレクトリ除外を適用せず、
+commit 済みなら `node_modules/` 下も検査する。root に `.git` entry があるのに Git 列挙が失敗した場合は、
+`rglob` へ黙って fallback せず `gate-error` で赤にする。
+
+root に `.git` entry が無いアーカイブ展開後やコピー先では、検査自体を消さず `Path.rglob()` 相当で
+ルート以下を再帰走査する。この `rglob-fallback` でだけ、次のディレクトリを対象外にする。
+
+```text
+.git
+.omc
+.omx
+.venv
+venv
+node_modules
+__pycache__
+```
+
+列挙された regular file は suffix やファイル名で選別せず、`.env`、`LICENSE`、`Dockerfile`、`.txt`、
+拡張子なしもすべて UTF-8 decode を試す。decode できないファイルは binary としてスキャンを飛ばすが、
+`binary files skipped: N` に必ず集計する。Git mode の symlink は Git が公開する readlink text を検査する。
+`rglob-fallback` は symlink を follow せず、`symlinks skipped: N` に集計する。
+
+summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と、
+`denylist rules loaded : N` を表示する。raw view の hit は raw text の行番号を使い、percent/HTML decode 後に
+初めて見つかった hit は decoded text の行番号と `(decoded view)` marker を表示する。
+
+`--selftest` の violating corpus、clean twin、sample denylist は checker 自体の string constants として
+埋め込まれている。disk 上の `fixtures/` は人間向け資料であり selftest の依存ではないため、checker の
+`.py` だけを別ディレクトリへコピーしても `--selftest` は完走する。
+
+## family-os / organization `.github` からの移行
+
+`family-os` と organization `.github` にある局所コピーは、この stencil の挙動を先に確定した後、
+後続の **B9 lane** で置き換える。このテンプレート導入と既存リポの移行を同じ diff で混ぜない。
+
+移行時の意図的な差分は2つ。
+
+- 旧コピーの email masking のバグは修正済みで、新チェッカーの方が**厳格**。以前通っていた表記が
+  新しく赤になった場合、検知退行ではなく bug fix の結果として対象テキストを直す。
+- 外部 `.publication-denylist` は必須。先にファイルを配置・カスタマイズせず checker だけを切り替えると、
+  ゲートは意図的に赤のままになる。
+
+移行 PR では `--selftest`、対象リポの `make test`、通常 CLI の実行結果、CI status check の
+required 登録を証拠として残す。

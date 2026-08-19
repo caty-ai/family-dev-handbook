@@ -1,0 +1,3 @@
+# Copy this file to the repository root as .publication-denylist and customize it.
+private-marker	acme[-_ ]secret
+private-host	private\.example\.invalid

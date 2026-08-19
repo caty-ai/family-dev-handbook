@@ -45,6 +45,7 @@ register_suite # README files are present and non-empty.
 register_suite # The four localized READMEs have matching structure.
 register_suite # Seat-resolver unit tests.
 register_suite # Seat-resolver conformance vectors.
+register_suite # Publication-gate self-test.
 
 if [ "$#" -ne 0 ]; then
     printf 'FAIL usage (expected=no-arguments)\n' >&2
@@ -109,6 +110,7 @@ run_suite readme-nonempty check_readmes
 run_suite readme-structure "$python_bin" -B scripts/readme-check/inspect_readme.py langs README.ja.md README.md README.zh.md README.th.md
 run_suite seat-resolver-unit "$python_bin" -B -m unittest discover -s templates/seat-resolver/tests -v
 run_suite seat-resolver-conformance run_conformance
+run_suite publication-gate-template "$python_bin" -B templates/publication-gate/check_publication_gate.py --selftest
 
 if [ "$failures" -ne 0 ]; then
     exit 1
