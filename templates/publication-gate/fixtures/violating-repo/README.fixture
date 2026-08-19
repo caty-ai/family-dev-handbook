@@ -1,0 +1,3 @@
+# Internal project
+
+This fixture exposes an acme-secret marker and must fail the publication gate.

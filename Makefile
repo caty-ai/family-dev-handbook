@@ -11,7 +11,7 @@ LINT_TARGETS := $(READMES) i18n/README.md
 
 .PHONY: test lint
 
-# test: 非空ガード + 4言語 README 構造一致 + seat-resolver unit/conformance gates — fail-closed
+# test: 非空ガード + 4言語 README 構造一致 + seat-resolver unit/conformance + publication-gate self-test — fail-closed
 test:
 	@/bin/sh scripts/test.sh
 
