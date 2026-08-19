@@ -11,7 +11,7 @@
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
 ![status](https://img.shields.io/badge/status-active-blue)
-[![Test + Lint](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml)
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 กฎกลางที่ทำให้เอเจนต์ AI หลายตัวและเซสชันหลายเซสชัน พัฒนาโค้ดเบสเดียวกันไปพร้อมกันได้โดยไม่ชนกัน<br>
 มันแก้สามเรื่องนี้ คือ สองฝ่ายแก้ไฟล์เดียวกันพร้อมกันจนพัง คำว่า “เสร็จแล้ว” ที่เชื่อถือไม่ได้ และตอนส่งงานต่อแล้วไม่มีใครรู้ว่าอะไรเสร็จไปแล้วบ้าง<br>

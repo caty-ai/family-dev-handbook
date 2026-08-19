@@ -11,7 +11,7 @@
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
 ![status](https://img.shields.io/badge/status-active-blue)
-[![Test + Lint](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml)
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 让多个 AI 智能体和多个会话并行开发同一个代码库而不发生冲突的共通规则。<br>
 它要解决的是这三件事：两边同时改同一个文件把它改坏、“做完了”这句话不可信、交接的那一刻没人说得清什么已经完成。<br>

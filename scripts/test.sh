@@ -41,6 +41,11 @@ trap 'interrupt HUP' HUP
 trap 'interrupt INT' INT
 trap 'interrupt TERM' TERM
 
+register_suite # README files are present and non-empty.
+register_suite # The four localized READMEs have matching structure.
+register_suite # Seat-resolver unit tests.
+register_suite # Seat-resolver conformance vectors.
+
 if [ "$#" -ne 0 ]; then
     printf 'FAIL usage (expected=no-arguments)\n' >&2
     exit 2
@@ -50,11 +55,6 @@ if ! command -v "$python_bin" >/dev/null 2>&1; then
     printf 'missing-dep: %s\n' "$python_bin" >&2
     exit 127
 fi
-
-register_suite # README files are present and non-empty.
-register_suite # The four localized READMEs have matching structure.
-register_suite # Seat-resolver unit tests.
-register_suite # Seat-resolver conformance vectors.
 
 check_readmes() {
     for file in README.ja.md README.md README.zh.md README.th.md i18n/README.md; do

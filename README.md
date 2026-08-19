@@ -11,7 +11,7 @@
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
 ![status](https://img.shields.io/badge/status-active-blue)
-[![Test + Lint](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml)
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 A shared protocol that lets multiple AI agents and multiple sessions develop the same codebase in parallel without colliding.<br>
 It addresses three failures: two workers editing the same file at once, a "done!" you cannot trust, and a handoff where nobody knows what actually finished.<br>

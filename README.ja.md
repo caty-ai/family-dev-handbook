@@ -11,7 +11,7 @@
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
 ![status](https://img.shields.io/badge/status-active-blue)
-[![Test + Lint](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml)
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 複数の AI エージェントと複数のセッションが、同じコードベースを衝突せずに並行開発するための共通ルールです。<br>
 同じファイルを同時に直して壊す・「できました」が信用できない・引き継いだ時に何が終わっているか分からない、を解決します。<br>
