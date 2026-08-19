@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
-![status](https://img.shields.io/badge/status-active-blue)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
+![status](https://img.shields.io/badge/status-active-lightgrey)
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 複数の AI エージェントと複数のセッションが、同じコードベースを衝突せずに並行開発するための共通ルールです。<br>

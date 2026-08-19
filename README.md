@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
-![status](https://img.shields.io/badge/status-active-blue)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
+![status](https://img.shields.io/badge/status-active-lightgrey)
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 A shared protocol that lets multiple AI agents and multiple sessions develop the same codebase in parallel without colliding.<br>
