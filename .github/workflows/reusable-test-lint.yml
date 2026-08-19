@@ -23,7 +23,7 @@
 #           (他リポからのバージョンタグ pin 名は templates/ci/README.md を参照)
 #
 # 昇格した仕様 (issue #80 コメント 2026-08-19 オーナー決裁。起源は handbook#81 (T-6 clause, pending) が
-# 語彙 `suites: declared=N executed=N` の正本、および context-kit#12 / self-growth-loop#4 →
+# 語彙 `suites: declared=N executed=M skipped=K` の正本、および context-kit#12 / self-growth-loop#4 →
 # オーナー決裁 2026-08-19 が2つの昇格の起源):
 # - promotion ①: OS matrix の run_macos / macos_skip_reason (上記)。
 # - promotion ②: ubuntu の test job で suite-count reconciliation (下記) を行う。
@@ -40,7 +40,7 @@ on:
         type: string
         default: ''
       require_suite_reconciliation:
-        description: "true の場合、T-6 の suite 突合行 (suites: declared=N executed=N) が make test ログに無いと赤にする。"
+        description: "true の場合、T-6 の suite 突合行 (suites: declared=N executed=M skipped=K) が make test ログに無いと赤にする。"
         type: boolean
         default: false
       max_skip_percent:
@@ -81,10 +81,10 @@ jobs:
           fi
 
       - name: Suite-count reconciliation (T-6 promotion, issue #80 comment 2026-08-19)
-        # 語彙の SoT: handbook#81 T-6 は `suites: declared=N executed=N skipped=K` と declared=executed+skipped。
-        # `suites: declared=N executed=N` は移行中の2-field形式として引き続き受け入れる。
+        # 語彙の SoT: handbook#81 T-6 は `suites: declared=N executed=M skipped=K` と declared=executed+skipped。
+        # 3-field regex のみを受け入れる。
         # 昇格の起源: context-kit#12 / self-growth-loop#4 → オーナー決裁 2026-08-19。
-        # 2-field / 3-field を合わせて最後に一致した行を採用する (複数回出力されうるため、最終状態を正とする)。
+        # 最後に一致した行を採用する (複数回出力されうるため、最終状態を正とする)。
         env:
           REQUIRE_RECONCILIATION: ${{ inputs.require_suite_reconciliation }}
           MAX_SKIP_PERCENT: ${{ inputs.max_skip_percent }}
@@ -94,10 +94,10 @@ jobs:
             echo "::error::max_skip_percent must be a nonnegative integer; received '${MAX_SKIP_PERCENT}' — failing closed."
             exit 1
           fi
-          LINE=$(grep -oE 'suites: declared=[0-9]+ executed=[0-9]+( skipped=[0-9]+)?' /tmp/test-output.log | tail -n 1 || true)
+          LINE=$(grep -oE 'suites: declared=[0-9]+ executed=[0-9]+ skipped=[0-9]+' /tmp/test-output.log | tail -n 1 || true)
           if [ -z "$LINE" ]; then
             if [ "$REQUIRE_RECONCILIATION" = "true" ]; then
-              echo "::error::suite reconciliation line ('suites: declared=N executed=N') not found in make test output, and require_suite_reconciliation=true — failing closed."
+              echo "::error::suite reconciliation line ('suites: declared=N executed=M skipped=K') not found in make test output, and require_suite_reconciliation=true — failing closed."
               exit 1
             fi
             echo "::notice::suite reconciliation line not found — T-6 vocabulary not adopted by this repo yet; reconciliation explicitly skipped (not silently)."
@@ -105,32 +105,20 @@ jobs:
           fi
           DECLARED=$(echo "$LINE" | grep -oE 'declared=[0-9]+' | grep -oE '[0-9]+')
           EXECUTED=$(echo "$LINE" | grep -oE 'executed=[0-9]+' | grep -oE '[0-9]+')
-          if [[ "$LINE" == *" skipped="* ]]; then
-            SKIPPED=$(echo "$LINE" | grep -oE 'skipped=[0-9]+' | grep -oE '[0-9]+')
-            if (( 10#$EXECUTED + 10#$SKIPPED != 10#$DECLARED )); then
-              echo "::error::suite reconciliation mismatch: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED}; T-6 requires declared=executed+skipped — failing closed."
-              exit 1
-            fi
-            if (( 10#$EXECUTED == 0 )); then
-              echo "::error::suite reconciliation: executed=0 — zero executed suites cannot prove anything, failing closed."
-              exit 1
-            fi
-            if (( 10#$DECLARED > 0 && 10#$SKIPPED * 100 > 10#$DECLARED * 10#$MAX_SKIP_PERCENT )); then
-              echo "::error::suite reconciliation skip cap exceeded: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED} max_skip_percent=${MAX_SKIP_PERCENT} — failing closed."
-              exit 1
-            fi
-            echo "suite reconciliation OK: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED} max_skip_percent=${MAX_SKIP_PERCENT}"
-          else
-            if [ "$EXECUTED" != "$DECLARED" ]; then
-              echo "::error::suite reconciliation mismatch: declared=${DECLARED} executed=${EXECUTED} — dropped suites detected, failing closed."
-              exit 1
-            fi
-            if [ "$EXECUTED" -eq 0 ]; then
-              echo "::error::suite reconciliation: executed=0 — zero executed suites cannot prove anything, failing closed."
-              exit 1
-            fi
-            echo "suite reconciliation OK: declared=${DECLARED} executed=${EXECUTED}"
+          SKIPPED=$(echo "$LINE" | grep -oE 'skipped=[0-9]+' | grep -oE '[0-9]+')
+          if (( 10#$EXECUTED + 10#$SKIPPED != 10#$DECLARED )); then
+            echo "::error::suite reconciliation mismatch: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED}; T-6 requires declared=executed+skipped — failing closed."
+            exit 1
           fi
+          if (( 10#$EXECUTED == 0 )); then
+            echo "::error::suite reconciliation: executed=0 — zero executed suites cannot prove anything, failing closed."
+            exit 1
+          fi
+          if (( 10#$DECLARED > 0 && 10#$SKIPPED * 100 > 10#$DECLARED * 10#$MAX_SKIP_PERCENT )); then
+            echo "::error::suite reconciliation skip cap exceeded: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED} max_skip_percent=${MAX_SKIP_PERCENT} — failing closed."
+            exit 1
+          fi
+          echo "suite reconciliation OK: declared=${DECLARED} executed=${EXECUTED} skipped=${SKIPPED} max_skip_percent=${MAX_SKIP_PERCENT}"
 
   # test と同一コマンドを macOS (Apple Silicon) でも走らせる。job 名を分けているのは
   # 既存の required checks 設定 (test / lint) を壊さないため。required に入れるかは各リポの owner 判断。
