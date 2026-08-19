@@ -23,3 +23,5 @@ jobs:
       contents: read
     with:
       run_macos: true
+      # T-6 (docs/10, #81) adoption-completion.
+      require_suite_reconciliation: true

@@ -2,7 +2,7 @@
 
 # T 测试与 CI 基准 — 用机制持续积累正确性证明的层级
 
-L 层（L2 / L1 / L0）是「如何推进工作」的契约，R 层是「接受什么」的契约，与此相对，T 层规定的是**仓库为持续证明自身正确性所需的最低限度 — 初期整备、回归测试的积累、向委托格式的写入、不在红色状态下 merge、用标签为出货收尾**这一契约。每条规则都附有稳定的 rule ID（`T-1`〜`T-5`），并在每条规则处用〔 〕明确其适用对象。摘要侧（[docs/04](04-adoption.md)）引用这些 ID。把 gate 升格为 check 的一般原则见 [R-6](09-rejection-rubric.md)，无法验证时的姿态见 [docs/05](05-fail-posture.md)。
+L 层（L2 / L1 / L0）是「如何推进工作」的契约，R 层是「接受什么」的契约，与此相对，T 层规定的是**仓库为持续证明自身正确性所需的最低限度 — 初期整备、回归测试的积累、向委托格式的写入、不在红色状态下 merge、用标签为出货收尾、测试输出契约、徽章与数字的诚实性**这一契约。每条规则都附有稳定的 rule ID（`T-1`〜`T-7`），并在每条规则处用〔 〕明确其适用对象。摘要侧（[docs/04](04-adoption.md)）引用这些 ID。把 gate 升格为 check 的一般原则见 [R-6](09-rejection-rubric.md)，无法验证时的姿态见 [docs/05](05-fail-posture.md)。
 
 背景: 公开仓库的可信度，外部会立刻依据「有没有测试、CI 是否为绿」来判定。合并的证据关卡（[L1-7](02-issue-loop.md)）与 check 强制（[R-6](09-rejection-rubric.md)）的思路已经存在，但**此前没有一层规定「必须整备并积累测试与 CI」**。测试的积累不是 CI 的功能所能造就的，只能靠运作规则来实现。另一方面，本协议的落地要经过委托简报（[B 层](07-delegation-brief.md)），因此只要写入格式，就能被贯彻执行。
 
@@ -92,6 +92,61 @@ tag 的内容与签名：
 - **Epic 的子→epic 关卡（[E-6](06-epic-lane.md)②）不在打 tag 义务的范围内**——栏位本身与所有记录一样必须存在，值取上文第 3 点的类型④（`N/A（epic 集成前）`）。要求打 tag 的是 epic→main 的整合 merge（E-6③，完整 L1-7）
 - 对过去未打 tag 部分的追溯不属于本条范围（本条只对「今后的 merge」生效，过去的部分由各仓库 owner 自行判断）
 - 把本条升格为 check（例如：某个被记为出货级的 merge 之后，main 的 HEAD 一直偏离该 tag，直到迎来下一次 merge 就判红）按 [R-6](09-rejection-rubric.md) 以 Issue 追踪
+
+## T-6 测试输出契约 — 把执行事实写成机器可读的一行〔包含代码的新仓库 = MUST / 既有仓库 = 下次触碰代码、测试、CI test job 中任一项的车道，在同一 Issue 内整备（与 T-1 相同的 opportunistic）/ 没有运行器的非代码仓库 = 附理由的 N/A〕
+
+**测试运行器必须满足一份输出契约，使机器能够判断「哪些运行了、哪些没有运行、为什么」。** 成立条件共 5 点：
+
+1. **摘要行（契约本体）** — 运行器应在输出中给出下面这一行。格式正本就是这条正则表达式本身：
+
+   ```
+   suites: declared=([0-9]+) executed=([0-9]+) skipped=([0-9]+)
+   ```
+
+   含义定义：`declared` = 已注册的 suite 总数 / `executed` = 实际运行到 PASS 或 FAIL 的数量 / `skipped` = 如实申报为 SKIP 的数量。**不变条件为 `declared = executed + skipped`**。破坏该条件即为漏失（silent drop）= 红。数值须由运行器动态汇总 —— **嵌入固定值（例如用 echo 输出常数）违反本条**（机器无法验证其导出过程，因此这是采用评审中的检查项）。输出中至少出现一次该行；出现多次时，**以最后一次匹配为准**。决定把某个 suite 从 declared 中移除（取消注册）时，应在执行该决定的车道 Issue 中留一行记录 —— 没有记录的取消注册按漏失同等处理
+2. **结果词汇** — **家族编写的运行器、wrapper 所显示的结果**须使用 `PASS` / `FAIL` / `SKIP` 三种词汇。pytest / unittest / vitest 等**框架原生的原始输出不受此限制**（机器 gate 读取的是摘要行与 exit code，框架输出可原样透传）
+3. **exit code 的闭合集** — `0` = 没有 FAIL / `1` = 存在 FAIL / `2` = 用法或输入错误 / `127` = **缺少必需依赖**（在 preflight 中检测，先在 stderr 以 `missing-dep: <名称>` 点名原因再退出 —— 不得把依赖缺失误报为测试失败或输入错误）。缺少可选环境（例如没有实机）不使用 127，而是记为 **SKIP**（计入摘要行的 skipped）
+4. **异常退出时也输出摘要** — 运行器即使中途死亡，也须采用能输出摘要行的结构（bash 的 `trap finish EXIT` 仅为非规范性示例；Python atexit、Makefile 合成及其他同等机制均可）。缺少摘要 = 无法判定 = 红（[FP-6](05-fail-posture.md)）—— 但该红实际触发是在下述第 5 点接线完成之后
+5. **CI 对账接线（采用完成条件）** — 只有 CI 侧对账 gate（[templates/ci/](../../../templates/ci/README.md) 的 test-lint；reusable 的 `require_suite_reconciliation: true`）**已启用**时，才能把本条称为「已整备」。仅输出摘要行、仅引用条文都不能称为已整备（「只是放上去」= [FP-5](05-fail-posture.md)）。不在适用范围的仓库，应在 Issue 中明确留下 N/A —— 沉默不构成 N/A。skipped 形式（三字段摘要）的接线须在对账 gate 的 skipped 支持（#80 delta）进入 main 后进行；顺序相反会把诚实的 SKIP 判红
+
+**SKIP 率上限** — `skipped × 5 > declared`（= 超过 20%，且 declared > 0）即为红。调整上限的仓库须**把数值正本放在 CI caller 输入（机器读取的位置）**，并在 PR 中用一行记录变更依据，或记在带 [LC-1](08-lifecycle.md) 触发条件的 Issue 中（与 [LC-3](08-lifecycle.md) 相同的「数值在本地配置、变更必须记录」型）。没有记录的变更无效，按默认 20% 判定。对于 declared ≤ 4 的仓库，该公式意味着「默认 SKIP 为 0」—— 这是有意为之（仓库越小，越应能全部运行；若确需恒常 SKIP，应宣告并修改上限值）。SKIP 是对「缺少环境」的诚实申报，不是恒常逃生口 —— 超过上限的红是在催促「修好环境，或记录把对象移出范围的决定」
+
+理由：「测试已经运行」很容易沦为自我申报。declared / executed / skipped 三个值及其不变条件，把「假装运行过」的路径（suite 悄然脱落、把 SKIP 混入 executed、通过取消注册操纵分母、误报依赖缺失）收敛成一行机器检查。把格式固定为正则表达式，是为了让 CI 侧对账（W0-3 reusable test-lint）能以一套共通实现覆盖所有仓库。
+
+边界的明文化：
+
+- 本条是**输出契约**，不约束测试内容、粒度或框架选择（推荐运行器见附录）
+- 以 suite 为单位即可（无需细到测试用例 —— 粒度由仓库自行裁量。suite 内的 SKIP 可通过拆分 suite 来表达）
+- 测试为 0 的新仓库（只有 T-1 框架的状态），可以不输出摘要行（尚未接线，所以不会判红），也可输出 `declared=0 executed=0 skipped=0`（executed=0 判红 = 倒向不自制「对象为 0 却是绿」的一侧）—— 两者皆可，推荐后者
+- 本手册自身的运行器是本条的**首个适用对象**（发布条文的车道，应先让本仓库的 `make test` 符合契约再 merge —— pilot 原则）
+
+## T-7 徽章与数字的诚实性 — 只有机器涂出的颜色才是绿〔带 README 的公开仓库 = MUST / 其他仓库 = 放置数字或徽章时遵守同一纪律（不放这些内容的私有 scratch 仓库自然为 N/A）〕
+
+**README、docs 中任何「看起来已验证」的展示，都必须连接到机器检查结果。** 成立条件共 3 点：
+
+1. **明确 CI 状态（不得用无徽章隐藏「未检查」）** — 带 README 的公开仓库必须以以下**二者之一**显示 CI 状态：①执行 **T-1 测试 gate 的 workflow** 的 live badge（GitHub Actions 的 badge.svg，或指向该 workflow 的同等 live endpoint；**不运行测试的其他 workflow，即使 badge 为绿也不满足本条**）②CI 尚未整备时，使用灰色静态 badge `CI: not yet`。不显示、以其他 workflow 的绿色替代，均属违反
+2. **颜色的闭合集** — 静态 badge 可用的颜色仅限 **`lightgrey` / `blue`（包含语言、许可证等事实展示类）**，这是闭合列举。`green` / `brightgreen` / `success` / `passing` 系列及同等绿色 hex 均不得用于静态 badge（检查实质而非拼写 —— [R-6](09-rejection-rubric.md)）。只有机器涂出的 live badge 才能宣称绿色
+3. **实测数字与 Project status 节** — README / docs 中写入读起来像实测的数字（测试数量、覆盖率、性能值）时，必须附上**该次实测的 run URL 与实测日期**。无法附上时就不要写该数字（不放置无法验证的数字 —— [R 层](09-rejection-rubric.md)）。数字若与该 workflow 更新 run 中的**实测值不同**，即为 stale —— 应更新或删除（只要数值未变，仅 run 更新不构成 stale）。设计值、目标值可在明确标注「目标」后书写，但不得伪装成实测展示（例如没有 run URL 的「passed」）。README 设置状态节时的标准形式如下（**该形式为正本** —— 不以外部仓库为参考模型）：
+
+   ```markdown
+   ## Project status
+
+   [live badge（T-1 测试 workflow 的 badge.svg）或 CI: not yet（灰）]
+
+   - CI: <有无 test-lint gate，以及所连接的 workflow 名>
+   - 已验证环境: <实际测量的 OS / runtime>
+   - maturity: <stable / beta / reference 等>
+   - 已知限制: <列举；没有时明确写「无」>
+   ```
+
+理由：外部会根据「badge 是否为绿」立即判断仓库可靠性。手写绿色与机器绿色无法区分，一个手写绿色就会**损害家族所有仓库中绿色的证据能力**。反过来，不放 badge 以隐藏「未检查」，也是同一谎言的另一面（实测：9 个手写绿色 badge 与「没有 CI 且无展示」的仓库并存）。把展示限制为机器连接的状态，才能让「绿 = 检查运行过 / 灰 = 没有检查」在所有仓库中保持同一含义。
+
+边界的明文化：
+
+- 对象是「可能伪装成检查结果的展示」—— 事实展示类 badge（语言、许可证、版本；blue 系）可自由使用
+- **始终可以选择不写数字**（本条是「写就要诚实」+「仅 CI 状态是公开仓库义务」）
+- 不带 README、也不公开的私有 scratch 仓库自然为 N/A。**已经公开却没有 README** 的仓库，会在整备 README 的车道（B8 等）进入本条适用范围 —— README 缺失不构成本条的永久豁免
+- 把本条升格为 check（检测静态绿色 badge、stale 数字等）时，按 [R-6](09-rejection-rubric.md) 以 Issue 追踪
 
 ## 附录（非规范） — 推荐运行器速查表
 

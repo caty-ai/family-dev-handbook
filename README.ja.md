@@ -7,10 +7,11 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.15.0-blue)
+![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
-![status](https://img.shields.io/badge/status-active-brightgreen)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
+![status](https://img.shields.io/badge/status-active-blue)
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 複数の AI エージェントと複数のセッションが、同じコードベースを衝突せずに並行開発するための共通ルールです。<br>
 同じファイルを同時に直して壊す・「できました」が信用できない・引き継いだ時に何が終わっているか分からない、を解決します。<br>
@@ -195,7 +196,7 @@ handbook-revision の値は書き換えないでください。
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-5`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-7`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
 やめたくなったら、貼った50行ほどを消すだけで元に戻ります。ほかのファイルには触りません。
 
@@ -263,7 +264,7 @@ flowchart TD
 | **B** 委譲ブリーフ | 1回の委譲をどう契約にするか | `B-1`〜`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** ライフサイクル | 置いた物をいつ・どう退場させるか | `LC-1`〜`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 却下ルーブリック | 何を受け入れ・何を断るか | `R-1`〜`R-6` | [docs/09](docs/09-rejection-rubric.md) |
-| **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-5` | [docs/10](docs/10-test-ci-baseline.md) |
+| **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-7` | [docs/10](docs/10-test-ci-baseline.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -308,7 +309,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委譲ブリーフ — サブエージェントへ仕事を1回渡すときの依頼文の契約（`B-1`〜`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC ワークスペース・ライフサイクル — 置いた物の退場を契約にする層・退場条件の数値はローカル正本（`LC-1`〜`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 却下ルーブリック — 何を受け入れ・何を断るかの意図の層。自動却下の3理由・歓迎/却下の判断基準・前提検証・置き場所のはしご・check 昇格（`R-1`〜`R-6`） |
-| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge・リリース既定。付録に非規範のランナー早見表（`T-1`〜`T-5`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge・リリース既定・テスト出力契約・バッジと数字の正直さ。付録に非規範のランナー早見表（`T-1`〜`T-7`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
@@ -359,7 +360,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.15.0**（2026-08-18）。条文の改訂4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・grok-build ランタイム解析の5席クロスレビューからの還流）。① **後続ラウンドのラチェット禁止**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— round-2 以降で新たに blocking を追加できるのは実証済みの欠陥か未充足のゲート基準のみ。レビューラウンドが進むほど新しい好みが後出し blocking になりレーンが終端しない「ラチェットチャーン」を止める狭い条項です。② **指摘の引用要件**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— path:line を指すか実行ログを引用できない指摘は blocking にできない（non-blocking の懸念は自由）。①がその上に実証要件を重ねる引用水準の「床」の明文化です（二層の制約であり同一水準ではありません）。③ **B-4 に理由1文**（[docs/07](docs/07-delegation-brief.md)）— 常設 instruction ファイルが委譲境界で読まれず劣化する runtime も実在するため、必要な規約はブリーフ本文にインラインで書く。④ **git を触る自動化の衛生1文**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config は毎回 env で明示し、ユーザーの git 状態を読まない・書かない。
+現行バージョンは **v0.16.0**（2026-08-19）。テストと表示の正直さを閉じる2条を追加しました（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **テスト出力契約**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族製ランナーは `suites: declared=N executed=M skipped=K` の3値サマリを動的に出し、`declared = executed + skipped` を不変条件にします。exit code は閉じた集合、必須依存の欠落は `missing-dep:` と 127、異常終了でもサマリ必須です。SKIP 率20%超を赤とし、上限を変える場合は LC-3 型でローカル値と根拠を記録します。採用完了は CI の照合ゲートが有効になった時点です。② **表示契約**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 緑は機械が塗ったものだけ。README を持つ公開リポは T-1 の test workflow に結びつく live バッジか灰の `CI: not yet` を必ず示し、静的色は `lightgrey` / `blue` の閉じた列挙に限定します。条文内に Project status の標準形を置き、実測数字には run URL と実測日を必須にしました。設計の起点は consistency campaign W0-4 と family-os#56、確定は3席の設計レビューです。
+
+- **v0.15.0**（2026-08-18） — 条文の改訂4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・grok-build ランタイム解析の5席クロスレビューからの還流）。① **後続ラウンドのラチェット禁止**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— round-2 以降で新たに blocking を追加できるのは実証済みの欠陥か未充足のゲート基準のみ。レビューラウンドが進むほど新しい好みが後出し blocking になりレーンが終端しない「ラチェットチャーン」を止める狭い条項です。② **指摘の引用要件**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— path:line を指すか実行ログを引用できない指摘は blocking にできない（non-blocking の懸念は自由）。①がその上に実証要件を重ねる引用水準の「床」の明文化です（二層の制約であり同一水準ではありません）。③ **B-4 に理由1文**（[docs/07](docs/07-delegation-brief.md)）— 常設 instruction ファイルが委譲境界で読まれず劣化する runtime も実在するため、必要な規約はブリーフ本文にインラインで書く。④ **git を触る自動化の衛生1文**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config は毎回 env で明示し、ユーザーの git 状態を読まない・書かない。
 
 - **v0.14.1**（2026-08-16） — 条文の改訂はありません — README（4言語）の v0.12.0 版歴が `T-5` の条文と食い違っていたのを訂正しました。未履行のレーン（`vX.Y.Z` を宣言したのにタグを切っていないレーン）は「**終端しないまま WIP として残り** stale 時計に乗る」のであって、非アクティブ扱いになるわけではありません（非アクティブ扱いが掛かるのは **tag URL を欠く MERGED** の方）。あわせて、同じ段落で `N/A` の閉じた列挙を「3類型」と書いていたのを **4類型**（v0.12.0 で入った Epic 子→epic を含む）に直しました。条文（[docs/10](docs/10-test-ci-baseline.md)）・i18n ミラー・[docs/04](docs/04-adoption.md) のダイジェストは当初から正しく、README だけが取り残されていた形です — 「要約層と正本が食い違えば正本が正・要約を追従させる」の自己適用にあたります（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
 
