@@ -19,6 +19,8 @@ BRANCH="${2:-main}"
 # 各門番は「caller job / reusable job」の形式で check 名が決まる (caller は templates/ci/*.yml、
 # reusable は caty-ai/family-dev-handbook/.github/workflows/reusable-*.yml@ci-v1 側の job)。
 # pr-size は既定で required に含めない (可視化ゲート — 各リポの判断で追加)。
+# macOS を required にする場合は test-lint / test-macos と test-lint / test-macos-skip を必ず対で登録する。
+# 片方だけでは skip 側の赤が merge を止めない。既定は両方 non-required のため EXPECTED に含めない。
 EXPECTED=(
   "test-lint / test"
   "test-lint / lint"

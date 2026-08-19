@@ -72,7 +72,7 @@ jobs:
           if [ -f Makefile ] && grep -qE '^test:' Makefile; then
             make test 2>&1 | tee /tmp/test-output.log
           else
-            echo "::error::test command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            echo "::error::test command is not configured. Add a 'test:' target to this repo's Makefile (the gate runs 'make test') — an unconfigured gate must not pass (fail-closed by design)."
             exit 1
           fi
 
@@ -109,7 +109,7 @@ jobs:
   # 既存の required checks 設定 (test / lint) を壊さないため。required に入れるかは各リポの owner 判断。
   test-macos:
     name: test-macos
-    if: inputs.run_macos == true
+    if: ${{ inputs.run_macos }}
     runs-on: macos-latest
     timeout-minutes: 30
     permissions:
@@ -134,17 +134,17 @@ jobs:
           if [ -f Makefile ] && grep -qE '^test:' Makefile; then
             make test
           else
-            echo "::error::test command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            echo "::error::test command is not configured. Add a 'test:' target to this repo's Makefile (the gate runs 'make test') — an unconfigured gate must not pass (fail-closed by design)."
             exit 1
           fi
 
   # run_macos=false のときに走る代替ジョブ (ubuntu・cheap)。無言スキップを禁止する:
   # macos_skip_reason が空なら赤、あれば warning で明示してから緑にする。test-macos と
-  # test-macos-skip は if: が相互排他 (inputs.run_macos == true / == false) なので、
-  # どちらか一方が呼び出しごとに必ず走る — 「両方 skipped」を型として作れない (FP-5)。
+  # test-macos-skip は if: が構造的に補集合 (x / !x) なので、inputs.run_macos の値によらず
+  # どちらか一方だけが必ず走る — 「両方 skipped」を型として作れない (FP-5)。
   test-macos-skip:
     name: test-macos-skip
-    if: inputs.run_macos == false
+    if: ${{ !inputs.run_macos }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -197,6 +197,6 @@ jobs:
           if [ -f Makefile ] && grep -qE '^lint:' Makefile; then
             make lint
           else
-            echo "::error::lint command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            echo "::error::lint command is not configured. Add a 'lint:' target to this repo's Makefile (the gate runs 'make lint') — an unconfigured gate must not pass (fail-closed by design)."
             exit 1
           fi

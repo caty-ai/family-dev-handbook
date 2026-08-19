@@ -35,6 +35,7 @@
    - `pr-size.yml` — `max_lines` / `exclude_patterns`（サイズ計測の除外パターン。既定の除外〔lockfile・`i18n/**`〕は reusable 側に内蔵済み）
    - `review-labels.yml` — **`risk_paths_billing` / `risk_paths_outbound` / `risk_paths_gates` / `risk_paths_auth`（高リスク領域のリポ固有パスをカテゴリ別に宣言）。「該当なし」でもカテゴリごとに `none` の明示宣言まで必須**（いずれかが `__DECLARE_ME__` のままなら赤）。AUTH は既定網の `**/auth/**` が「認証コードは auth/ ディレクトリにある」配置前提のため常設 — フラット配置（`app/auth.py` 等）のリポは実パスを列挙し、auth/ 配下に集約済みのリポだけ `none` と書く（AUTH=none で `**/auth/**` が0マッチのリポには検知ログが警告を出す）。**複数パターンは1行1パターンの改行区切り**（空白区切りで1行に並べると「空白を含む1つの pathspec」＝0件マッチになるため、行内空白は赤で止まる）。「該当なし」の受理語は `none` のみ（大小文字不問・`n/a` 等の同義語は不可）
 5. branch protection の required status checks に各門番の check 名を登録する。**handbook#80 以降、check 名は「`<caller job> / <reusable job>`」の形式になる**: `test-lint / test`・`test-lint / lint`・`gitleaks / gitleaks`・`history-check / history-check`・`risk-review-gate / risk-review-gate`。**`pr-size` は既定で required に含めない**（可視化ゲート・required 化は各リポの判断）
+   macOS を required に入れる場合は `test-lint / test-macos` と `test-lint / test-macos-skip` を必ず対で登録する。片方だけだと skip 側の赤が merge を止めず、`run_macos: false` 時に skipped=success の穴が再び開く。既定はどちらも required 非登録。
 6. **`check-required-checks.sh` を実行して登録を機械確認する**（この script の `EXPECTED` は上記の新しい check 名形式で既に更新済み）:
    ```bash
    bash check-required-checks.sh <owner/repo> main
