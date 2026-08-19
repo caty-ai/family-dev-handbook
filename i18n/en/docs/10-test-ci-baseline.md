@@ -2,7 +2,7 @@
 
 # T Test & CI Baseline — the Layer that Mechanically Accumulates Proof of Correctness
 
-Where the L layers (L2 / L1 / L0) are the contract for **how work proceeds**, and the R layer is the contract for **what gets accepted**, the T layer defines the contract for **the minimum a repository must do to keep proving its own correctness through tests and CI — initial setup, accumulating regression tests, baking it into the delegation format, never merging while red, and closing out shipping with a tag**. Each rule carries a stable rule ID (`T-1` through `T-5`), and the scope of application for each clause is noted in 〔 〕. The summary side ([docs/04](04-adoption.md)) references these IDs. The general principle of enforcing a gate as a check is [R-6](09-rejection-rubric.md); the stance to take when verification isn't possible is [docs/05](05-fail-posture.md).
+Where the L layers (L2 / L1 / L0) are the contract for **how work proceeds**, and the R layer is the contract for **what gets accepted**, the T layer defines the contract for **the minimum a repository must do to keep proving its own correctness through tests and CI — initial setup, accumulating regression tests, baking it into the delegation format, never merging while red, closing out shipping with a tag, a test-output contract, and honest badges and numbers**. Each rule carries a stable rule ID (`T-1` through `T-7`), and the scope of application for each clause is noted in 〔 〕. The summary side ([docs/04](04-adoption.md)) references these IDs. The general principle of enforcing a gate as a check is [R-6](09-rejection-rubric.md); the stance to take when verification isn't possible is [docs/05](05-fail-posture.md).
 
 Background: a public repository's credibility gets judged from the outside, instantly, by "does it have tests, is CI green." The merge evidence gate ([L1-7](02-issue-loop.md)) and check enforcement ([R-6](09-rejection-rubric.md)) already embody this thinking, but **no layer required the initial setup and accumulation of tests and CI**. Accumulating tests is something only an operating rule can create — it isn't a feature CI provides on its own. Meanwhile, this protocol's implementation always passes through a delegation brief (the [B layer](07-delegation-brief.md)), so baking it into the format is enough to make it stick.
 
@@ -92,6 +92,61 @@ Making the boundary explicit:
 - **The Epic child→epic gate ([E-6](06-epic-lane.md)②) is exempt from the tagging obligation** — the field itself is still required, same as every record, with a value from type ④ above (`N/A (pre-epic-integration)`). Tagging is required at the epic→main integration merge (E-6③, full L1-7)
 - Retroactively applying this to past untagged merges is out of scope (this clause governs merges "from now on"; past ones are each repo owner's call)
 - Turning this clause into a check (e.g., red once main's HEAD has drifted away from the tag after a ship-equivalent merge was recorded, and the next merge arrives) follows [R-6](09-rejection-rubric.md) and is tracked via an Issue
+
+## T-6 Test-Output Contract — Put the Fact of Execution in One Machine-Readable Line〔new repository with code = MUST / existing repository = establish it in the same Issue on the next lane that touches code, tests, or a CI test job (the same opportunistic rule as T-1) / non-code repository with no runner = justified N/A〕
+
+**A test runner must satisfy an output contract that lets a machine determine what ran, what did not, and why.** Five conditions must hold:
+
+1. **Summary line (the body of the contract)** — the runner emits the following line in its output. This regular expression itself is the canonical format:
+
+   ```
+   suites: declared=([0-9]+) executed=([0-9]+) skipped=([0-9]+)
+   ```
+
+   Definitions: `declared` = total number of registered suites / `executed` = number that actually ran through PASS or FAIL / `skipped` = number honestly reported as SKIP. The invariant is **`declared = executed + skipped`**. Breaking it is a silent drop = red. The runner aggregates the numbers dynamically — **embedding fixed values (such as constant output with echo) violates this clause** (because a machine cannot verify their derivation, this is an inspection item in the adoption review). The line appears at least once in the output; if it appears more than once, **the last match is authoritative**. A decision to remove a suite from `declared` (unregister it) is recorded in one line in the Issue for the lane doing so — an unrecorded unregister is treated the same as a silent drop
+2. **Result vocabulary** — result displays produced by a **family-written runner or wrapper** use the three words `PASS` / `FAIL` / `SKIP`. Raw framework-native output from pytest / unittest / vitest and similar tools is **outside this vocabulary constraint** (the machine gate reads the summary line and exit code, so framework output may pass through unchanged)
+3. **Closed exit-code set** — `0` = no FAIL / `1` = one or more FAIL / `2` = usage or input error / `127` = **missing required dependency** (detect it in preflight, name the cause on stderr as `missing-dep: <name>`, and then exit — never misreport a missing dependency as a test failure or input error). A missing optional environment (no physical device, etc.) is not 127; it is **SKIP** and is counted in the summary's `skipped`
+4. **Emit the summary even on abnormal exit** — structure the runner so the summary line is emitted even if it dies partway through (`trap finish EXIT` in bash is a non-normative example; Python atexit, Makefile composition, and equivalent mechanisms are all valid). A missing summary = indeterminate = red ([FP-6](05-fail-posture.md)) — though this red does not actually fire until the wiring in item 5 is in place
+5. **CI reconciliation wiring (completion condition for adoption)** — this clause is not "established" until the CI-side reconciliation gate ([templates/ci/](../../../templates/ci/README.md) test-lint; reusable input `require_suite_reconciliation: true`) is **enabled**. Merely emitting the summary line or quoting the clause is not adoption ("just placed" = [FP-5](05-fail-posture.md)). A repository outside scope leaves an explicit N/A to that effect in an Issue — silence is not N/A. Wire the skipped form (the three-value summary) only after the reconciliation gate's skipped support (#80 delta) lands on main; reversing the order makes an honest SKIP red
+
+**SKIP-rate cap** — `skipped × 5 > declared` (= above 20%, with declared > 0) is red. A repository that changes the cap puts **the authoritative value in a CI caller input (the machine-readable location)** and records the reason for the change in one PR line or an Issue carrying an [LC-1](08-lifecycle.md) trigger (the same "numbers live in local configuration and changes are recorded" pattern as [LC-3](08-lifecycle.md)). An unrecorded change is invalid, so the default 20% applies. For a repository with declared ≤ 4, the formula means "SKIP 0 by default" — intentionally so (smaller repositories should be able to run everything; if a permanent SKIP is necessary, declare a different cap). SKIP is an honest report that an environment is absent, not a permanent escape hatch — red above the cap prompts "fix the environment or record the decision to remove the suite from scope"
+
+Reason: "the tests ran" is easy to make a self-report. The three values declared / executed / skipped and their invariant reduce the routes for "pretend it ran" (silent suite loss, mixing SKIP into executed, denominator manipulation by unregistering, or misreporting a missing dependency) to one machine check. Fixing the format as a regular expression lets CI-side reconciliation (the W0-3 reusable test-lint) use one common implementation across every repository.
+
+Making the boundary explicit:
+
+- This clause is an **output contract**; it does not constrain test contents, granularity, or framework choice (see the appendix for recommended runners)
+- Suite-level reporting is enough (test-case-level reporting is not required — granularity is the repository's choice. Make a SKIP inside a suite visible by splitting the suite)
+- A new repository with zero tests (only the T-1 frame exists) may emit no summary line (there is no wiring yet, so it is not red), or may emit `declared=0 executed=0 skipped=0` (executed=0 is red, choosing the side that does not manufacture "green with zero targets") — either is valid, and the latter is recommended
+- This handbook's own runner is the **first subject of this clause** (the lane publishing the clause makes its own `make test` conform before merge — the pilot principle)
+
+## T-7 Honest Badges and Numbers — Green Only When a Machine Painted It〔public repository with a README = MUST / any other repository = the same discipline whenever it displays numbers or badges (a private scratch repository displaying neither is naturally N/A)〕
+
+**Any display in a README or docs that looks "verified" is limited to one connected to a machine inspection result.** Three conditions must hold:
+
+1. **CI state is explicit (do not hide "uninspected" by omitting a badge)** — a public repository with a README always displays CI state in **one of two** ways: ① a live badge for **the workflow that runs T-1's test gate** (a GitHub Actions badge.svg or equivalent live endpoint pointing to that workflow; **a badge for some other workflow that does not run tests does not satisfy this clause even when green**) ② if CI is not set up, a grey static badge reading `CI: not yet`. Omitting the display, or substituting the green of another workflow, both violate the clause
+2. **Closed color set** — the only permitted colors for a static badge are **`lightgrey` / `blue` (including factual displays such as language and license)**, a closed enumeration. `green` / `brightgreen` / `success` / `passing` variants and equivalent green hex values cannot be used for static badges (inspect the substance, not the spelling — [R-6](09-rejection-rubric.md)). Only a machine-painted live badge may claim green
+3. **Measured numbers and the Project status section** — when a README or docs states a number that reads as measured (test count, coverage, performance), it includes **the URL of that measurement run and the measurement date**. If those cannot be attached, do not state the number (do not place a number that cannot be verified — the [R layer](09-rejection-rubric.md)). A number that **differs from the measured value** in a newer run of that workflow is stale — update or remove it (the mere existence of a newer run does not make it stale when the value has not changed). A design value or target may be written when labeled "target," but it cannot masquerade as a measurement (such as "passed" with no run URL). When a README carries a status section, the standard form is below (**this form is canonical** — no external repository is the reference model):
+
+   ```markdown
+   ## Project status
+
+   [live badge (badge.svg for the T-1 test workflow) or CI: not yet (grey)]
+
+   - CI: <whether the test-lint gate exists and the connected workflow name>
+   - Verified environment: <measured OS / runtime>
+   - maturity: <stable / beta / reference, etc.>
+   - Known limitations: <list them; explicitly write "none" when there are none>
+   ```
+
+Reason: outsiders make an immediate judgment about repository reliability from "is the badge green?" Handwritten green cannot be distinguished from machine green, and one handwritten green **damages the evidentiary value of green across every family repository**. Conversely, hiding "uninspected" by placing no badge is the other side of the same lie (measurement: nine handwritten green badges coexisted with repositories that had no CI and displayed nothing). Restricting displays to machine-connected states makes green = inspection ran / grey = no inspection mean the same thing everywhere.
+
+Making the boundary explicit:
+
+- The subject is a display that can impersonate an inspection result — factual badges (language, license, version; blue family) remain unrestricted
+- **You are always free to state no numbers** (this clause says "if you write one, be honest," plus "public repositories must display CI state")
+- A private scratch repository that is neither public nor has a README is naturally N/A. A repository that **is public but has no README** enters scope when it takes a lane to establish a README (B8, etc.) — lack of a README is not a permanent exemption
+- Turning this clause into checks (detecting static green badges, stale numbers, and so on) follows [R-6](09-rejection-rubric.md) and is tracked in Issues
 
 ## Appendix (Non-Normative) — Recommended Runner Cheat Sheet
 

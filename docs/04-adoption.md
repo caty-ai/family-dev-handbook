@@ -29,7 +29,7 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-18 (v0.15.0) / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-19 (v0.16.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
 この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
@@ -91,6 +91,9 @@ T テスト&CI基準: T-1 コードを含む新規リポは作成時にテスト
   タグは当該 merge が main に残したコミットへ annotated+SemVer（原則は宣言と同名・レビュー後にスコープが動いた時のみ別名可+MERGED に差異と理由1行）・
   リリースノートに証拠ポインタ1つ以上・署名検証リポは署名タグ必須（鍵 per-repo）他は SHOULD・
   Epic 子→epic は対象外（N/A・T-5 は epic→main に掛かる）・全リポ一律（出荷相当が無ければ自然に N/A）
+  T-6 家族製ランナーは PASS/FAIL/SKIP と動的3値サマリ（declared/executed/skipped・declared=executed+skipped）+閉じた exit code・必須依存欠落は missing-dep 付き127・異常終了でもサマリ必須・
+  SKIP率20%超は赤（変更値はCI caller入力を正本+記録）・整備済みは require_suite_reconciliation: true のCI照合が有効になった時点 /
+  T-7 公開READMEはT-1 test workflowのliveバッジか灰のCI: not yetを必須表示・静的色はlightgrey/blueのみ・実測数字はrun URL+実測日必須・Project status標準形は条文内蔵
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 

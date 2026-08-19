@@ -7,10 +7,11 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.15.0-blue)
+![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-green)
-![status](https://img.shields.io/badge/status-active-brightgreen)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
+![status](https://img.shields.io/badge/status-active-blue)
+[![Test + Lint](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/shojikumaru/family-dev-handbook/actions/workflows/test-lint.yml)
 
 让多个 AI 智能体和多个会话并行开发同一个代码库而不发生冲突的共通规则。<br>
 它要解决的是这三件事：两边同时改同一个文件把它改坏、“做完了”这句话不可信、交接的那一刻没人说得清什么已经完成。<br>
@@ -197,7 +198,7 @@ handbook-revision 的值请不要改动。
 3. 把第一行的 `owner` 和 `last-verified` 改成你自己和今天的日期。`handbook-revision` 原样保留
 4. 把第二行的 `正本:` 改成本仓库的 URL（如果你 fork 了，就填你 fork 的地址）
 
-要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-5`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
+要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-7`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
 
 想停用的话，把粘进去的那 50 行左右删掉就回到原样。其他文件一概不碰。
 
@@ -265,7 +266,7 @@ flowchart TD
 | **B** 委派简报 | 一次委派如何成为契约 | `B-1`–`B-5` | [docs/07](docs/07-delegation-brief.md) |
 | **LC** 生命周期 | 放下的东西何时、如何退场 | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 拒收准则 | 接受什么、拒绝什么 | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
-| **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-5` | [docs/10](docs/10-test-ci-baseline.md) |
+| **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-7` | [docs/10](docs/10-test-ci-baseline.md) |
 
 其中有两条特别左右成效。一条是 **FP** 的口号“无法验证就串行。fail-open 不等于‘通过’”——它宣告的是：即便你有意选择在无法确认时放行，那也绝不能被读成“已确认”。另一条是**高风险领域的单一定义**，碰到这里的工作一定要停下来等人确认，评审席位也会增加（对外发布、计费、不可逆操作、权限边界之类都算。准确的界线请看正本）。为了不让同一个定义存在于两个地方，正本只放在 [docs/06](docs/06-epic-lane.md) 这一处。
 
@@ -310,7 +311,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [docs/07-delegation-brief.md](docs/07-delegation-brief.md) | B 委派简报 — 每次把工作交给子智能体时，提示词所承载的契约（`B-1`–`B-5`） |
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC 工作区生命周期 — 把“退场”变成契约的层；退场条件的数值以本地设置为正本（`LC-1`–`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 拒收准则 — 决定接受什么、拒绝什么的意图层：自动拒收的三个理由、欢迎/拒收的判断标准、前提验证、放置阶梯、把方针升格为 check（`R-1`–`R-6`） |
-| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge、发布既定。附录为非规范性的运行器速查表（`T-1`–`T-5`） |
+| [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge、发布既定、测试输出契约、徽章与数字的诚实性。附录为非规范性的运行器速查表（`T-1`–`T-7`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue 模板与全部车道评论格式（WIP / HOLD / 终结 / TAKEOVER / 恢复检查 / 完成记录） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
@@ -361,7 +362,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.15.0**（2026-08-18）。条文修订4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・来自 grok-build 运行时解析5席交叉评审的反馈）。① **禁止后续轮次的 ratchet**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— 从第2轮开始，能新增 blocking 的仅限已证实的缺陷或尚未满足的门槛标准。这是一条狭窄的条款，用来阻止"评审轮次越往后，新的偏好就变成后补 blocking，导致车道永远无法终结"的 ratchet churn。② **意见的引用要求**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— 指不出 path:line 或无法引用执行日志的意见不能被标记为 blocking（作为 non-blocking 的担忧提出是自由的）。这是①在其上叠加实证要求的引用水位「地板」的明文化（两层约束，并非同一水位）。③ **B-4 新增理由一句**（[docs/07](docs/07-delegation-brief.md)）— 因为确实存在常设 instruction 文件在委托边界处不被读取而失效的 runtime，所以需要的规约要写进简报正文内联。④ **触碰 git 的自动化卫生一句**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config 每次都要通过 env 显式指定，不读取也不写入用户的 git 状态。
+当前版本是 **v0.16.0**（2026-08-19）。新增两条条文，用于封闭测试与状态展示中的诚实性缺口（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **测试输出契约**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族编写的运行器须动态输出 `suites: declared=N executed=M skipped=K` 三字段摘要，并以 `declared = executed + skipped` 为不变条件。exit code 采用闭合集；必需依赖缺失时输出 `missing-dep:` 并以 127 退出；即使异常退出也必须输出摘要。SKIP 率超过 20% 即为红；如调整上限，须按 LC-3 型在本地保存数值并记录理由。只有 CI 对账 gate 开启后，才算完成采用。② **展示契约**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 只有机器涂出的结果才能是绿色。带 README 的公开仓库必须展示绑定 T-1 测试 workflow 的 live badge，或灰色的 `CI: not yet`；静态颜色只允许闭合列举中的 `lightgrey` / `blue`。Project status 的标准形式直接写入条文，实测数字必须附 run URL 和实测日期。设计起点为 consistency campaign W0-4 与 family-os#56，并经 3 席设计评审冻结。
+
+- **v0.15.0**（2026-08-18） — 条文修订4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・来自 grok-build 运行时解析5席交叉评审的反馈）。① **禁止后续轮次的 ratchet**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— 从第2轮开始，能新增 blocking 的仅限已证实的缺陷或尚未满足的门槛标准。这是一条狭窄的条款，用来阻止"评审轮次越往后，新的偏好就变成后补 blocking，导致车道永远无法终结"的 ratchet churn。② **意见的引用要求**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— 指不出 path:line 或无法引用执行日志的意见不能被标记为 blocking（作为 non-blocking 的担忧提出是自由的）。这是①在其上叠加实证要求的引用水位「地板」的明文化（两层约束，并非同一水位）。③ **B-4 新增理由一句**（[docs/07](docs/07-delegation-brief.md)）— 因为确实存在常设 instruction 文件在委托边界处不被读取而失效的 runtime，所以需要的规约要写进简报正文内联。④ **触碰 git 的自动化卫生一句**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config 每次都要通过 env 显式指定，不读取也不写入用户的 git 状态。
 
 - **v0.14.1**（2026-08-16） — 条文没有修订——本次订正的是 README（4 种语言）中 v0.12.0 版本历史与 `T-5` 条文不一致之处。未履行的车道（已宣告 `vX.Y.Z` 却没有切 tag 的车道）是「**不会终结，会以 WIP 状态留存**」并挂在 stale 时钟上，而不是按非活跃处理（按非活跃处理的是**缺少 tag URL 的 MERGED**）。同一段中把 `N/A` 的闭合列举写成「3 种类型」，也一并改为 **4 种类型**（含 v0.12.0 加入的 Epic 子→epic）。条文（[docs/10](docs/10-test-ci-baseline.md)）、i18n 镜像与 [docs/04](docs/04-adoption.md) 的摘要一直是正确的，只有 README 被落下了——这正是「摘要层与正本不一致时以正本为准、让摘要跟随」的自我适用（[#73](https://github.com/caty-ai/family-dev-handbook/issues/73)）。
 
