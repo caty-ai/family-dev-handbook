@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
-![status](https://img.shields.io/badge/status-active-blue)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
+![status](https://img.shields.io/badge/status-active-lightgrey)
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 複数の AI エージェントと複数のセッションが、同じコードベースを衝突せずに並行開発するための共通ルールです。<br>
@@ -393,6 +393,15 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 これからの予定は [Issue 一覧](https://github.com/caty-ai/family-dev-handbook/issues)が正本です。README では二重に管理しません。
 
 提案の入り口も、同じルールの上にあります。
+
+## Project status
+
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
+
+- CI: ローカル caller から Test + Lint を含む reusable `@ci-v1` セット（5ゲート）を実行し、suite-count 照合を有効にしています。CI と同じエントリーポイントをローカルで実行するには `make test` と `make lint` を使います。
+- 検証済み環境: CI で `ubuntu-latest` と `macos-latest` を実行し、macOS でのローカル開発も行っています。
+- maturity: `stable` — 規範の正本です。
+- 既知の制約: runtime code を持たない docs-only リポジトリです。また、タイ語ミラーの既知のリンク2件を [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) で追跡しています。
 
 ---
 

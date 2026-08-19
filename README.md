@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
-![status](https://img.shields.io/badge/status-active-blue)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
+![status](https://img.shields.io/badge/status-active-lightgrey)
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 A shared protocol that lets multiple AI agents and multiple sessions develop the same codebase in parallel without colliding.<br>
@@ -396,6 +396,15 @@ The current version is **v0.16.0** (2026-08-19). It adds two clauses that close 
 What comes next is tracked canonically in the [Issue list](https://github.com/caty-ai/family-dev-handbook/issues). This README does not keep a second copy.
 
 The way in for proposals sits on the same rules.
+
+## Project status
+
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
+
+- CI: Local callers exercise the reusable `@ci-v1` set (five gates), including Test + Lint; suite-count reconciliation is enabled. Run the same CI entry points locally with `make test` and `make lint`.
+- 検証済み環境: `ubuntu-latest` and `macos-latest` are exercised in CI; macOS is also used for local development.
+- maturity: `stable` — the normative canonical handbook.
+- 既知の制約: This is a docs-only repository with no runtime code; two known links in the Thai mirror are tracked in [#89](https://github.com/caty-ai/family-dev-handbook/issues/89).
 
 ---
 

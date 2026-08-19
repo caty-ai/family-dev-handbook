@@ -9,8 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![version](https://img.shields.io/badge/version-v0.16.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
-![docs](https://img.shields.io/badge/docs-Japanese%20canonical-blue)
-![status](https://img.shields.io/badge/status-active-blue)
+![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
+![status](https://img.shields.io/badge/status-active-lightgrey)
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 กฎกลางที่ทำให้เอเจนต์ AI หลายตัวและเซสชันหลายเซสชัน พัฒนาโค้ดเบสเดียวกันไปพร้อมกันได้โดยไม่ชนกัน<br>
@@ -396,6 +396,15 @@ flowchart TD
 แผนถัดจากนี้ยึด [รายการ Issue](https://github.com/caty-ai/family-dev-handbook/issues) เป็นฉบับหลัก README จะไม่เก็บอีกชุดซ้ำ
 
 ทางเข้าสำหรับข้อเสนอ ก็ตั้งอยู่บนกฎชุดเดียวกันนี้
+
+## Project status
+
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
+
+- CI: caller ในรีโปจะเรียกใช้ชุด reusable `@ci-v1` (ห้า gate) ซึ่งรวม Test + Lint และเปิดใช้การกระทบยอด suite-count แล้ว หากต้องการใช้ entry point เดียวกับ CI ในเครื่อง ให้รัน `make test` และ `make lint`
+- 検証済み環境: CI รันบน `ubuntu-latest` และ `macos-latest` รวมทั้งมีการพัฒนาในเครื่องบน macOS
+- maturity: `stable` — เป็นฉบับหลักเชิงบรรทัดฐาน
+- 既知の制約: เป็นรีโปเอกสารล้วนที่ไม่มี runtime code และลิงก์ที่ทราบปัญหาสองรายการในมิเรอร์ภาษาไทยกำลังติดตามอยู่ใน [#89](https://github.com/caty-ai/family-dev-handbook/issues/89)
 
 ---
 
