@@ -31,7 +31,7 @@ DENYLIST_NAME = ".publication-denylist"
 WHITELIST_NAME = ".publication-label-whitelist"
 ACCOUNT_SLUG = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$")
 URL_CANDIDATE = re.compile(
-    r"(?<![A-Za-z0-9@._-])(?:https?://)?"
+    r"(?<![A-Za-z0-9@._-])(?:https?://(?:[A-Za-z0-9._~!$&'()*+,;=:%-]+@)?)?"
     r"(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+\.?(?::[0-9]+)?"
     r"(?:/[^\s<>'\"`()\[\]{}]*)?",
     re.IGNORECASE,
@@ -653,8 +653,26 @@ def _capture_main(arguments):
 
 
 def _fixture_personal_url(account_slug, repository=None):
-    url = "https://github." + "com/" + account_slug
+    url = "https://" + "github." + "com/" + account_slug
     return url + "/" + repository if repository else url
+
+
+def _fixture_module_link(repo="example-org/example-module"):
+    return "https://" + "github." + "com/" + repo
+
+
+def _fixture_module_line(with_status=True):
+    line = "[Example Module](" + _fixture_module_link() + ")"
+    return line + " — published, MIT" if with_status else line
+
+
+def _fixture_email(local_part, domain):
+    return local_part + "@" + domain
+
+
+def _fixture_userinfo_personal_url(account_slug, repository, username, host=None):
+    target_host = host or ("github." + "com")
+    return "https://" + username + "@" + target_host + "/" + account_slug + "/" + repository
 
 
 def selftest_policy_parsers():
@@ -756,11 +774,51 @@ def selftest_scanners():
     )
     _selftest_check(
         check_denylist(
-            {"README.md": "bob@neutral-owner.com"}, email_rule, email_failures
+            {"README.md": _fixture_email("bob", "neutral-owner." + "com")},
+            email_rule,
+            email_failures,
         )
         == 1
         and email_failures,
         "slug-domain email remains visible to raw denylist",
+    )
+    userinfo_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {
+                "README.md": "See "
+                + _fixture_userinfo_personal_url(
+                    "neutral-owner", "private", "viewer"
+                )
+            },
+            "neutral-owner",
+            None,
+            userinfo_failures,
+        )
+        == 1
+        and "personal-url: README.md:1 references personal account repository neutral-owner/private"
+        in userinfo_failures[0],
+        "userinfo personal URL candidate",
+    )
+    clean_userinfo_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {
+                "README.md": "See "
+                + _fixture_userinfo_personal_url(
+                    "neutral-owner",
+                    "private",
+                    "viewer",
+                    host="github." + "com.evil.invalid",
+                )
+            },
+            "neutral-owner",
+            None,
+            clean_userinfo_failures,
+        )
+        == 0
+        and not clean_userinfo_failures,
+        "userinfo clean host control",
     )
 
     normalized_failures = []
@@ -818,13 +876,11 @@ def selftest_scanners():
 
 def selftest_registry_checks():
     registry = _fixture_registry()
-    clean = {
-        "README.md": "[Example Module](https://github.com/example-org/example-module) — published, MIT\n"
-    }
+    clean = {"README.md": _fixture_module_line() + "\n"}
     failures = []
     _selftest_check(check_missing_labels(clean, registry, frozenset(), failures) == 1 and not failures, "clean label")
     missing = []
-    line = "[Example Module](https://github.com/example-org/example-module)"
+    line = _fixture_module_line(with_status=False)
     _selftest_check(check_missing_labels({"README.md": line}, registry, frozenset(), missing) == 1 and missing, "missing label")
     exempt = []
     whitelist = frozenset((("README.md", line),))
@@ -836,6 +892,13 @@ def selftest_registry_checks():
     _selftest_check(check_svg_state_sources(svg, clean, registry, svg_failures) >= 1 and not svg_failures, "clean SVG state")
     missing_svg = []
     _selftest_check(check_svg_state_sources(svg, {"README.md": line}, registry, missing_svg) >= 1 and missing_svg, "missing SVG state")
+
+
+SELFTEST_SOURCE_SCAN_DENYLIST = (
+    "email-address\t\\b[A-Z0-9._%+\\-]+@[A-Z0-9.\\-]+\\.[A-Z]{2,}\\b\n"
+    "github-url-ish\thttps?://(?:[A-Za-z0-9._~!$&'()*+,;=:%-]+@)?"
+    "(?:gist\\.)?github\\.(?:com|io)/[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)?\n"
+)
 
 
 def _materialize_fixture(root, readme=SELFTEST_CLEAN_README, denylist=SELFTEST_DENYLIST):
@@ -900,6 +963,15 @@ def selftest_end_to_end():
             whitespace_status == 1 and "gate-error: --account-slug" in whitespace_output,
             "whitespace account slug fails closed",
         )
+        invalid_slug_status, invalid_slug_output = _capture_main(
+            ["--root", str(root), "--account-slug", "foo/bar"]
+        )
+        _selftest_check(
+            invalid_slug_status == 1
+            and "gate-error: --account-slug must match ^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$ (fail-closed)"
+            in invalid_slug_output,
+            "invalid account slug fails closed",
+        )
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
@@ -915,6 +987,15 @@ def selftest_end_to_end():
         shutil.copyfile(Path(__file__), copied_gate)
         status, output = _capture_main(["--root", str(root), "--account-slug", "neutral-owner"])
         _selftest_check(status == 0 and "source files scanned : 2" in output, "copied gate self-scan: %r" % output)
+        (root / DENYLIST_NAME).write_text(SELFTEST_SOURCE_SCAN_DENYLIST, encoding="utf-8")
+        source_scan_status, source_scan_output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner"]
+        )
+        _selftest_check(
+            source_scan_status == 0
+            and "denylist matches     : 0" in source_scan_output,
+            "copied gate source scan denylist stays green: %r" % source_scan_output,
+        )
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
@@ -923,7 +1004,7 @@ def selftest_end_to_end():
         registry_path.parent.mkdir(parents=True)
         registry_path.write_text(json.dumps(_fixture_registry()), encoding="utf-8")
         (root / "README.md").write_text(
-            "[Example Module](https://github.com/example-org/example-module) — published, MIT\n",
+            _fixture_module_line() + "\n",
             encoding="utf-8",
         )
         status, output = _capture_main(
