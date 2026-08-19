@@ -15,14 +15,18 @@ set -euo pipefail
 REPO="${1:?usage: check-required-checks.sh <owner/repo> [branch]}"
 BRANCH="${2:-main}"
 
-# CUSTOMIZE: required に登録する check 名 (= 各門番の job name)。
+# CUSTOMIZE: required に登録する check 名。handbook#80 (reusable workflow_call 化) 以降、
+# 各門番は「caller job / reusable job」の形式で check 名が決まる (caller は templates/ci/*.yml、
+# reusable は caty-ai/family-dev-handbook/.github/workflows/reusable-*.yml@ci-v1 側の job)。
 # pr-size は既定で required に含めない (可視化ゲート — 各リポの判断で追加)。
+# macOS を required にする場合は test-lint / test-macos と test-lint / test-macos-skip を必ず対で登録する。
+# 片方だけでは skip 側の赤が merge を止めない。既定は両方 non-required のため EXPECTED に含めない。
 EXPECTED=(
-  "test"
-  "lint"
-  "gitleaks"
-  "history-check"
-  "risk-review-gate"
+  "test-lint / test"
+  "test-lint / lint"
+  "gitleaks / gitleaks"
+  "history-check / history-check"
+  "risk-review-gate / risk-review-gate"
 )
 
 CONTEXTS=$(gh api "repos/${REPO}/branches/${BRANCH}/protection" \
