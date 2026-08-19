@@ -3,6 +3,19 @@
 **このハンドブックは、自分自身のルールで更新される。** コントリビュートの手順そのものが、このリポが定めるプロトコル（L2/L1/L0）の実演になる。
 
 > **English summary**: This handbook is maintained under its own rules. To contribute: (1) file an Issue first with *Why / Done when / predicted files to touch*; (2) post a 4-field WIP declaration (`agent / date / Files to touch / Branch`) on the Issue before starting; (3) work in a dedicated worktree/branch, touching only declared files; (4) get a cross review — the merge-approving reviewer must be a different model or a different agent from the implementer (no self-approval); (5) put an L1-7 **completion record** (Done-when → PASS/FAIL/reasoned-N/A with inline evidence, candidate SHA, declared-vs-diff reconciliation, identity check) in the PR body. Field schemas: [templates/issue-template.md](templates/issue-template.md). Canonical docs are Japanese.
+> Prerequisites are Python 3.9+, `make`, and `git` on macOS or Linux; `make test` and `make lint` are the same entry points used by CI.
+
+## Prerequisites / 前提ツール
+
+ローカルでの変更と検証には、次の環境が必要です。macOS と Linux をサポートしています。
+
+| Requirement / 必要条件 | Notes / 補足 |
+|---|---|
+| Python 3.9+ | 呼び出されるチェッカーが Python 3.9+ を宣言し、`list[...]` などの組み込みジェネリック型構文（3.9+）を使います。必要なのは標準ライブラリのみで、`tomllib` やサードパーティ製パッケージは不要です。 |
+| `make` | `Makefile` の検証ターゲットを実行します。 |
+| `git` | 変更差分と worktree を管理します。 |
+
+テスト実行: `make test` と `make lint` は、CI が使うものと同じエントリーポイントです（T-1 / T-6）。
 
 ## 変更提案の流れ
 
