@@ -394,6 +394,15 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 提案の入り口も、同じルールの上にあります。
 
+## Project status
+
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
+
+- CI: ローカル caller から Test + Lint を含む reusable `@ci-v1` セット（5ゲート）を実行し、suite-count 照合を有効にしています。CI と同じエントリーポイントをローカルで実行するには `make test` と `make lint` を使います。
+- 検証済み環境: CI で `ubuntu-latest` と `macos-latest` を実行し、macOS でのローカル開発も行っています。
+- maturity: `stable` — 規範の正本です。
+- 既知の制約: runtime code を持たない docs-only リポジトリです。また、タイ語ミラーの既知のリンク2件を [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) で追跡しています。
+
 ---
 
 <a id="contributing"></a>

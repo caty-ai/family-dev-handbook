@@ -397,6 +397,15 @@ What comes next is tracked canonically in the [Issue list](https://github.com/ca
 
 The way in for proposals sits on the same rules.
 
+## Project status
+
+[![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
+
+- CI: Local callers exercise the reusable `@ci-v1` set (five gates), including Test + Lint; suite-count reconciliation is enabled. Run the same CI entry points locally with `make test` and `make lint`.
+- 検証済み環境: `ubuntu-latest` and `macos-latest` are exercised in CI; macOS is also used for local development.
+- maturity: `stable` — the normative canonical handbook.
+- 既知の制約: This is a docs-only repository with no runtime code; two known links in the Thai mirror are tracked in [#89](https://github.com/caty-ai/family-dev-handbook/issues/89).
+
 ---
 
 <a id="contributing"></a>
