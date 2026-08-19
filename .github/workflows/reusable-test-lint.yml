@@ -1,0 +1,202 @@
+# 基本門番①: テスト + lint (reusable 正本)
+#
+# 守るもの: 「テストが通っていないコードが main に入らない」こと。
+# 配り方: このファイルが正本 (workflow_call)。他リポの呼び出し側は
+#         caty-ai/family-dev-handbook/.github/workflows/reusable-test-lint.yml をバージョンタグ
+#         (タグ名は templates/ci/README.md「バージョニング」節を参照) 付きで `uses:` 参照する
+#         (同リポ内の呼び出し元はローカルパスで参照する — このファイルを改訂する PR が
+#         古いタグの内容で自己検証されるデッドロックを避けるため)。
+#         スタンドアロン配布用のキャリアー stencil は templates/ci/ を参照。
+#
+# 設計姿勢 (handbook docs/05・docs/09 R-6):
+# - 未設定 = 赤 (fail-closed)。「テストが無いリポでは green」にしない。
+#   fail-open で置くと「置いただけで守られた気になる」(FP-5) ため、導入時に必ずコマンドを書かせる。
+# - set -euo pipefail 必須・`|| true` でゲート判定を飲み込むこと禁止。
+# - test は ubuntu と macOS の両方で走らせる (handbook #54)。開発機は全員 macOS で、
+#   Linux 単独の CI は BSD/GNU のコマンド挙動差 (sed/grep/date/`--`/`\r`) を構造的に見逃すため。
+#   private リポへ配る場合のみ: macOS 分は課金レート10倍のため、owner 判断で `run_macos: false` +
+#   `macos_skip_reason` を caller の with: で渡すことで opt-down できる。理由が空のスキップは
+#   赤にする (下記 test-macos-skip)。この型は素では test-macos / test-macos-skip のどちらか
+#   一方が必ず走るため、「if だけ付けて常に skipped」という「置いただけ」の穴を型として作れない (FP-5)。
+#   注意: workflow 単位で必須化する ruleset のリポでは、job 追加はそのまま必須チェックに加わる。
+# 型の正本: caty-ai/family-dev-handbook .github/workflows/reusable-test-lint.yml
+#           (他リポからのバージョンタグ pin 名は templates/ci/README.md を参照)
+#
+# 昇格した仕様 (issue #80 コメント 2026-08-19 オーナー決裁。起源は handbook#81 (T-6 clause, pending) が
+# 語彙 `suites: declared=N executed=N` の正本、および context-kit#12 / self-growth-loop#4 →
+# オーナー決裁 2026-08-19 が2つの昇格の起源):
+# - promotion ①: OS matrix の run_macos / macos_skip_reason (上記)。
+# - promotion ②: ubuntu の test job で suite-count reconciliation (下記) を行う。
+
+on:
+  workflow_call:
+    inputs:
+      run_macos:
+        description: "macOS matrix (test-macos) を走らせるか。false にする場合は macos_skip_reason 必須。"
+        type: boolean
+        default: true
+      macos_skip_reason:
+        description: "run_macos=false のときに必須の理由。空だと赤 (無言スキップ禁止・FP-5)。"
+        type: string
+        default: ''
+      require_suite_reconciliation:
+        description: "true の場合、T-6 の suite 突合行 (suites: declared=N executed=N) が make test ログに無いと赤にする。"
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Require pull_request event
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          # CUSTOMIZE: このリポのテストコマンドに差し替える (例: npm test / pytest / swift test)。
+          # 既定は Makefile の `test` ターゲットを試み、無ければ「未設定」として赤で落ちる (fail-closed)。
+          if [ -f Makefile ] && grep -qE '^test:' Makefile; then
+            make test 2>&1 | tee /tmp/test-output.log
+          else
+            echo "::error::test command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            exit 1
+          fi
+
+      - name: Suite-count reconciliation (T-6 promotion, issue #80 comment 2026-08-19)
+        # 語彙の出典: handbook#81 (T-6 clause, pending) が `suites: declared=N executed=N` の正本。
+        # 昇格の起源: context-kit#12 / self-growth-loop#4 → オーナー決裁 2026-08-19。
+        # 最後に一致した行を採用する (複数回出力されうるため、最終状態を正とする)。
+        env:
+          REQUIRE_RECONCILIATION: ${{ inputs.require_suite_reconciliation }}
+        run: |
+          set -euo pipefail
+          LINE=$(grep -oE 'suites: declared=[0-9]+ executed=[0-9]+' /tmp/test-output.log | tail -n 1 || true)
+          if [ -z "$LINE" ]; then
+            if [ "$REQUIRE_RECONCILIATION" = "true" ]; then
+              echo "::error::suite reconciliation line ('suites: declared=N executed=N') not found in make test output, and require_suite_reconciliation=true — failing closed."
+              exit 1
+            fi
+            echo "::notice::suite reconciliation line not found — T-6 vocabulary not adopted by this repo yet; reconciliation explicitly skipped (not silently)."
+            exit 0
+          fi
+          DECLARED=$(echo "$LINE" | grep -oE 'declared=[0-9]+' | grep -oE '[0-9]+')
+          EXECUTED=$(echo "$LINE" | grep -oE 'executed=[0-9]+' | grep -oE '[0-9]+')
+          if [ "$EXECUTED" != "$DECLARED" ]; then
+            echo "::error::suite reconciliation mismatch: declared=${DECLARED} executed=${EXECUTED} — dropped suites detected, failing closed."
+            exit 1
+          fi
+          if [ "$EXECUTED" -eq 0 ]; then
+            echo "::error::suite reconciliation: executed=0 — zero executed suites cannot prove anything, failing closed."
+            exit 1
+          fi
+          echo "suite reconciliation OK: declared=${DECLARED} executed=${EXECUTED}"
+
+  # test と同一コマンドを macOS (Apple Silicon) でも走らせる。job 名を分けているのは
+  # 既存の required checks 設定 (test / lint) を壊さないため。required に入れるかは各リポの owner 判断。
+  test-macos:
+    name: test-macos
+    if: inputs.run_macos == true
+    runs-on: macos-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Require pull_request event
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Run tests (macOS)
+        run: |
+          set -euo pipefail
+          # CUSTOMIZE: test ジョブと同じコマンドに揃える (乖離したら片方のゲートが嘘になる)。
+          if [ -f Makefile ] && grep -qE '^test:' Makefile; then
+            make test
+          else
+            echo "::error::test command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            exit 1
+          fi
+
+  # run_macos=false のときに走る代替ジョブ (ubuntu・cheap)。無言スキップを禁止する:
+  # macos_skip_reason が空なら赤、あれば warning で明示してから緑にする。test-macos と
+  # test-macos-skip は if: が相互排他 (inputs.run_macos == true / == false) なので、
+  # どちらか一方が呼び出しごとに必ず走る — 「両方 skipped」を型として作れない (FP-5)。
+  test-macos-skip:
+    name: test-macos-skip
+    if: inputs.run_macos == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Require pull_request event
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - name: Require explicit skip reason
+        env:
+          SKIP_REASON: ${{ inputs.macos_skip_reason }}
+        run: |
+          set -euo pipefail
+          TRIMMED_SKIP_REASON=$(printf '%s' "$SKIP_REASON" | tr -d '[:space:]')
+          if [ -z "$TRIMMED_SKIP_REASON" ]; then
+            echo "::error::run_macos is false but macos_skip_reason is empty or whitespace-only — skipping the macOS matrix silently or without a stated reason is forbidden (fail-closed)."
+            exit 1
+          fi
+          echo "::warning::macOS matrix explicitly skipped by caller: ${SKIP_REASON}"
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Require pull_request event
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Run lint
+        run: |
+          set -euo pipefail
+          # CUSTOMIZE: このリポの lint コマンドに差し替える (例: npm run lint / ruff check / swiftlint)。
+          # 既定は Makefile の `lint` ターゲットを試み、無ければ「未設定」として赤で落ちる (fail-closed)。
+          if [ -f Makefile ] && grep -qE '^lint:' Makefile; then
+            make lint
+          else
+            echo "::error::lint command is not configured. Edit the CUSTOMIZE block in test-lint.yml — an unconfigured gate must not pass (fail-closed by design)."
+            exit 1
+          fi
