@@ -5,6 +5,7 @@
 # this lane. The script reads API state and never mutates tags, Releases, or repository data.
 # Exemptions come only from .github/release-sync-ignore on the target's default branch:
 # exact tag names, one per line, # comments, no globs. The active list is printed every run.
+# Classes: RED = missing/draft/orphan Release; WARNING = legacy/non-SemVer tag, staged/stray draft.
 #
 # Fail posture: every gh read uses --paginate --slurp. All responses are parsed and shape-
 # checked before any finding is printed. Any failed read or unparseable payload exits 2 with
@@ -31,6 +32,10 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 fail_read() {
   echo "ERROR: $1; refusing to report any findings." >&2
+  if [ -s "$TMP_DIR/api.err" ]; then
+    printf '  last API stderr: ' >&2
+    tail -n 2 "$TMP_DIR/api.err" >&2
+  fi
   exit 2
 }
 
@@ -130,11 +135,17 @@ release_state() {
   local tag=$1
   jq -r --arg tag "$tag" '
     [.[][] | select(.tag_name == $tag)] as $matches |
-    if any($matches[]; .draft == true) then "draft"
-    elif any($matches[]; .draft == false) then "published"
+    if any($matches[]; .draft == false) then "published"
+    elif any($matches[]; .draft == true) then "draft"
     else "none"
     end
   ' "$TMP_DIR/releases.json"
+}
+
+has_draft_release() {
+  local tag=$1
+  jq -e --arg tag "$tag" 'any(.[][]; .tag_name == $tag and .draft == true)' \
+    "$TMP_DIR/releases.json" >/dev/null
 }
 
 RED_COUNT=0
@@ -154,6 +165,11 @@ while IFS=$'\t' read -r TAG OBJECT_TYPE; do
     echo "RED: annotated SemVer tag $TAG has no GitHub Release."
     echo "  remediation: cd <clone> && gh release create $TAG --verify-tag --notes-from-tag"
     RED_COUNT=$((RED_COUNT + 1))
+  fi
+
+  if [ "$STATE" = "published" ] && has_draft_release "$TAG"; then
+    echo "WARNING: stray draft Release alongside published Release for $TAG"
+    WARNING_COUNT=$((WARNING_COUNT + 1))
   fi
 
   if [ "$OBJECT_TYPE" = "commit" ]; then

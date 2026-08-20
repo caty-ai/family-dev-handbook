@@ -22,7 +22,7 @@
 
 ## 展開手順（コピペ順）
 
-1. `templates/ci/*.yml`（**caller stencil**）を対象リポの `.github/workflows/` へ、`scripts/assemble_review_comment.py` を `scripts/ci/` へコピー（Layer 2 を使わないなら合成器は後回しでよい）。各ファイルの `uses:` 行が `caty-ai/family-dev-handbook/.github/workflows/reusable-<gate>.yml@ci-v1` を pin していることを確認する（バージョニングは下記「バージョニング」節を参照）
+1. `templates/ci/*.yml`（**caller stencil**）を対象リポの `.github/workflows/` へ、`scripts/assemble_review_comment.py` を `scripts/ci/` へコピー（Layer 2 を使わないなら合成器は後回しでよく、`release-sync.yml` は下記 release-sync 節の導入順（handbook release + `ci-v1` 前進の確認）を満たすまでコピーしない）。各ファイルの `uses:` 行が `caty-ai/family-dev-handbook/.github/workflows/reusable-<gate>.yml@ci-v1` を pin していることを確認する（バージョニングは下記「バージョニング」節を参照）
 2. `.github/risk-reviewers.txt` を作成: `risk-reviewers.txt.example` をコピーし、オーナー（人間）の GitHub ID を記入（プレースホルダのままなら赤）
 3. ラベルを作成:
    ```bash
