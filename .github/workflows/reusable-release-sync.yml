@@ -1,0 +1,232 @@
+# T-5 release fulfillment: turn a pushed annotated SemVer tag into a GitHub Release.
+#
+# Distribution: this file is the reusable source of truth. External callers pin
+# caty-ai/family-dev-handbook/.github/workflows/reusable-release-sync.yml@ci-v1;
+# the handbook itself uses a local-path caller (templates/ci/README.md).
+#
+# Design rationale / invariant (F-19): this job never checks out or executes repository
+# content. Every read is a GitHub API call; it creates Releases and mutates nothing else.
+# The write-capable token therefore never crosses into code controlled by the pushed tag.
+# Exemptions are read from .github/release-sync-ignore on the default branch, so a tagged
+# commit cannot exempt itself. Missing config means no exemptions; unreadable config is red.
+# Release notes are the tag object's message. The object SHA captured by the annotated-tag
+# check is reused for the message read and the saved message is piped to creation (A11): one
+# API snapshot, with post-snapshot tag moves left to the documented tag-ruleset boundary.
+# Existing Releases and drafts are never edited, published, or deleted. Every ambiguous API
+# result fails closed; a create race is green only after a published Release is observed.
+
+name: reusable-release-sync
+
+on:
+  workflow_call:
+
+jobs:
+  release-sync:
+    name: release-sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Require a pushed tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" != "push" ] || [[ "$REF" != refs/tags/* ]]; then
+            echo "::error::release-sync must be called from a push event for a tag ref; refusing to infer a tag (fail-closed). event=${EVENT_NAME} ref=${REF}"
+            exit 1
+          fi
+          TAG="${REF#refs/tags/}"
+          [ -n "$TAG" ] || { echo "::error::pushed tag name is empty — failing closed."; exit 1; }
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Read declared exemptions from the default branch
+        run: |
+          set -euo pipefail
+          DEFAULT_BRANCH=$(gh api "repos/$GH_REPO" --jq '.default_branch') || {
+            echo "::error::cannot read the repository default branch — failing closed."; exit 1; }
+          [ -n "$DEFAULT_BRANCH" ] && [ "$DEFAULT_BRANCH" != "null" ] || {
+            echo "::error::default branch is empty or malformed — failing closed."; exit 1; }
+
+          CONFIG_JSON="$RUNNER_TEMP/release-sync-ignore.json"
+          CONFIG_ERR="$RUNNER_TEMP/release-sync-ignore.err"
+          set +e
+          gh api --method GET \
+            "repos/$GH_REPO/contents/.github/release-sync-ignore" \
+            -f "ref=$DEFAULT_BRANCH" > "$CONFIG_JSON" 2> "$CONFIG_ERR"
+          CONFIG_RC=$?
+          set -e
+
+          CONFIG_FILE="$RUNNER_TEMP/release-sync-ignore"
+          if [ "$CONFIG_RC" -eq 0 ]; then
+            if ! jq -r 'if (.content | type) == "string" then .content else error("missing content") end' \
+              "$CONFIG_JSON" | tr -d '\n' | base64 --decode > "$CONFIG_FILE"; then
+              echo "::error::.github/release-sync-ignore on the default branch is malformed — failing closed."
+              exit 1
+            fi
+          elif grep -Fq '(HTTP 404)' "$CONFIG_ERR"; then
+            : > "$CONFIG_FILE"
+          else
+            echo "::error::cannot read .github/release-sync-ignore from the default branch — failing closed."
+            exit 1
+          fi
+
+          ACTIVE_FILE="$RUNNER_TEMP/release-sync-active-exemptions"
+          awk '{ sub(/\r$/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, "") }
+               /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+               { print }' "$CONFIG_FILE" > "$ACTIVE_FILE"
+          if grep -Fxq -- "$TAG" "$ACTIVE_FILE"; then
+            echo "::notice::declared exemption for $TAG in .github/release-sync-ignore on $DEFAULT_BRANCH; no Release will be created."
+            echo 'RELEASE_SYNC_EXEMPT=true' >> "$GITHUB_ENV"
+            exit 0
+          fi
+          echo 'RELEASE_SYNC_EXEMPT=false' >> "$GITHUB_ENV"
+
+      - name: Require v-prefixed SemVer
+        if: env.RELEASE_SYNC_EXEMPT != 'true'
+        run: |
+          set -euo pipefail
+          # semver.org's official regex, translated from PCRE to Bash ERE and prefixed by v.
+          SEMVER_RE='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\+([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$'
+          if [[ ! "$TAG" =~ $SEMVER_RE ]]; then
+            echo "::error::tag $TAG is not a v-prefixed SemVer tag — failing closed."
+            exit 1
+          fi
+          CORE_WITH_PRERELEASE="${TAG%%+*}"
+          if [[ "$CORE_WITH_PRERELEASE" == *-* ]]; then
+            echo 'IS_PRERELEASE=true' >> "$GITHUB_ENV"
+          else
+            echo 'IS_PRERELEASE=false' >> "$GITHUB_ENV"
+          fi
+
+      - name: Require an annotated tag
+        if: env.RELEASE_SYNC_EXEMPT != 'true'
+        run: |
+          set -euo pipefail
+          TAG_DATA=$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" \
+            --jq '[.object.type, .object.sha] | @tsv') || {
+              echo "::error::cannot resolve pushed tag $TAG through the GitHub API — failing closed."; exit 1; }
+          IFS=$'\t' read -r OBJECT_TYPE OBJECT_SHA <<< "$TAG_DATA"
+          if [ "$OBJECT_TYPE" = "commit" ]; then
+            echo "::error::tag $TAG is lightweight; T-5 requires an annotated SemVer tag. Delete and re-tag intentionally as a human."
+            exit 1
+          fi
+          if [ "$OBJECT_TYPE" != "tag" ] || [ -z "$OBJECT_SHA" ]; then
+            echo "::error::tag $TAG resolved to an unexpected or malformed Git object — failing closed."
+            exit 1
+          fi
+          echo "TAG_OBJECT_SHA=$OBJECT_SHA" >> "$GITHUB_ENV"
+
+      - name: Read and validate the tag-object message
+        if: env.RELEASE_SYNC_EXEMPT != 'true'
+        run: |
+          set -euo pipefail
+          TAG_MESSAGE_FILE="$RUNNER_TEMP/release-sync-tag-message"
+          if ! gh api "repos/$GH_REPO/git/tags/$TAG_OBJECT_SHA" --jq '.message | strings' > "$TAG_MESSAGE_FILE"; then
+            echo "::error::cannot read the message from tag object $TAG_OBJECT_SHA — failing closed."
+            exit 1
+          fi
+          if ! grep -q '[^[:space:]]' "$TAG_MESSAGE_FILE"; then
+            echo "::error::tag $TAG has an empty or whitespace-only message. Delete it and re-tag with a message carrying a pointer to verifiable evidence before creating a Release."
+            exit 1
+          fi
+          echo "TAG_MESSAGE_FILE=$TAG_MESSAGE_FILE" >> "$GITHUB_ENV"
+
+      - name: Check for an existing Release or draft
+        if: env.RELEASE_SYNC_EXEMPT != 'true'
+        run: |
+          set -euo pipefail
+
+          api_with_status() {
+            local endpoint=$1 body_file=$2 combined_file=$3 error_file=$4
+            local rc status
+            set +e
+            gh api --include "$endpoint" > "$combined_file" 2> "$error_file"
+            rc=$?
+            set -e
+            status=$(awk '/^HTTP\// { code=$2 } END { print code }' "$combined_file")
+            if [[ ! "$status" =~ ^[0-9]{3}$ ]]; then
+              echo "::error::GitHub API returned no parseable HTTP status for $endpoint (exit $rc) — failing closed." >&2
+              return 1
+            fi
+            awk 'body { print } /^\r?$/ { body=1 }' "$combined_file" > "$body_file"
+            printf '%s\n' "$status"
+          }
+
+          BODY="$RUNNER_TEMP/release-by-tag-body.json"
+          STATUS=$(api_with_status "repos/$GH_REPO/releases/tags/$TAG" "$BODY" \
+            "$RUNNER_TEMP/release-by-tag.response" "$RUNNER_TEMP/release-by-tag.err") || exit 1
+          case "$STATUS" in
+            200)
+              if ! jq -e '.draft == false' "$BODY" >/dev/null; then
+                echo "::error::release lookup for $TAG returned malformed or non-published data — failing closed."
+                exit 1
+              fi
+              echo "::notice::Release $TAG is already synced; no mutation performed."
+              echo 'CREATE_RELEASE=false' >> "$GITHUB_ENV"
+              ;;
+            404)
+              DRAFTS="$RUNNER_TEMP/release-drafts.json"
+              if ! gh api --paginate --slurp "repos/$GH_REPO/releases" > "$DRAFTS"; then
+                echo "::error::cannot scan Releases for a draft occupying $TAG — failing closed."
+                exit 1
+              fi
+              if ! DRAFT_COUNT=$(jq -er --arg tag "$TAG" \
+                'if type == "array" and all(.[]; type == "array") and all(.[][]; type == "object" and (.draft | type) == "boolean" and (.tag_name | type) == "string") then [.[][] | select(.draft == true and .tag_name == $tag)] | length else error("malformed pages") end' \
+                "$DRAFTS"); then
+                echo "::error::Release list for $TAG is malformed — failing closed."
+                exit 1
+              fi
+              if [ "$DRAFT_COUNT" -gt 0 ]; then
+                echo "::error::a draft Release already occupies tag $TAG; a human must publish or delete the draft. release-sync refuses to guess."
+                exit 1
+              fi
+              echo 'CREATE_RELEASE=true' >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "::error::release lookup for $TAG returned HTTP $STATUS — failing closed."
+              exit 1
+              ;;
+          esac
+
+      - name: Create the Release from the captured tag message
+        if: env.RELEASE_SYNC_EXEMPT != 'true' && env.CREATE_RELEASE == 'true'
+        run: |
+          set -euo pipefail
+          CREATE_ARGS=("$TAG" --verify-tag --title "$TAG" --notes-file -)
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            CREATE_ARGS+=(--prerelease)
+          fi
+
+          if cat "$TAG_MESSAGE_FILE" | gh release create "${CREATE_ARGS[@]}"; then
+            echo "::notice::created published Release $TAG from the annotated tag message."
+            exit 0
+          fi
+
+          # A concurrent creator may have won the race. Re-check once; only an observable,
+          # published Release is fulfillment. A draft or another error remains red.
+          RESPONSE="$RUNNER_TEMP/release-create-recheck.response"
+          BODY="$RUNNER_TEMP/release-create-recheck.json"
+          ERR="$RUNNER_TEMP/release-create-recheck.err"
+          set +e
+          gh api --include "repos/$GH_REPO/releases/tags/$TAG" > "$RESPONSE" 2> "$ERR"
+          RECHECK_RC=$?
+          set -e
+          STATUS=$(awk '/^HTTP\// { code=$2 } END { print code }' "$RESPONSE")
+          if [[ "$STATUS" =~ ^[0-9]{3}$ ]]; then
+            awk 'body { print } /^\r?$/ { body=1 }' "$RESPONSE" > "$BODY"
+          else
+            echo "::error::Release creation for $TAG failed and the re-check had no parseable HTTP status (exit $RECHECK_RC)."
+            exit 1
+          fi
+          if [ "$STATUS" = "200" ] && jq -e '.draft == false' "$BODY" >/dev/null; then
+            echo "::notice::Release $TAG was published concurrently; treating the idempotent race as synced."
+            exit 0
+          fi
+          echo "::error::Release creation for $TAG failed and no published Release was confirmed (HTTP $STATUS)."
+          exit 1

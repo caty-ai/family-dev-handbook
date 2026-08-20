@@ -1,0 +1,12 @@
+name: release-sync
+on:
+  push:
+    tags: ['v*']
+permissions: {}
+concurrency:
+  group: 'release-sync-${{ github.ref }}'
+  cancel-in-progress: false
+jobs:
+  release-sync:
+    uses: ./.github/workflows/reusable-release-sync.yml
+    permissions: {contents: write}
