@@ -198,7 +198,7 @@ handbook-revision 的值请不要改动。
 3. 把第一行的 `owner` 和 `last-verified` 改成你自己和今天的日期。`handbook-revision` 原样保留
 4. 把第二行的 `正本:` 改成本仓库的 URL（如果你 fork 了，就填你 fork 的地址）
 
-要粘贴的就这些。里面只有九套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-7`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
+要粘贴的就这些。里面只有十套 rule ID（`L2-1`–`L2-6` / `L1-1`–`L1-11` / `L0-1`–`L0-9` / `FP-1`–`FP-9` / `E-1`–`E-10` / `B-1`–`B-5` / `LC-1`–`LC-5` / `R-1`–`R-6` / `T-1`–`T-7` / `PB-1`–`PB-5`）和每一条一行的姿态，条文正文并不在里面。**正文的正本是这个仓库，摘要与正本不一致时，以正本为准。** 按自己的仓库把它改得更严格是自由的，但放宽是禁止的。
 
 想停用的话，把粘进去的那 50 行左右删掉就回到原样。其他文件一概不碰。
 
@@ -254,7 +254,7 @@ flowchart TD
 
 ## 规则全景
 
-规则分为九套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
+规则分为十套，每一条都带着不会改变的 ID。摘要、对话、Issue，全都用这些 ID 互相指认。
 
 | 体系 | 决定什么 | rule ID | 正文 |
 |---|---|---|---|
@@ -267,6 +267,7 @@ flowchart TD
 | **LC** 生命周期 | 放下的东西何时、如何退场 | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 拒收准则 | 接受什么、拒绝什么 | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
 | **T** 测试与 CI 基准 | 如何积累“正确”的证明 | `T-1`–`T-7` | [docs/10](docs/10-test-ci-baseline.md) |
+| **PB** 公开准备 | 仓库公开靠什么把关 | `PB-1`–`PB-5` | [docs/11](docs/11-publication.md) |
 
 其中有两条特别左右成效。一条是 **FP** 的口号“无法验证就串行。fail-open 不等于‘通过’”——它宣告的是：即便你有意选择在无法确认时放行，那也绝不能被读成“已确认”。另一条是**高风险领域的单一定义**，碰到这里的工作一定要停下来等人确认，评审席位也会增加（对外发布、计费、不可逆操作、权限边界之类都算。准确的界线请看正本）。为了不让同一个定义存在于两个地方，正本只放在 [docs/06](docs/06-epic-lane.md) 这一处。
 
@@ -274,6 +275,8 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 <details>
 <summary>核心契约 P1–P5（v0.1.0 引入的五根脊梁）</summary>
+
+核心契约 P1–P5 与 PB 层（`PB-1`–`PB-5`・[docs/11](docs/11-publication.md)）是两回事。
 
 | 契约 | 内容 | rule ID |
 |---|---|---|
@@ -312,9 +315,11 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC 工作区生命周期 — 把“退场”变成契约的层；退场条件的数值以本地设置为正本（`LC-1`–`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 拒收准则 — 决定接受什么、拒绝什么的意图层：自动拒收的三个理由、欢迎/拒收的判断标准、前提验证、放置阶梯、把方针升格为 check（`R-1`–`R-6`） |
 | [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T 测试与 CI 基准 — 初期整备、回归测试既定、简报对接、fail-closed merge、发布既定、测试输出契约、徽章与数字的诚实性。附录为非规范性的运行器速查表（`T-1`–`T-7`） |
+| [docs/11-publication.md](docs/11-publication.md) | PB 公开准备 — 用正本检查清单为仓库公开把关的一层（`PB-1`–`PB-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue 模板与全部车道评论格式（WIP / HOLD / 终结 / TAKEOVER / 恢复检查 / 完成记录） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic 模板与人类检查点表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委派简报模板（三层结构与写法要点） |
+| [templates/publication-checklist.md](templates/publication-checklist.md) | 仓库公开检查清单 — A1–E4 逐项判定・步骤・证据 artifact 的正本 |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 放进各仓库 `ARCHITECTURE.md` 的“并行安全地图”模板 |
 | [templates/ci/](templates/ci/README.md) | 机器门禁模板一套 — 测试+lint / 密钥检测 / PR 体积 / 拒绝历史断裂 / 高风险人工确认门 / 报告汇总器（附部署指南） |
 | [templates/conformance/](templates/conformance/README.md) | 席位决定的 31 条验证向量（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）与成员侧的运行方法 |
