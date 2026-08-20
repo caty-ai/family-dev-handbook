@@ -1,0 +1,13 @@
+name: tmp dry-run gitleaks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    uses: ./.github/workflows/reusable-gitleaks.yml
+    permissions:
+      contents: read

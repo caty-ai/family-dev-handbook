@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "tmp-dryrun-fixture"
+description = "Harmless inline rule for the #90 validation dry-run"
+regex = '''DRYRUN_FIXTURE_[0-9]{40}'''
