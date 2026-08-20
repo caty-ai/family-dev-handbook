@@ -92,26 +92,29 @@ jobs:
           done
           if [ -n "$BASE_CONFIG" ]; then
             git show "origin/${BASE_REF}:${BASE_CONFIG}" > /tmp/gitleaks-base-config.toml
-            # [extend] の path は「設定ファイルの位置」ではなく実行時の作業ディレクトリ基準で解決される。
-            # base 設定が extend.path を持つと、参照先ファイルを PR 側 (checkout ツリー) が差し替えられ、
-            # base 固定を迂回できる。path の無い useDefault = true のみは gitleaks 内蔵デフォルトを参照し、
-            # PR ツリーが差し替えられるファイルが無いため例外として許可する。それ以外の extend は赤。
+            # extend は top-level key を大文字小文字を区別せず検出する。gitleaks は設定 key を再帰的に
+            # lowercase 化するため、case variant の extend.path も PR 側ファイルへの迂回になる。
+            # canonical lowercase の extend が一つだけあり、その中身が useDefault = true だけの場合に限り、
+            # PR ツリーが差し替えられるファイルを参照しないため許可する。それ以外の extend は赤。
             # 検出は文字列マッチではなく TOML の実パース ([ extend ]・["extend"]・inline table 等の
             # 別記法をすり抜けさせない)。パースできない設定も赤 (判定不能 = 赤・FP-6)。
             python3 -c '
-          import sys, tomllib
+          import sys
           try:
+              import tomllib
               with open("/tmp/gitleaks-base-config.toml", "rb") as f:
                   data = tomllib.load(f)
           except Exception as e:
               print(f"::error::base gitleaks config is not parseable TOML ({e}) — cannot judge, failing closed.")
               sys.exit(1)
-          if "extend" in data and not (
-              isinstance(data["extend"], dict)
+          ext_keys = [k for k in data if k.lower() == "extend"]
+          if ext_keys and not (
+              ext_keys == ["extend"]
+              and isinstance(data["extend"], dict)
               and set(data["extend"]) == {"useDefault"}
               and data["extend"]["useDefault"] is True
           ):
-              print("::error::base gitleaks config contains a disallowed extend value — extend paths resolve against the working directory and can be redirected to PR-controlled files. Only extend = { useDefault = true } (equivalently, [extend] containing only useDefault = true) is allowed; all other extend forms fail closed.")
+              print("::error::base gitleaks config contains a disallowed extend value — the top-level extend key is matched case-insensitively because gitleaks lowercases config keys. Only one canonical lowercase extend containing exactly useDefault = true is allowed; every case variant, sibling variant, and other extend form fails closed.")
               sys.exit(1)
           ' || exit 1
             CONFIG_ARGS=(--config /tmp/gitleaks-base-config.toml)
