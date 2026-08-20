@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.17.0-blue)
+![version](https://img.shields.io/badge/version-v0.18.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
 ![status](https://img.shields.io/badge/status-active-lightgrey)
@@ -367,7 +367,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.17.0**（2026-08-21）。新增用于机器强制执行 `T-5` 发布履行的层（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync 载体**（[templates/ci/](templates/ci/README.md)・reusable 为纯 API 实现＝无 checkout）— 推送 annotated SemVer 的 `v*` 标签即自动创建 GitHub Release（notes＝标签消息；lightweight／非 SemVer／空消息标签为红；豁免仅来自 default branch 上的 `.github/release-sync-ignore`，被标签的树无法自我豁免）。② **漂移审计**（`templates/ci/check-release-drift.sh`）— 仅通过 API 检测并报告标签与 Releases 的偏离（仅检测、不自动删除；状态不可读时以 exit 2 结束且不输出任何 findings）。③ **条文跟进** — tag URL 义务现在**包含 Release 的实际存在**才算履行（[docs/10](docs/10-test-ci-baseline.md) `T-5`；裸标签的 `/releases/tag/<名称>` URL 也返回 200，URL 的存在不代表 Release 的存在）。record-vs-reality 的 PR-side check 与定期扫描在 [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) 中跟踪。
+当前版本是 **v0.18.0**（2026-08-21）。新增为仓库公开设门的 **PB 层**（`PB-1`〜`PB-5`・[docs/11](docs/11-publication.md)）及其正本检查清单（[templates/publication-checklist.md](templates/publication-checklist.md)・A1〜E4 共28项）（[#109](https://github.com/caty-ai/family-dev-handbook/issues/109)；盘点与 owner 决裁见 [#100](https://github.com/caty-ai/family-dev-handbook/issues/100)）。公开车道以逐项 PASS / FAIL / 带理由 N/A 表与证据 artifact 写完成记录，只要仍有 FAIL 或无法验证的项目就不公开（fail-closed）。(c) 项目仅凭 owner 发行的记录通过（3种发行者要件；绝对不能靠自我申报通过）。两项 owner 决裁已写入条文与清单：超大 vendored 正本文件的 `size-exempt` 标签唯一宣言形（D7），以及公开前全历史 secret 扫描的 must-pass 化（C1——在机制建成前以手动扫描 + transcript 充足）。层 ID 采用 `PB` 以避免与冻结的核心契约 P1〜P5 冲突（设计评审3席的收敛 finding）。PB-5 为限时试点条款，在指定的第1、第2消费者车道的缺口回流反映到正本后失效。
+
+- **v0.17.0**（2026-08-21） — 新增用于机器强制执行 `T-5` 发布履行的层（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync 载体**（[templates/ci/](templates/ci/README.md)・reusable 为纯 API 实现＝无 checkout）— 推送 annotated SemVer 的 `v*` 标签即自动创建 GitHub Release（notes＝标签消息；lightweight／非 SemVer／空消息标签为红；豁免仅来自 default branch 上的 `.github/release-sync-ignore`，被标签的树无法自我豁免）。② **漂移审计**（`templates/ci/check-release-drift.sh`）— 仅通过 API 检测并报告标签与 Releases 的偏离（仅检测、不自动删除；状态不可读时以 exit 2 结束且不输出任何 findings）。③ **条文跟进** — tag URL 义务现在**包含 Release 的实际存在**才算履行（[docs/10](docs/10-test-ci-baseline.md) `T-5`；裸标签的 `/releases/tag/<名称>` URL 也返回 200，URL 的存在不代表 Release 的存在）。record-vs-reality 的 PR-side check 与定期扫描在 [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) 中跟踪。
 
 - **v0.16.0**（2026-08-19） — 新增两条条文，用于封闭测试与状态展示中的诚实性缺口（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **测试输出契约**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族编写的运行器须动态输出 `suites: declared=N executed=M skipped=K` 三字段摘要，并以 `declared = executed + skipped` 为不变条件。exit code 采用闭合集；必需依赖缺失时输出 `missing-dep:` 并以 127 退出；即使异常退出也必须输出摘要。SKIP 率超过 20% 即为红；如调整上限，须按 LC-3 型在本地保存数值并记录理由。只有 CI 对账 gate 开启后，才算完成采用。② **展示契约**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 只有机器涂出的结果才能是绿色。带 README 的公开仓库必须展示绑定 T-1 测试 workflow 的 live badge，或灰色的 `CI: not yet`；静态颜色只允许闭合列举中的 `lightgrey` / `blue`。Project status 的标准形式直接写入条文，实测数字必须附 run URL 和实测日期。设计起点为 consistency campaign W0-4 与 family-os#56，并经 3 席设计评审冻结。
 
