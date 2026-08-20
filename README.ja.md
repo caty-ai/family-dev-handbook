@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.17.0-blue)
+![version](https://img.shields.io/badge/version-v0.18.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
 ![status](https://img.shields.io/badge/status-active-lightgrey)
@@ -365,7 +365,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.17.0**（2026-08-21）。T-5 のリリース履行を機械で強制する層が加わりました（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync キャリアー**（[templates/ci/](templates/ci/README.md)・reusable は API-only＝checkout なし）— annotated SemVer の `v*` タグ push から GitHub Release を自動作成します（notes はタグメッセージ・lightweight／非 SemVer／空メッセージは赤・免除は default branch 上の `.github/release-sync-ignore` のみ＝タグ側ツリーからの自己免除は不成立）。② **ドリフト監査**（`templates/ci/check-release-drift.sh`）— タグと Releases の乖離を API だけで検知してレポートします（検知のみ・自動削除なし・読めない時は findings ゼロで exit 2）。③ **条文追随** — tag URL 義務は **Release 実在まで含めて履行**になりました（[docs/10](docs/10-test-ci-baseline.md) `T-5`。素のタグでも `/releases/tag/<名前>` の URL は 200 を返すため、URL の存在は Release の存在を意味しません）。record-vs-reality の PR-side check と定期スイープは [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) で追跡します。
+現行バージョンは **v0.18.0**（2026-08-21）。リポジトリ公開をゲートする **PB 層**（`PB-1`〜`PB-5`・[docs/11](docs/11-publication.md)）と、その正本チェックリスト（[templates/publication-checklist.md](templates/publication-checklist.md)・A1〜E4 の28項目）が加わりました（[#109](https://github.com/caty-ai/family-dev-handbook/issues/109)・棚卸しと決裁の親 = [#100](https://github.com/caty-ai/family-dev-handbook/issues/100)）。公開レーンは項目ごとの PASS / FAIL / 理由付き N/A と証拠 artifact で完了記録を書き、FAIL または検証不能な項目が残る限り公開しません（fail-closed）。(c) 項目はオーナー発行の記録（3形の発行者要件・自己申告は絶対に通過しない）だけで通過します。オーナー決裁2件 — 巨大 vendored 正本ファイルの `size-exempt` ラベル一本化（D7）と、公開前の全履歴 secret スキャンの must-pass 化（C1・ジョブ実装までは手動走査 + transcript）— を条文とチェックリストに焼き込みました。層 ID はコア契約 P1〜P5 との衝突を避けて `PB` です（設計レビュー3席の収束 finding）。PB-5 は時限のパイロット条項で、指名された第1・第2消費者レーンのギャップ還流が正本へ反映された時点で失効します。
+
+- **v0.17.0**（2026-08-21） — T-5 のリリース履行を機械で強制する層が加わりました（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync キャリアー**（[templates/ci/](templates/ci/README.md)・reusable は API-only＝checkout なし）— annotated SemVer の `v*` タグ push から GitHub Release を自動作成します（notes はタグメッセージ・lightweight／非 SemVer／空メッセージは赤・免除は default branch 上の `.github/release-sync-ignore` のみ＝タグ側ツリーからの自己免除は不成立）。② **ドリフト監査**（`templates/ci/check-release-drift.sh`）— タグと Releases の乖離を API だけで検知してレポートします（検知のみ・自動削除なし・読めない時は findings ゼロで exit 2）。③ **条文追随** — tag URL 義務は **Release 実在まで含めて履行**になりました（[docs/10](docs/10-test-ci-baseline.md) `T-5`。素のタグでも `/releases/tag/<名前>` の URL は 200 を返すため、URL の存在は Release の存在を意味しません）。record-vs-reality の PR-side check と定期スイープは [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) で追跡します。
 
 - **v0.16.0**（2026-08-19） — テストと表示の正直さを閉じる2条を追加しました（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **テスト出力契約**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族製ランナーは `suites: declared=N executed=M skipped=K` の3値サマリを動的に出し、`declared = executed + skipped` を不変条件にします。exit code は閉じた集合、必須依存の欠落は `missing-dep:` と 127、異常終了でもサマリ必須です。SKIP 率20%超を赤とし、上限を変える場合は LC-3 型でローカル値と根拠を記録します。採用完了は CI の照合ゲートが有効になった時点です。② **表示契約**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 緑は機械が塗ったものだけ。README を持つ公開リポは T-1 の test workflow に結びつく live バッジか灰の `CI: not yet` を必ず示し、静的色は `lightgrey` / `blue` の閉じた列挙に限定します。条文内に Project status の標準形を置き、実測数字には run URL と実測日を必須にしました。設計の起点は consistency campaign W0-4 と family-os#56、確定は3席の設計レビューです。
 

@@ -29,7 +29,7 @@
 各エージェントの常時コンテキストに、以下をそのまま貼る:
 
 ```markdown
-## 並行開発プロトコル要約（handbook-revision: 2026-08-19 (v0.16.0) / owner: 貼った本人名 / last-verified: 貼った日付）
+## 並行開発プロトコル要約（handbook-revision: 2026-08-21 (v0.18.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
 この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜11、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
