@@ -1,6 +1,6 @@
 # Issue / レーンコメント テンプレート
 
-各契約（rule ID）のフィールドスキーマの正本。本文側（docs/01〜03・05〜10）は最小 MUST 文のみを持ち、詳細はここに置く。
+各契約（rule ID）のフィールドスキーマの正本。本文側（docs/01〜03・05〜11）は最小 MUST 文のみを持ち、詳細はここに置く。
 EPIC Issue と Epic レーン固有の様式（チェックポイント表・Epic ログ・ライトゲート記録・Epic 終端）は [epic-template.md](epic-template.md)（E 系）。Epic 内の子 Issue は本ページの様式をそのまま使う。
 
 ## Issue 本文（L1-2）

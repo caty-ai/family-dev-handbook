@@ -10,7 +10,7 @@
 
 - **バージョン刻印付きのコンパクト要約のオーナーは本ページ（docs/04）ただ1つ**。下流コピー（各 CLAUDE.md / AGENTS.md / system prompt）は owner-applies — 幹事エージェントが提案し、各ランタイムのオーナーが自分で貼る
 - 下流のローカル要約・上書きは、正本より**厳しくするのは可・緩めるのは禁止**（tighten only）。この原則のエージェント横断規範オーナーは family-os の operations-policy（config trust 節 — [README](../README.ja.md) の「Caty AI ファミリー」節参照）。本ページはその協働プロトコルへの適用。sister projects なしで導入する場合は tighten-only 原則をそのまま適用すればよい
-- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜10、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- 要約は本文を書き写さず **rule ID + 1行ポスチャ**で参照する。ID の定義本文は docs/01〜03・05〜11、コメント様式のフィールドスキーマは templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## エージェント別の組み込み先
 
@@ -31,7 +31,7 @@
 ```markdown
 ## 並行開発プロトコル要約（handbook-revision: 2026-08-19 (v0.16.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜11、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -94,6 +94,11 @@ T テスト&CI基準: T-1 コードを含む新規リポは作成時にテスト
   T-6 家族製ランナーは PASS/FAIL/SKIP と動的3値サマリ（declared/executed/skipped・declared=executed+skipped）+閉じた exit code・必須依存欠落は missing-dep 付き127・異常終了でもサマリ必須・
   SKIP率20%超は赤（変更値はCI caller入力を正本+記録）・整備済みは require_suite_reconciliation: true のCI照合が有効になった時点 /
   T-7 公開READMEはT-1 test workflowのliveバッジか灰のCI: not yetを必須表示・静的色はlightgrey/blueのみ・実測数字はrun URL+実測日必須・Project status標準形は条文内蔵
+PB 公開準備: PB-1 リポ公開は正本チェックリストの項目別PASS/FAIL/理由付きN/A+証拠でゲート・検証不能は未通過（fail-closed） /
+  PB-2 正本は templates/publication-checklist.md・原則リリースタグ、未包含時だけcommit SHA+後続タグ追記 /
+  PB-3 (a)=run URL・(b)=名指し手動手順+記録・(c)=オーナー発行3形のみ、自己申告禁止 /
+  PB-4 完了記録は1レーン1つをレーンIssueへ置くL1-7特則・PRはポインタ1行・run URL実在+head SHA一致 /
+  PB-5 第1・第2消費者のギャップを#100へ還流して失効する時限パイロット条項
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
@@ -105,6 +110,7 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 2. Issue テンプレート（[templates/issue-template.md](../templates/issue-template.md)）を `.github/ISSUE_TEMPLATE/` に置く（任意だが推奨）
 3. main の直接 push を避ける運用を全員で守る（branch protection が張れる場合は張る）
 4. テストランナー + CI workflow を整備し、required status checks に登録する（[T-1](10-test-ci-baseline.md)・型は [templates/ci/](../templates/ci/README.md)。非コードリポは理由付き N/A を Issue に1行）
+5. リポジトリを公開する時は公開チェックリスト（[PB-1](11-publication.md)・[templates/publication-checklist.md](../templates/publication-checklist.md)）でレーンをゲートする
 
 ## 役割分担はエージェントごとに自由
 
