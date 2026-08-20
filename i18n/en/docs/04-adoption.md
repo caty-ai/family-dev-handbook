@@ -112,7 +112,7 @@ For a new repo (or one applying this protocol for the first time):
 2. Place the Issue template ([templates/issue-template.md](../templates/issue-template.md)) under `.github/ISSUE_TEMPLATE/` (optional, but recommended)
 3. Have everyone honor a no-direct-push-to-main policy (enable branch protection where possible)
 4. Set up a test runner + CI workflow and register it as a required status check ([T-1](10-test-ci-baseline.md); the template type lives at [templates/ci/](../../../templates/ci/README.md). A non-code repo records a one-line justified N/A on its Issue)
-5. When publishing a repository, gate the lane with the publication checklist ([PB-1](11-publication.md); [templates/publication-checklist.md](../../../templates/publication-checklist.md))
+5. When publishing a repository, gate the lane with the publication checklist ([PB-1](11-publication.md); [templates/publication-checklist.md](../templates/publication-checklist.md))
 
 ## Role assignment is up to each agent
 

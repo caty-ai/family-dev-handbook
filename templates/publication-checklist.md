@@ -43,7 +43,7 @@ checklist release tag (追記): <その状態を含む handbook release tag>
 
 | ID | 項目 | 分類 | 今日どう通すか | 証拠 artifact |
 |---|---|---|---|---|
-| A1 | リポジトリ作成時から test を gate とする CI を置く（T-1）。CI がまだ無い場合は緑を装わず、README に `CI: not yet` と書く | (b) — no bootstrap conformance check exists; T-1 is prose | test-lint caller の存在と pin を目視確認し、実行する。未整備なら README の `CI: not yet` を確認する | test-lint caller の初回 run URL、または README の明示的な `CI: not yet` |
+| A1 | リポジトリ作成時から test を gate とする CI を置く（T-1）。CI がまだ無い場合は緑を装わず、README に `CI: not yet` と書く | (b) — no bootstrap conformance check exists; T-1 is prose | test-lint caller の存在を目視確認し、実行する。未整備なら README の `CI: not yet` を確認する | test-lint caller の初回 run URL、または README の明示的な `CI: not yet` |
 | A2 | `make test` / `make lint` の入口が存在し、終了コードを伝播する（campaign rule 4。強制失敗時に make が Error になることまで確認する） | (b) — checkable by a bootstrap script; today proven only by seat sandbox runs | `make test` と `make lint` を実行し、隔離した作業状態で意図的な失敗を入れて非0終了を確認する | ローカル実行 transcript + 強制失敗の証明 |
 | A3 | lint target を no-op にしない。失敗不能な lint を緑のバッジの背後に置かない | (b) — mechanizable as "lint job must have ≥1 failable step / placeholder-echo detector" | lint 違反を一時的に導入し、lint が赤になることを隔離した作業状態で確認する | lint 違反を導入した mutation が赤になる証明 |
 | A4 | 5つの gate caller（test-lint / pr-size / review-labels / gitleaks / history-check）が存在し、`@ci-v1` に pin され、`templates/ci` の正本と byte-identical であり、走査ロジックをリポジトリ内へ複製していない | (a) today the *identity* is seat-verified by hand; caller presence is machine-fact | 5 caller の初回 run URL を記録し、各ファイルの SHA256 を正本と照合する | 正本との SHA256 照合 + 初回 run URL |

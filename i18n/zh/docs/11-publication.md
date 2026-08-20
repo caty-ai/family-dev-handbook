@@ -4,13 +4,15 @@
 
 L 层（L2 / L1 / L0）是「如何推进工作」的契约，R 层是「接受什么」的契约，T 层是「如何积累正确性的证明」的契约，与此相对，PB 层规定的是**公开仓库的车道，如何用逐项证据证明公开前的确认已经完成**这一契约。每条规则都附有稳定的 rule ID（`PB-1`〜`PB-5`），并在每条规则处用〔 〕明确其适用对象。完成记录的正本见 [docs/02](02-issue-loop.md)，无法验证时的姿态见 [docs/05](05-fail-posture.md)，出货与证据的规律见 [docs/10](10-test-ci-baseline.md)。正本的置放遵循 [R-5](09-rejection-rubric.md) 的放置阶梯，后续升格为 check 遵循 [R-6](09-rejection-rubric.md) 的一般规律，价值判断不超越 [R-1](09-rejection-rubric.md)。
 
+本层的 `PB-1`〜`PB-5` 与 README 的核心契约 `P1`〜`P5`（v0.1.0・冻结）是两回事。
+
 背景: 在家系仓库的整合 campaign 中，展示的诚实性、CI 的实效性、密钥与历史、评审、完成记录、组织联动，都是逐个仓库靠人工验证的。这份实绩在 [Issue #100](https://github.com/caty-ai/family-dev-handbook/issues/100) 的 Phase 1〜4 中被盘点，整理成 [Phase 2 的28项](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5355210694) 与 [Phase 4 的条文骨架](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5355215540) 之后，经 [owner 专属决定](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5359570954) 确定了宣告形式、必须度与试点顺序。本章把这份结果定为公开车道的门禁。
 
 <a id="pb-1"></a>
 
 ## PB-1 门禁束缚 — 公开靠逐项证据来把关〔private→public 切换・新建 public = MUST〕
 
-**公开仓库的车道，应以 [PB-2](#pb-2) 的正本检查清单来把关。完成记录中应放置以检查清单的表头为样式正本的逐项 PASS / FAIL / N/A 表，以及每一项所指定的证据 artifact。无法验证的项目视为未通过，不予公开。**
+**公开仓库的车道，应以 [PB-2](#pb-2) 的正本检查清单来把关。完成记录中应放置以检查清单的表头为样式正本的逐项 PASS / FAIL / N/A 表，以及每一项所指定的证据 artifact。无法验证的项目视为未通过。只要仍有 FAIL 或未通过的项目，就不予公开。**
 
 理由: 在 campaign 中，全部项目都出现过真实的失败案例，仅靠散文式的提醒无法防住。要求逐项证据，就能堵住把"未确认"的状态当成"已确认"的路径。这是把 [docs/05](05-fail-posture.md) 的 fail-closed 姿态应用到公开车道，让展示的诚实性与 [T-7](10-test-ci-baseline.md) 保持同一含义。
 

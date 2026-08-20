@@ -4,13 +4,15 @@
 
 Where the L layers (L2 / L1 / L0) are the contract for **how work proceeds**, the R layer is the contract for **what gets accepted**, and the T layer is the contract for **how proof of correctness is accumulated**, the PB layer sets the contract for **how a lane publishing a repository shows that its pre-publication checks are complete, item by item, with evidence**. Each rule carries a stable rule ID (`PB-1` through `PB-5`), and the scope of application for each clause is noted in 〔 〕. The canonical home for completion records is [docs/02](02-issue-loop.md), the stance to take when verification isn't possible is [docs/05](05-fail-posture.md), and the discipline of shipping and evidence is [docs/10](10-test-ci-baseline.md). The canonical placement follows [R-5](09-rejection-rubric.md)'s placement ladder, promoting a policy to a check afterward follows [R-6](09-rejection-rubric.md)'s general discipline, and value judgment never goes beyond [R-1](09-rejection-rubric.md).
 
+This layer's `PB-1`–`PB-5` are distinct from the README's core contracts `P1`–`P5` (v0.1.0, frozen).
+
 Background: in the family-repository consistency campaign, display honesty, CI effectiveness, secrets and history, review, completion records, and org integration were each verified by hand, repository by repository. [Issue #100](https://github.com/caty-ai/family-dev-handbook/issues/100)'s Phase 1–4 took stock of that track record, organized it into [Phase 2's 28 items](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5355210694) and [Phase 4's clause skeleton](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5355215540), and then [an owner ruling](https://github.com/caty-ai/family-dev-handbook/issues/100#issuecomment-5359570954) settled the declaration forms, required-ness, and pilot order. This chapter defines the result as the gate for a publication lane.
 
 <a id="pb-1"></a>
 
 ## PB-1 Gate Binding — Publication Stops on Item-by-Item Evidence〔a private→public switch, or creating a new public repo = MUST〕
 
-**A lane that publishes a repository is gated by [PB-2](#pb-2)'s canonical checklist. Its completion record carries an item-by-item PASS / FAIL / N/A table — whose canonical format is the checklist's own header — plus the evidence artifact each item specifies. An item that can't be verified counts as not passed, and the repository does not get published.**
+**A lane that publishes a repository is gated by [PB-2](#pb-2)'s canonical checklist. Its completion record carries an item-by-item PASS / FAIL / N/A table — whose canonical format is the checklist's own header — plus the evidence artifact each item specifies. An item that can't be verified counts as not passed. As long as any item remains FAIL or not passed, the repository does not get published.**
 
 Reason: in the campaign, every item had a real-world failure example, and a prose caveat alone did not prevent it. Requiring evidence per item closes off the route where an unverified state gets treated as "verified." This applies [docs/05](05-fail-posture.md)'s fail-closed stance to the publication lane, and keeps display honesty meaning the same thing as [T-7](10-test-ci-baseline.md).
 

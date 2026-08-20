@@ -16,9 +16,9 @@
 
 ```text
 checklist version: <handbook release tag>
-# 仅 tag 未包含时
+# タグ未包含時だけ
 checklist commit: <full commit SHA>
-checklist release tag (追记): <包含该状态的 handbook release tag>
+checklist release tag (追記): <その状態を含む handbook release tag>
 ```
 
 ## 消费者步骤
@@ -27,9 +27,9 @@ checklist release tag (追记): <包含该状态的 handbook release tag>
 2. 在车道 Issue 的完成记录中恰好放置一份下表。判定为 `PASS` / `FAIL` / 带理由的 `N/A` 之一，证据栏记录各项指定的证据 artifact 本体或可解析的指针。
 
    ```markdown
-   | ID | 判定 | 证据 artifact | 备注 |
+   | ID | 判定 | 証拠 artifact | 注記 |
    |---|---|---|---|
-   | A1 | PASS / FAIL / N/A（理由） | <该项指定的证据> | <必要的补充> |
+   | A1 | PASS / FAIL / N/A（理由） | <項目指定の証拠> | <必要な補足> |
    ```
 
 3. 在 public→private→public 的再公开中，引用最近一次完成记录，重走前次以后发生变化的项目，以及再公开可能改变结果的项目。新表须列出全部28项，复用的证据注明引用来源，重走的证据记录本次的 artifact。
@@ -45,7 +45,7 @@ checklist release tag (追记): <包含该状态的 handbook release tag>
 
 | ID | 项目 | 分类 | 今天如何通过 | 证据 artifact |
 |---|---|---|---|---|
-| A1 | 从仓库创建之初就放置以 test 为 gate 的 CI（T-1）。CI 尚未整备时不得伪装成绿色，须在 README 中写明 `CI: not yet` | (b) — no bootstrap conformance check exists; T-1 is prose | 目视确认 test-lint caller 的存在与 pin，并执行。尚未整备时确认 README 中的 `CI: not yet` | test-lint caller 的首次 run URL，或 README 中明确写出的 `CI: not yet` |
+| A1 | 从仓库创建之初就放置以 test 为 gate 的 CI（T-1）。CI 尚未整备时不得伪装成绿色，须在 README 中写明 `CI: not yet` | (b) — no bootstrap conformance check exists; T-1 is prose | 目视确认 test-lint caller 的存在，并执行。尚未整备时确认 README 中的 `CI: not yet` | test-lint caller 的首次 run URL，或 README 中明确写出的 `CI: not yet` |
 | A2 | `make test` / `make lint` 的入口存在，且能传播终止代码（campaign rule 4。须确认强制失败时 make 会变成 Error） | (b) — checkable by a bootstrap script; today proven only by seat sandbox runs | 执行 `make test` 与 `make lint`，在隔离的作业状态中故意引入失败，确认返回非 0 终止代码 | 本地执行 transcript + 强制失败的证明 |
 | A3 | 不把 lint target 设为 no-op。不把无法失败的 lint 藏在绿色徽章背后 | (b) — mechanizable as "lint job must have ≥1 failable step / placeholder-echo detector" | 临时引入 lint 违规，在隔离的作业状态中确认 lint 变红 | 引入 lint 违规的 mutation 会变红的证明 |
 | A4 | 存在5个 gate caller（test-lint / pr-size / review-labels / gitleaks / history-check），均 pin 在 `@ci-v1`，与 `templates/ci` 的正本 byte-identical，且没有把扫描逻辑复制进仓库内 | (a) today the *identity* is seat-verified by hand; caller presence is machine-fact | 记录 5 个 caller 的首次 run URL，并将各文件的 SHA256 与正本比对 | 与正本的 SHA256 比对 + 首次 run URL |
