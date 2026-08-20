@@ -70,7 +70,7 @@ remaining work / successor: <残作業 or 引き継ぎ先>
 
 evidence / successor: <PR リンク・後継 Issue・打ち切りの証拠（L1-6）>
 release: <tag URL（+ 署名必須リポは「署名: あり | 対象外」） | deferred #n（完了記録どおり） | N/A>
-<!-- MERGED の必須フィールド（T-5 / L1-4）。vX.Y.Z を宣言したレーンは、タグを切って URL を載せるまで MERGED を宣言できない（URL 無き MERGED は不正形式 = 終端未成立）。宣言と異なる版を切った場合は差異と理由を1行 -->
+<!-- MERGED の必須フィールド（T-5 / L1-4）。vX.Y.Z を宣言したレーンの履行確認は Release 実在まで（release-sync の green run URL を貼るのが最短・キャリアー無しリポは gh release view で確認）。タグを切って URL を載せ Release を実在させるまで MERGED を宣言できない（URL または Release 実在を欠く MERGED は不正形式 = 終端未成立）。宣言と異なる版を切った場合は差異と理由を1行 -->
 ```
 
 ## TAKEOVER コメント（L0-3 — stale レーンの引き取り）

@@ -1,0 +1,2 @@
+# release-sync exemptions: exact tag names, one per line.
+# Lines beginning with # are comments. Blank lines are ignored. Globs are not supported.

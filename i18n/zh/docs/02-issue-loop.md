@@ -45,7 +45,7 @@ Issue 起票 → WIP宣言（L0-1）→ worktree で実装 → テスト/lint gr
 - `STUCK` **不是**第六种状态——它是一个触发条件，唯一合法的出口是有效的 HOLD（或上报给人类）
 - 状态缺失、未知或格式不正确的通道，一律**视为非活跃（按 HOLD 等同的姿态处理：不写入）等待状态修复**。在 GO 判定中不将此通道计为「空闲」——可能与宣告范围交叉的工作在修复完成前一律串行（[FP-1](05-fail-posture.md)）。不得从不正确的输入伪造出有效的 HOLD 记录（HOLD 的必备字段无法从不正确的输入中构造出来）——下一个接触该通道的 Agent 的首要义务是**修复状态**，而不是写入（[FP-7](05-fail-posture.md)）
 - **终止 / 阻塞声明优先于继续推进的压力**。同一次更新中如果存在阻塞项，该次更新的完成主张即无效
-- **MERGED 须以 release 的履行报告作为必备字段**（[T-5](10-test-ci-baseline.md)）：在完成记录中宣告了 `vX.Y.Z` 的车道，**只有在 MERGED 中带有 tag URL 时终结才成立**（缺少 URL 的 MERGED 属于不合法格式 = 上文的非活跃处理）。`deferred` / `N/A` 只需重述完成记录中的值即可
+- **MERGED 须以 release 的履行报告作为必备字段**（[T-5](10-test-ci-baseline.md)）：在完成记录中宣告了 `vX.Y.Z` 的车道，**只有在 MERGED 中带有 tag URL 且 Release 实际存在时终结才成立**（缺少 URL 或 Release 实际存在的 MERGED 属于不合法格式 = 上文的非活跃处理）。`deferred` / `N/A` 只需重述完成记录中的值即可
 
 ## L1-5 HOLD 的必备字段
 
@@ -119,6 +119,6 @@ HOLD 是**可恢复、非终态**的。只有同时具备以下全部要素时�
 
 - 测试、lint 均已通过（唯一的明文例外见 [T-4](10-test-ci-baseline.md)）
 - 带有 L1-7 完成记录的 PR 已 merge，Issue 已关闭
-- **release 判断已经履行** —— 宣告了 `vX.Y.Z` 的车道，在 MERGED 带有 main 上 annotated tag 的 URL 之前都不算完成（[T-5](10-test-ci-baseline.md)）
+- **release 判断已经履行** —— 宣告了 `vX.Y.Z` 的车道，在 MERGED 带有 main 上 annotated tag 的 URL 且 Release 实际存在之前都不算完成（[T-5](10-test-ci-baseline.md)）
 - **在线仓库已成为最新的正本**（不能以仅在本地取得成果的状态结束）
 - 若跨越多个会话，续接的入口（接下来要做什么）需留在 Issue 评论或 handoff 中

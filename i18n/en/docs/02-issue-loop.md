@@ -45,7 +45,7 @@ Lane state is declared via a labeled comment on the owning Issue. **The Issue is
 - `STUCK` is **not** a sixth state — it's a trigger condition, and the only legal way out is a valid HOLD (or escalation to a human)
 - A lane with a missing, unknown, or malformed state is **treated as inactive (HOLD-equivalent stance: no writes) pending state repair**. Don't count this lane as "available" in a GO judgment — work that could intersect the declared scope stays serial until repair ([FP-1](05-fail-posture.md)). Don't fabricate a valid HOLD record from malformed input (HOLD's required fields can't be manufactured from malformed input) — the next agent to touch this lane's first obligation is **repairing the state**, not writing ([FP-7](05-fail-posture.md))
 - **A termination / blocker declaration outweighs pressure to continue**. If a blocker appears within the same update, that update's completion claim is void
-- **MERGED carries a release-fulfillment report as a required field** ([T-5](10-test-ci-baseline.md)): a lane that declared `vX.Y.Z` in its completion record **cannot have its termination hold unless the MERGED comment carries the tag URL** (a MERGED lacking the URL is malformed = the inactive treatment described above). `deferred` / `N/A` only need to restate the completion record's value
+- **MERGED carries a release-fulfillment report as a required field** ([T-5](10-test-ci-baseline.md)): a lane that declared `vX.Y.Z` in its completion record **cannot have its termination hold unless the MERGED comment carries the tag URL and the Release exists** (a MERGED lacking either the URL or Release existence is malformed = the inactive treatment described above). `deferred` / `N/A` only need to restate the completion record's value
 
 ## L1-5 HOLD's required fields
 
@@ -119,6 +119,6 @@ The seat counts in this table apply to **implementation review that clears a mer
 
 - Tests and lint pass (the sole explicit exception is [T-4](10-test-ci-baseline.md))
 - The PR carrying an L1-7 completion record is merged, and the Issue is closed
-- **The release decision has been fulfilled** — a lane that declared `vX.Y.Z` is not complete until MERGED carries the URL of an annotated tag on main ([T-5](10-test-ci-baseline.md))
+- **The release decision has been fulfilled** — a lane that declared `vX.Y.Z` is not complete until MERGED carries the URL of an annotated tag on main and the Release exists ([T-5](10-test-ci-baseline.md))
 - **The online repo is the up-to-date source of truth** (it doesn't end with results that only exist locally)
 - If work spans multiple sessions, the entry point for continuing (what to do next) is left in an Issue comment or a handoff

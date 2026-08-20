@@ -22,7 +22,7 @@
 
 ## 展開手順（コピペ順）
 
-1. `templates/ci/*.yml`（**caller stencil**）を対象リポの `.github/workflows/` へ、`scripts/assemble_review_comment.py` を `scripts/ci/` へコピー（Layer 2 を使わないなら合成器は後回しでよい）。各ファイルの `uses:` 行が `caty-ai/family-dev-handbook/.github/workflows/reusable-<gate>.yml@ci-v1` を pin していることを確認する（バージョニングは下記「バージョニング」節を参照）
+1. `templates/ci/*.yml`（**caller stencil**）を対象リポの `.github/workflows/` へ、`scripts/assemble_review_comment.py` を `scripts/ci/` へコピー（Layer 2 を使わないなら合成器は後回しでよく、`release-sync.yml` は下記 release-sync 節の導入順（handbook release + `ci-v1` 前進の確認）を満たすまでコピーしない）。各ファイルの `uses:` 行が `caty-ai/family-dev-handbook/.github/workflows/reusable-<gate>.yml@ci-v1` を pin していることを確認する（バージョニングは下記「バージョニング」節を参照）
 2. `.github/risk-reviewers.txt` を作成: `risk-reviewers.txt.example` をコピーし、オーナー（人間）の GitHub ID を記入（プレースホルダのままなら赤）
 3. ラベルを作成:
    ```bash
@@ -50,6 +50,50 @@ job 名の変更など required checks の再キーが必要になる変更）�
 は明示的に `@ci-v2` へ書き換えるまで `ci-v1` のまま動き続ける。同リポ内 (family-dev-handbook 自身) の
 呼び出し元だけは `@ci-v1` を pin せずローカルパス (`./.github/workflows/reusable-<gate>.yml`) で参照する
 — 改訂 PR が古いタグの内容で自己検証されるデッドロックを避けるため。
+
+## release-sync — tag push 後の Release 履行
+
+`release-sync.yml` は PR の7番目の門番ではない。annotated な SemVer `v*` tag の push を受け、
+tag object の message を notes にした GitHub Release を作る、T-5 履行用のキャリアーである。
+push workflow の赤それ自体は merge や tag を阻止しないため、これだけで完了を強制したとは扱わない。
+各 release では [L1-7⑦](../../docs/02-issue-loop.md) が Layer 1 の結果を購読し、tag・MERGED の
+URL・Release 実在（通常は release-sync の green run URL）を確認して初めて履行済みになる。
+run の不発・赤・キャリアー不在は履行ではない。
+
+機械保証の範囲は、`ci-v1` advance 後にキャリアーを採用し、その caller を既に含む commit 上の
+annotated SemVer `v*` tag を人が push した場合である。採用前 commit の tag と `GITHUB_TOKEN` が
+push した tag は workflow 自体が発火せず、非採用リポは drift script と記録規律に依存する。
+既存 Release の編集、draft の publish、tag / Release の削除は行わない。
+
+導入順は固定する。**handbook v0.17.0 以上が release され、その release commit へ `ci-v1` が
+advance 済みであることを先に確認してから**、`templates/ci/release-sync.yml` を対象リポの
+`.github/workflows/` へコピーする。それより前は `@ci-v1` の参照先に reusable が無く、startup で
+404 の赤になる。対象リポの default branch に `.github/release-sync-ignore` も置く。形式は
+**免除する tag の正確な名前を1行に1つ**、`#` で始まる行はコメント、空行は無視、glob は不可。
+ファイルが無ければ空リストとして扱い、default branch から読めない場合は赤になる。移動する major
+tag 等、明示的に Release を作らない tag だけを列挙し、legacy lightweight tag は免除に入れない。
+
+これは family の CI キャリアーで初めて `contents: write` を要求する門番であり、moving tag の
+`ci-v1` が初めて書き込み経路を守る。reusable は checkout せず、tag 側のリポ内容を実行せず、
+GitHub API で Release を作る以外を変更しない。この不変条件を崩す改訂は後方互換な `ci-v1` 更新と
+みなさず、バージョニング判断をやり直す。
+
+導入時には push 権限を持つ token で次を実行し、active exemption list と zero-RED を記録する
+（read-only token では draft が見えないため、script は exit 2 で報告を拒否する）。
+
+```bash
+bash check-release-drift.sh <owner/repo>
+```
+
+Layer 2 の定期 runner はまだ無い。各 release の購読者は上記 L1-7⑦であり、scheduled な横断 sweep
+と record-vs-reality の PR-side check は [Issue #106](https://github.com/caty-ai/family-dev-handbook/issues/106)
+まで claim しない。事前検証を望む導入先は product repo に fixture tag を置かず、fork または disposable
+repo に caller を置き、annotated / lightweight / non-SemVer / prerelease / draft / 再実行を試す。
+
+Release 作成後に tag が移動されたかを現在の API 状態から確実に比較する方法は無い。
+`tagger.date > release.created_at` は false positive を生む noisy な heuristic として検討の上で退けた。
+機械的な防御は、repository ruleset で `v*` tag の update と deletion を禁止することなので、導入時の
+hardening として強く推奨する。
 
 ## カスタマイズ早見表
 

@@ -83,8 +83,8 @@ T テスト&CI基準: T-1 コードを含む新規リポは作成時にテスト
   T-4 CI 赤のまま merge 禁止・例外は既知無関係の赤のみ（base 再現+赤の identity+LC-1 期限つき Issue 参照+実在検証できるオーナー専決の4条件すべて必須）・
   flaky は含めない・CI 不在は green ではない・N/A は CI が当該変更を検査しない場合のみ・参照無き赤・検証できない例外は例外にならない /
   T-5 全完了記録に release 欄必須（vX.Y.Z / deferred / N/A の3語彙）・出荷相当（利用者の挙動・公開API・配布物・規範が変わる）は N/A 不可・迷ったら出荷相当・
-  欄なし/空欄/未編集プレースホルダ/語彙外=blocking・vX.Y.Z はタグを切り URL を載せた MERGED まで終端不成立
-  （未履行レーンは終端せず WIP のまま stale 時計に乗る・非アクティブ扱いが掛かるのは tag URL を欠く MERGED=不正形式の方）・
+  欄なし/空欄/未編集プレースホルダ/語彙外=blocking・vX.Y.Z はタグを切り URL を載せ Release を実在させた MERGED まで終端不成立
+  （未履行レーンは終端せず WIP のまま stale 時計に乗る・非アクティブ扱いが掛かるのは tag URL または Release 実在を欠く MERGED=不正形式の方）・
   deferred は退場トリガー付き Issue 参照必須（失効=「切らない特権」を失い次の出荷相当は vX.Y.Z 必須・失効自体は記録を止めない）・
   N/A は閉じた4類型（規範なし docs のみ/挙動・API・配布物不変の内部整理/CI・開発配線のみ/main 未到達の Epic 子→epic）+類型外はオーナー専決・
   全完了記録に previous release 欄（直前の出荷相当 merge の値+履行状態）・未履行の vX.Y.Z は blocking・deferred 連続は出荷相当列で数え vX.Y.Z でリセット・2連続の次は deferred 不可・
