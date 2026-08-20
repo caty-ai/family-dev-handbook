@@ -2,7 +2,7 @@
 
 # Issue / 车道评论 模板
 
-各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜10）只保留最小的 MUST 条文，细节放在这里。
+各契约（rule ID）字段规范的正本。正文侧（docs/01〜03・05〜11）只保留最小的 MUST 条文，细节放在这里。
 EPIC Issue 与 Epic 车道专属的格式（检查点表・Epic 日志・轻量门禁记录・Epic 终结）见 [epic-template.md](epic-template.md)（E 系列）。Epic 内部的子 Issue 照搬本页的格式。
 
 ## Issue 正文（L1-2）

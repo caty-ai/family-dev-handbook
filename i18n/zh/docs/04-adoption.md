@@ -12,7 +12,7 @@
 
 - **带版本刻印的紧凑摘要，唯一 owner 是本页面（docs/04）**。下游副本（各 CLAUDE.md / AGENTS.md / system prompt）是 owner-applies —— 由干事 Agent 提出建议，各运行时的 owner 自行贴入
 - 下游本地摘要的覆盖，**允许比正本更严格，禁止比正本更宽松**（tighten only）。该原则的跨 Agent 通用规范 owner 是 family-os 的 operations-policy（config trust 节 —— 参见 [README](../../../README.zh.md) 的"Caty AI ファミリー"节）。本页面是该协作协议的应用。若在没有 sister projects 的情况下导入，直接套用 tighten-only 原则即可
-- 摘要不誊写正文，而是以 **rule ID + 一行姿态**来引用。ID 的定义正文在 docs/01〜03・05〜10，注释样式的字段模式在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
+- 摘要不誊写正文，而是以 **rule ID + 一行姿态**来引用。ID 的定义正文在 docs/01〜03・05〜11，注释样式的字段模式在 templates/issue-template.md・templates/epic-template.md・templates/brief-template.md
 
 ## 各 Agent 的集成位置
 
@@ -33,7 +33,7 @@
 ```markdown
 ## 並行開発プロトコル要約（handbook-revision: 2026-08-19 (v0.16.0) / owner: 貼った本人名 / last-verified: 貼った日付）
 正本: <このハンドブックの正本リポ URL（fork した場合は fork 先）> — 食い違えば正本が正。
-この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜10、様式は templates/issue-template.md・epic-template.md・brief-template.md。
+この要約は厳しくしてよいが緩めるのは禁止。ID の本文は正本 docs/01〜03・05〜11、様式は templates/issue-template.md・epic-template.md・brief-template.md。
 
 L2 並行可否: L2-1 ゴール合意・重さ判定（迷えば重い側）・設計を難しくする要件は一度疑う（消す決定は依頼者） / L2-2 境界変更は境界PR1本先行 /
   L2-3 Issue に触るファイル予測必須 / L2-4 並行GO=宣言ファイル集合が非交差のみ /
@@ -96,6 +96,11 @@ T テスト&CI基準: T-1 コードを含む新規リポは作成時にテスト
   T-6 家族製ランナーは PASS/FAIL/SKIP と動的3値サマリ（declared/executed/skipped・declared=executed+skipped）+閉じた exit code・必須依存欠落は missing-dep 付き127・異常終了でもサマリ必須・
   SKIP率20%超は赤（変更値はCI caller入力を正本+記録）・整備済みは require_suite_reconciliation: true のCI照合が有効になった時点 /
   T-7 公開READMEはT-1 test workflowのliveバッジか灰のCI: not yetを必須表示・静的色はlightgrey/blueのみ・実測数字はrun URL+実測日必須・Project status標準形は条文内蔵
+PB 公開準備: PB-1 リポ公開は正本チェックリストの項目別PASS/FAIL/理由付きN/A+証拠でゲート・検証不能は未通過（fail-closed） /
+  PB-2 正本は templates/publication-checklist.md・原則リリースタグ、未包含時だけcommit SHA+後続タグ追記 /
+  PB-3 (a)=run URL・(b)=名指し手動手順+記録・(c)=オーナー発行3形のみ、自己申告禁止 /
+  PB-4 完了記録は1レーン1つをレーンIssueへ置くL1-7特則・PRはポインタ1行・run URL実在+head SHA一致 /
+  PB-5 第1・第2消費者のギャップを#100へ還流して失効する時限パイロット条項
 FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。fail-open は「通過」を意味しない。Epic チェックポイント表が不在・未承認なら人間へエスカレーション（FP-9）。（詳細: 正本 docs/05）
 ```
 
@@ -107,6 +112,7 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
 3. 全员遵守避免直接 push main 的运作方式（能设置 branch protection 的话就设置）
 4. 整备测试运行器 + CI workflow，并注册到 required status checks（[T-1](10-test-ci-baseline.md)；类型见 [templates/ci/](../templates/ci/README.md)。非代码仓库在 Issue 中记录一行理由付 N/A）
+5. 公开仓库时，以公开检查清单（[PB-1](11-publication.md)、[templates/publication-checklist.md](../templates/publication-checklist.md)）作为 lane 的门禁
 
 ## 角色分工由各 Agent 自行决定
 

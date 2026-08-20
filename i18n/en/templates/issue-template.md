@@ -2,7 +2,7 @@
 
 # Issue / Lane Comment Templates
 
-The canonical field schema for each contract (rule ID). The body text (docs/01–03, 05–10) carries only minimal MUST statements; the details live here.
+The canonical field schema for each contract (rule ID). The body text (docs/01–03, 05–11) carries only minimal MUST statements; the details live here.
 The EPIC Issue and the formats specific to the Epic lane (checkpoint table, Epic log, light-gate record, Epic termination) live in [epic-template.md](epic-template.md) (E series). Child Issues within an Epic use this page's formats as-is.
 
 ## Issue body (L1-2)

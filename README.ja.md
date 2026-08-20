@@ -196,7 +196,7 @@ handbook-revision の値は書き換えないでください。
 3. 1行目の `owner` と `last-verified` を自分と今日の日付に書き換える。`handbook-revision` はそのまま残す
 4. 2行目の `正本:` を、このハンドブックのリポジトリ URL（fork したなら fork 先）に書き換える
 
-貼るのはこれだけです。中身は9系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-7`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
+貼るのはこれだけです。中身は10系統の rule ID（`L2-1`〜`L2-6` / `L1-1`〜`L1-11` / `L0-1`〜`L0-9` / `FP-1`〜`FP-9` / `E-1`〜`E-10` / `B-1`〜`B-5` / `LC-1`〜`LC-5` / `R-1`〜`R-6` / `T-1`〜`T-7` / `PB-1`〜`PB-5`）と、それぞれ1行の方針（ポスチャ）だけで、条文の本文は入っていません。**本文の正本はこのリポジトリで、要約と食い違ったら正本が正です。** 自分のリポジトリに合わせて厳しくするのは自由ですが、緩めるのは禁止しています。
 
 やめたくなったら、貼った50行ほどを消すだけで元に戻ります。ほかのファイルには触りません。
 
@@ -252,7 +252,7 @@ flowchart TD
 
 ## ルールの全体像
 
-ルールは9系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
+ルールは10系統に分かれ、すべてに変わらない ID が振ってあります。要約も会話も Issue も、この ID で指し合います。
 
 | 系統 | 決めること | rule ID | 本文 |
 |---|---|---|---|
@@ -265,6 +265,7 @@ flowchart TD
 | **LC** ライフサイクル | 置いた物をいつ・どう退場させるか | `LC-1`〜`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** 却下ルーブリック | 何を受け入れ・何を断るか | `R-1`〜`R-6` | [docs/09](docs/09-rejection-rubric.md) |
 | **T** テスト & CI 基準 | 正しさの証明をどう蓄積するか | `T-1`〜`T-7` | [docs/10](docs/10-test-ci-baseline.md) |
+| **PB** 公開準備 | リポ公開を何でゲートするか | `PB-1`〜`PB-5` | [docs/11](docs/11-publication.md) |
 
 とくに効き目を左右する条文が2つあります。ひとつは **FP** の合言葉「検証不能なら直列。fail-open は『通過』を意味しない」— 確かめられない時に通す側へ倒す設計を選んだとしても、それは「確認済み」の意味には決してならない、という宣言です。もうひとつは **高リスク領域の単一定義**で、ここに触れる作業は人間が必ず止まり、レビューの席が増えます（対外公開・課金・不可逆な操作・権限まわりの境界などが該当します。正確な線引きは正本を見てください）。同じ定義を2か所に持たないよう、正本は [docs/06](docs/06-epic-lane.md) の1箇所だけに置いています。
 
@@ -272,6 +273,8 @@ Epic レーン（`E-1`〜`E-10`）は任意です。オーナーが承認して�
 
 <details>
 <summary>コア契約 P1〜P5（v0.1.0 で導入した5つの背骨）</summary>
+
+このコア契約 P1〜P5 は、PB 層（PB-1〜PB-5・[docs/11](docs/11-publication.md)）とは別物です。
 
 | 契約 | 内容 | rule ID |
 |---|---|---|
@@ -310,9 +313,11 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC ワークスペース・ライフサイクル — 置いた物の退場を契約にする層・退場条件の数値はローカル正本（`LC-1`〜`LC-5`） |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R 却下ルーブリック — 何を受け入れ・何を断るかの意図の層。自動却下の3理由・歓迎/却下の判断基準・前提検証・置き場所のはしご・check 昇格（`R-1`〜`R-6`） |
 | [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T テスト & CI 基準 — 初期整備・回帰テスト既定・ブリーフ接続・fail-closed merge・リリース既定・テスト出力契約・バッジと数字の正直さ。付録に非規範のランナー早見表（`T-1`〜`T-7`） |
+| [docs/11-publication.md](docs/11-publication.md) | PB 公開準備 — リポジトリ公開を正本チェックリストでゲートする層（`PB-1`〜`PB-5`） |
 | [templates/issue-template.md](templates/issue-template.md) | Issue テンプレートと全レーンコメント様式（WIP / HOLD / 終端 / TAKEOVER / 再開チェック / 完了記録） |
 | [templates/epic-template.md](templates/epic-template.md) | Epic テンプレートと人間チェックポイント表 |
 | [templates/brief-template.md](templates/brief-template.md) | 委譲ブリーフのテンプレート（3層構造・書き方の要点） |
+| [templates/publication-checklist.md](templates/publication-checklist.md) | リポジトリ公開チェックリスト — A1〜E4 の項目別判定・手順・証拠 artifact の正本 |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | 各リポの `ARCHITECTURE.md` に置く「並行安全マップ」テンプレート |
 | [templates/ci/](templates/ci/README.md) | 機械の門番テンプレ一式 — テスト+lint / secret 検知 / PR サイズ / 歴史切断拒否 / 高リスク人間確認ゲート / 報告合成器（展開手順は同梱 README） |
 | [templates/conformance/](templates/conformance/README.md) | 席決定の検証ベクタ31本（抽象 ID・`L1-9` / `L1-10` / `L1-11` / `FP-7`）とメンバー側での流し方 |

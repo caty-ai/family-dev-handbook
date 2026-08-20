@@ -198,7 +198,7 @@ Do not change the handbook-revision value.
 3. On the first line, rewrite `owner` and `last-verified` for yourself and today. Leave `handbook-revision` untouched
 4. On the second line, rewrite `正本:` to the URL of this repository (or of your fork, if you forked it)
 
-That is the whole installation. What you pasted is nine families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`, `T-1`–`T-7`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
+That is the whole installation. What you pasted is ten families of rule IDs (`L2-1`–`L2-6`, `L1-1`–`L1-11`, `L0-1`–`L0-9`, `FP-1`–`FP-9`, `E-1`–`E-10`, `B-1`–`B-5`, `LC-1`–`LC-5`, `R-1`–`R-6`, `T-1`–`T-7`, `PB-1`–`PB-5`) and one line of posture for each — the rule text itself is not in there. **This repository is the canonical source, and where the summary and the source disagree, the source wins.** Making your local copy stricter is up to you; loosening it is not allowed.
 
 If you change your mind, delete those 50-odd lines and you are back where you started. Nothing else is touched.
 
@@ -254,7 +254,7 @@ That single diagram is one clause, `L2-4`. The map of everything else is below.
 
 ## The full rule map
 
-The rules fall into nine families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
+The rules fall into ten families, and every one of them carries an ID that does not change. Summaries, conversations, and Issues all point at each other through those IDs.
 
 | Family | What it decides | Rule IDs | Text |
 |---|---|---|---|
@@ -267,6 +267,7 @@ The rules fall into nine families, and every one of them carries an ID that does
 | **LC** Lifecycle | When and how what you put down leaves | `LC-1`–`LC-5` | [docs/08](docs/08-lifecycle.md) |
 | **R** Rejection rubric | What gets accepted and what gets declined | `R-1`–`R-6` | [docs/09](docs/09-rejection-rubric.md) |
 | **T** Test & CI baseline | How proof of correctness is accumulated | `T-1`–`T-7` | [docs/10](docs/10-test-ci-baseline.md) |
+| **PB** Publication readiness | What gates publishing a repository | `PB-1`–`PB-5` | [docs/11](docs/11-publication.md) |
 
 Two clauses matter most for whether any of this actually works. One is the **FP** watchword, "if you cannot verify it, go serial — fail-open never means *passed*" — a declaration that even where you deliberately choose to let something through unverified, that can never be read as having been confirmed. The other is the **single definition of high-risk territory**. Work that touches it always stops for a human, and its review seats increase (publishing, spending money, irreversible operations, and permission boundaries are the kind of thing it covers — read the canonical text for the exact line). So that the definition never lives in two places, its only canonical home is [docs/06](docs/06-epic-lane.md).
 
@@ -274,6 +275,8 @@ The Epic lane (`E-1`–`E-10`) is optional. It only comes into being when an own
 
 <details>
 <summary>Core contracts P1–P5 (the five pillars introduced in v0.1.0)</summary>
+
+This core contract, P1–P5, is a separate thing from the PB layer (`PB-1`–`PB-5`, [docs/11](docs/11-publication.md)).
 
 | Contract | Content | Rule IDs |
 |---|---|---|
@@ -312,9 +315,11 @@ The files below are Japanese (canonical). A machine-translated English mirror of
 | [docs/08-lifecycle.md](docs/08-lifecycle.md) | LC workspace lifecycle — the layer that turns departure into a contract; the numbers in exit conditions live in local settings (`LC-1`–`LC-5`) |
 | [docs/09-rejection-rubric.md](docs/09-rejection-rubric.md) | R rejection rubric — the intent layer for what gets accepted and what gets declined: the three auto-decline reasons, welcome/decline criteria, premise verification, the placement ladder, and promoting policies to checks (`R-1`–`R-6`) |
 | [docs/10-test-ci-baseline.md](docs/10-test-ci-baseline.md) | T test & CI baseline — initial setup, the regression-test default, the brief-format hookup, fail-closed merge, the release default, the test-output contract, and honest badges and numbers. An appendix carries a non-normative runner cheat sheet (`T-1`–`T-7`) |
+| [docs/11-publication.md](docs/11-publication.md) | PB publication readiness — the layer that gates publishing a repository with the canonical checklist (`PB-1`–`PB-5`) |
 | [templates/issue-template.md](templates/issue-template.md) | Issue template and every lane comment format (WIP / HOLD / termination / TAKEOVER / resume check / completion record) |
 | [templates/epic-template.md](templates/epic-template.md) | Epic template and the human checkpoint table |
 | [templates/brief-template.md](templates/brief-template.md) | Delegation-brief template (the three-layer structure and writing guidance) |
+| [templates/publication-checklist.md](templates/publication-checklist.md) | Repository publication checklist — the canonical source for the item-by-item verdicts, procedures, and evidence artifacts across A1–E4 |
 | [templates/architecture-parallel-map.md](templates/architecture-parallel-map.md) | The "parallel-safety map" template for each repository's `ARCHITECTURE.md` |
 | [templates/ci/](templates/ci/README.md) | The machine-gate template set — test+lint / secret scan / PR size / unrelated-history rejection / high-risk human-review gate / report assembler (deployment guide included) |
 | [templates/conformance/](templates/conformance/README.md) | 31 conformance vectors for seat decisions (abstract IDs; `L1-9` / `L1-10` / `L1-11` / `FP-7`) plus how a member runs them |
