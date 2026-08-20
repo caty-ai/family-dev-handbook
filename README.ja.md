@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 5本のレーンがゲートを通って1本に合流する](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.16.0-blue)
+![version](https://img.shields.io/badge/version-v0.17.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
 ![status](https://img.shields.io/badge/status-active-lightgrey)
@@ -360,7 +360,9 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## 開発ステータス
 
-現行バージョンは **v0.16.0**（2026-08-19）。テストと表示の正直さを閉じる2条を追加しました（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **テスト出力契約**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族製ランナーは `suites: declared=N executed=M skipped=K` の3値サマリを動的に出し、`declared = executed + skipped` を不変条件にします。exit code は閉じた集合、必須依存の欠落は `missing-dep:` と 127、異常終了でもサマリ必須です。SKIP 率20%超を赤とし、上限を変える場合は LC-3 型でローカル値と根拠を記録します。採用完了は CI の照合ゲートが有効になった時点です。② **表示契約**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 緑は機械が塗ったものだけ。README を持つ公開リポは T-1 の test workflow に結びつく live バッジか灰の `CI: not yet` を必ず示し、静的色は `lightgrey` / `blue` の閉じた列挙に限定します。条文内に Project status の標準形を置き、実測数字には run URL と実測日を必須にしました。設計の起点は consistency campaign W0-4 と family-os#56、確定は3席の設計レビューです。
+現行バージョンは **v0.17.0**（2026-08-21）。T-5 のリリース履行を機械で強制する層が加わりました（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync キャリアー**（[templates/ci/](templates/ci/README.md)・reusable は API-only＝checkout なし）— annotated SemVer の `v*` タグ push から GitHub Release を自動作成します（notes はタグメッセージ・lightweight／非 SemVer／空メッセージは赤・免除は default branch 上の `.github/release-sync-ignore` のみ＝タグ側ツリーからの自己免除は不成立）。② **ドリフト監査**（`templates/ci/check-release-drift.sh`）— タグと Releases の乖離を API だけで検知してレポートします（検知のみ・自動削除なし・読めない時は findings ゼロで exit 2）。③ **条文追随** — tag URL 義務は **Release 実在まで含めて履行**になりました（[docs/10](docs/10-test-ci-baseline.md) `T-5`。素のタグでも `/releases/tag/<名前>` の URL は 200 を返すため、URL の存在は Release の存在を意味しません）。record-vs-reality の PR-side check と定期スイープは [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) で追跡します。
+
+- **v0.16.0**（2026-08-19） — テストと表示の正直さを閉じる2条を追加しました（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **テスト出力契約**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族製ランナーは `suites: declared=N executed=M skipped=K` の3値サマリを動的に出し、`declared = executed + skipped` を不変条件にします。exit code は閉じた集合、必須依存の欠落は `missing-dep:` と 127、異常終了でもサマリ必須です。SKIP 率20%超を赤とし、上限を変える場合は LC-3 型でローカル値と根拠を記録します。採用完了は CI の照合ゲートが有効になった時点です。② **表示契約**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 緑は機械が塗ったものだけ。README を持つ公開リポは T-1 の test workflow に結びつく live バッジか灰の `CI: not yet` を必ず示し、静的色は `lightgrey` / `blue` の閉じた列挙に限定します。条文内に Project status の標準形を置き、実測数字には run URL と実測日を必須にしました。設計の起点は consistency campaign W0-4 と family-os#56、確定は3席の設計レビューです。
 
 - **v0.15.0**（2026-08-18） — 条文の改訂4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・grok-build ランタイム解析の5席クロスレビューからの還流）。① **後続ラウンドのラチェット禁止**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— round-2 以降で新たに blocking を追加できるのは実証済みの欠陥か未充足のゲート基準のみ。レビューラウンドが進むほど新しい好みが後出し blocking になりレーンが終端しない「ラチェットチャーン」を止める狭い条項です。② **指摘の引用要件**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— path:line を指すか実行ログを引用できない指摘は blocking にできない（non-blocking の懸念は自由）。①がその上に実証要件を重ねる引用水準の「床」の明文化です（二層の制約であり同一水準ではありません）。③ **B-4 に理由1文**（[docs/07](docs/07-delegation-brief.md)）— 常設 instruction ファイルが委譲境界で読まれず劣化する runtime も実在するため、必要な規約はブリーフ本文にインラインで書く。④ **git を触る自動化の衛生1文**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config は毎回 env で明示し、ユーザーの git 状態を読まない・書かない。
 

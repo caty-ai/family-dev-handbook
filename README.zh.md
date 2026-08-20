@@ -7,7 +7,7 @@
 ![Family Dev Handbook — 五条车道穿过关卡汇成一条](assets/readme/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![version](https://img.shields.io/badge/version-v0.16.0-blue)
+![version](https://img.shields.io/badge/version-v0.17.0-blue)
 ![type](https://img.shields.io/badge/type-docs%2Btemplates-blue)
 ![docs](https://img.shields.io/badge/docs-Japanese%20canonical-lightgrey)
 ![status](https://img.shields.io/badge/status-active-lightgrey)
@@ -362,7 +362,9 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 
 ## 开发状态
 
-当前版本是 **v0.16.0**（2026-08-19）。新增两条条文，用于封闭测试与状态展示中的诚实性缺口（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **测试输出契约**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族编写的运行器须动态输出 `suites: declared=N executed=M skipped=K` 三字段摘要，并以 `declared = executed + skipped` 为不变条件。exit code 采用闭合集；必需依赖缺失时输出 `missing-dep:` 并以 127 退出；即使异常退出也必须输出摘要。SKIP 率超过 20% 即为红；如调整上限，须按 LC-3 型在本地保存数值并记录理由。只有 CI 对账 gate 开启后，才算完成采用。② **展示契约**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 只有机器涂出的结果才能是绿色。带 README 的公开仓库必须展示绑定 T-1 测试 workflow 的 live badge，或灰色的 `CI: not yet`；静态颜色只允许闭合列举中的 `lightgrey` / `blue`。Project status 的标准形式直接写入条文，实测数字必须附 run URL 和实测日期。设计起点为 consistency campaign W0-4 与 family-os#56，并经 3 席设计评审冻结。
+当前版本是 **v0.17.0**（2026-08-21）。新增用于机器强制执行 `T-5` 发布履行的层（[#103](https://github.com/caty-ai/family-dev-handbook/issues/103)）。① **release-sync 载体**（[templates/ci/](templates/ci/README.md)・reusable 为纯 API 实现＝无 checkout）— 推送 annotated SemVer 的 `v*` 标签即自动创建 GitHub Release（notes＝标签消息；lightweight／非 SemVer／空消息标签为红；豁免仅来自 default branch 上的 `.github/release-sync-ignore`，被标签的树无法自我豁免）。② **漂移审计**（`templates/ci/check-release-drift.sh`）— 仅通过 API 检测并报告标签与 Releases 的偏离（仅检测、不自动删除；状态不可读时以 exit 2 结束且不输出任何 findings）。③ **条文跟进** — tag URL 义务现在**包含 Release 的实际存在**才算履行（[docs/10](docs/10-test-ci-baseline.md) `T-5`；裸标签的 `/releases/tag/<名称>` URL 也返回 200，URL 的存在不代表 Release 的存在）。record-vs-reality 的 PR-side check 与定期扫描在 [#106](https://github.com/caty-ai/family-dev-handbook/issues/106) 中跟踪。
+
+- **v0.16.0**（2026-08-19） — 新增两条条文，用于封闭测试与状态展示中的诚实性缺口（[#81](https://github.com/caty-ai/family-dev-handbook/issues/81)）。① **测试输出契约**（`T-6`・[docs/10](docs/10-test-ci-baseline.md)）— 家族编写的运行器须动态输出 `suites: declared=N executed=M skipped=K` 三字段摘要，并以 `declared = executed + skipped` 为不变条件。exit code 采用闭合集；必需依赖缺失时输出 `missing-dep:` 并以 127 退出；即使异常退出也必须输出摘要。SKIP 率超过 20% 即为红；如调整上限，须按 LC-3 型在本地保存数值并记录理由。只有 CI 对账 gate 开启后，才算完成采用。② **展示契约**（`T-7`・[docs/10](docs/10-test-ci-baseline.md)）— 只有机器涂出的结果才能是绿色。带 README 的公开仓库必须展示绑定 T-1 测试 workflow 的 live badge，或灰色的 `CI: not yet`；静态颜色只允许闭合列举中的 `lightgrey` / `blue`。Project status 的标准形式直接写入条文，实测数字必须附 run URL 和实测日期。设计起点为 consistency campaign W0-4 与 family-os#56，并经 3 席设计评审冻结。
 
 - **v0.15.0**（2026-08-18） — 条文修订4点（[#75](https://github.com/caty-ai/family-dev-handbook/issues/75)・来自 grok-build 运行时解析5席交叉评审的反馈）。① **禁止后续轮次的 ratchet**（`L1-3`・[docs/02](docs/02-issue-loop.md)）— 从第2轮开始，能新增 blocking 的仅限已证实的缺陷或尚未满足的门槛标准。这是一条狭窄的条款，用来阻止"评审轮次越往后，新的偏好就变成后补 blocking，导致车道永远无法终结"的 ratchet churn。② **意见的引用要求**（`R-4`・[docs/09](docs/09-rejection-rubric.md)）— 指不出 path:line 或无法引用执行日志的意见不能被标记为 blocking（作为 non-blocking 的担忧提出是自由的）。这是①在其上叠加实证要求的引用水位「地板」的明文化（两层约束，并非同一水位）。③ **B-4 新增理由一句**（[docs/07](docs/07-delegation-brief.md)）— 因为确实存在常设 instruction 文件在委托边界处不被读取而失效的 runtime，所以需要的规约要写进简报正文内联。④ **触碰 git 的自动化卫生一句**（`L0-7`・[docs/03](docs/03-git-protocol.md)）— identity / config 每次都要通过 env 显式指定，不读取也不写入用户的 git 状态。
 
