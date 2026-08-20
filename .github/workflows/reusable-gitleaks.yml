@@ -93,8 +93,9 @@ jobs:
           if [ -n "$BASE_CONFIG" ]; then
             git show "origin/${BASE_REF}:${BASE_CONFIG}" > /tmp/gitleaks-base-config.toml
             # [extend] の path は「設定ファイルの位置」ではなく実行時の作業ディレクトリ基準で解決される。
-            # base 設定が extend を持つと、参照先ファイルを PR 側 (checkout ツリー) が差し替えられ、
-            # base 固定を迂回できる — extend を含む base 設定は赤 (ルールは base 設定にインライン化する)。
+            # base 設定が extend.path を持つと、参照先ファイルを PR 側 (checkout ツリー) が差し替えられ、
+            # base 固定を迂回できる。path の無い useDefault = true のみは gitleaks 内蔵デフォルトを参照し、
+            # PR ツリーが差し替えられるファイルが無いため例外として許可する。それ以外の extend は赤。
             # 検出は文字列マッチではなく TOML の実パース ([ extend ]・["extend"]・inline table 等の
             # 別記法をすり抜けさせない)。パースできない設定も赤 (判定不能 = 赤・FP-6)。
             python3 -c '
@@ -105,8 +106,12 @@ jobs:
           except Exception as e:
               print(f"::error::base gitleaks config is not parseable TOML ({e}) — cannot judge, failing closed.")
               sys.exit(1)
-          if "extend" in data:
-              print("::error::base gitleaks config contains extend — extend paths resolve against the working directory and can be redirected to PR-controlled files. Inline all rules into the base config (fail-closed).")
+          if "extend" in data and not (
+              isinstance(data["extend"], dict)
+              and set(data["extend"]) == {"useDefault"}
+              and data["extend"]["useDefault"] is True
+          ):
+              print("::error::base gitleaks config contains a disallowed extend value — extend paths resolve against the working directory and can be redirected to PR-controlled files. Only extend = { useDefault = true } (equivalently, [extend] containing only useDefault = true) is allowed; all other extend forms fail closed.")
               sys.exit(1)
           ' || exit 1
             CONFIG_ARGS=(--config /tmp/gitleaks-base-config.toml)
