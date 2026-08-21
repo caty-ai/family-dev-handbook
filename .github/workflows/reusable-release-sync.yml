@@ -30,6 +30,10 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
+      # `${#TITLE}` を文字数として数え、[[:space:]] が全角空白 (U+3000) を分類するよう、
+      # title logic を runner の locale によらず決定論にする。全 LC_* と LANG に優先し、
+      # runner 側の export で上書きされない LC_ALL を pin する。
+      LC_ALL: C.UTF-8
     steps:
       - name: Require a pushed tag
         env:
@@ -198,7 +202,19 @@ jobs:
         if: env.RELEASE_SYNC_EXEMPT != 'true' && env.CREATE_RELEASE == 'true'
         run: |
           set -euo pipefail
-          CREATE_ARGS=("$TAG" --verify-tag --title "$TAG" --notes-file -)
+          IFS= read -r TITLE < "$TAG_MESSAGE_FILE" || true
+          TITLE=${TITLE%$'\r'}
+          TITLE=$(printf '%s' "$TITLE" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+          if [ -z "$TITLE" ]; then
+            echo "::warning::Release title falls back to tag name $TAG because the first tag-message line is empty after trimming."
+            TITLE="$TAG"
+          # Git subject は約50〜72文字。120超はsubjectなしで本文を書いたものとみなし、
+          # 切り詰めで内容を黙って偽るよりTAGへ戻して、API側の長さ制限も避ける。
+          elif [ "${#TITLE}" -gt 120 ]; then
+            echo "::warning::Release title falls back to tag name $TAG because the first tag-message line exceeds 120 characters."
+            TITLE="$TAG"
+          fi
+          CREATE_ARGS=("$TAG" --verify-tag --title "$TITLE" --notes-file -)
           if [ "$IS_PRERELEASE" = "true" ]; then
             CREATE_ARGS+=(--prerelease)
           fi
