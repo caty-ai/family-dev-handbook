@@ -49,6 +49,8 @@ git worktree add ../<repo>-wt/<issue> -b fix/<issue>-<slug> origin/main
 
 main への直接 push 禁止。すべて PR 経由。
 
+記録済み例外: **決定論 bot の宣言済みパス直 commit** — レビュー済みの常設 WIP 宣言（対象リポ README 等）を持つ path-scoped な決定論 applier が、宣言済みパス集合内の自動 commit を検証つきパイプライン経由で main へ ff-only push すること（例: persona-growth-loop の overlay applier。宣言・検証・宣言外パス不可侵のいずれかを欠く自動 push は本例外に該当しない）。
+
 ## L0-6 PR 本文に触ったファイル一覧 + diff 照合
 
 WIP宣言との差分（宣言より増えた/減ったファイル）がレビューで見えるようにする。
