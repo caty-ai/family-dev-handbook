@@ -42,6 +42,10 @@
    ```
    登録確認を README のお願いで終わらせない（R-6 の自己適用）。branch protection が張れない環境（private の無償プラン等）は、その旨を導入台帳に明示記録する（FP-5: 劣化の可視化）。あわせて **detect-risk-paths ジョブのログに死にパターンの `::warning::` が出ていないことを確認する**（警告は「緑だが守れていない可能性」の唯一のシグナル — 出ていたら宣言を直してから「展開済み」）
 
+### required 登録が守る範囲 — オーナーの merge 経路は素通りする（FP-5）
+
+required 登録は「機械が merge を止める鍵」を意味しない。branch protection が機械的に効くのは **(i) 非 admin の PR merge (ii) force-push / branch 削除**のみ。家族の既定運用（`enforce_admins: false` + `gh pr merge` 禁止 → オーナー名義のローカル merge + push — [docs/03](../../docs/03-git-protocol.md)）では、**オーナーの merge 経路で required checks は一度も評価されない＝素通りする**（実測 2026-08-21/23: 家族9リポすべて `enforce_admins: false`・FMA 一貫性キャンペーンの merge 10本は全てこの経路で main に入った）。この経路を守るのは登録ではなく運用規律である — **merge 前に PR 画面で required の全チェックが緑であることを確認し、push は単独コマンドで実行して出力を確認する**（`&&` チェーンや pipeline に混ぜると push の失敗を飲む）。したがって「required に登録済み」を「守られている」と申告・誤読しないこと。登録が買うのは、非 admin 経路の機械強制と、オーナー経路が merge 前に照合する**チェックリストの正本**であって、鍵ではない（FP-5: fail-open は「チェックが通った」を意味しない）。
+
 ## バージョニング
 
 `@ci-v1` は handbook のリリースで維持する **moving major タグ**（`actions/checkout@v6` と同じ慣行 —
