@@ -42,6 +42,10 @@
    ```
    登録確認を README のお願いで終わらせない（R-6 の自己適用）。branch protection が張れない環境（private の無償プラン等）は、その旨を導入台帳に明示記録する（FP-5: 劣化の可視化）。あわせて **detect-risk-paths ジョブのログに死にパターンの `::warning::` が出ていないことを確認する**（警告は「緑だが守れていない可能性」の唯一のシグナル — 出ていたら宣言を直してから「展開済み」）
 
+### required 登録が守る範囲 — オーナーの merge 経路は素通りする（FP-5）
+
+required 登録は「機械が merge を止める鍵」を意味しない。家族の現構成（required status checks + 既定設定・`enforce_admins: false`）で branch protection が機械的に止めるのは **(i) 非 admin による protected branch の更新（PR merge・required 未通過 commit の直接 push とも） (ii) force-push / branch 削除（こちらは admin にも効く）**。admin は (i) を素通りできるため、家族の既定運用 — PR を GitHub API/UI で merge せず、オーナー名義でローカル merge + push する（成文は [publication-checklist D3](../publication-checklist.md) のローカル `--no-ff` merge。[docs/03](../../docs/03-git-protocol.md) L0-7 のローカル merge 手順と整合するが、API/UI merge 不使用そのものの L0 明文は現在ない）— では、**オーナーの merge 経路で required checks はゲートとして一度も評価されない＝素通りする**（実測 2026-08-21/23・記録は [#125](https://github.com/caty-ai/family-dev-handbook/issues/125): 家族9リポすべて `enforce_admins: false`・FMA 一貫性キャンペーンの merge 10本は全てこの経路で main に入った）。この経路を守るのは登録ではなく運用規律である — **merge 前に PR 画面で required の全チェックが緑であることを確認し、push は単独コマンドで実行して出力を確認する**（`&&` チェーンや pipeline に混ぜると push の失敗・出力を見ずに先へ進む）。したがって「required に登録済み」を「守られている」と申告・誤読しないこと。登録が買うのは、非 admin 経路の機械強制と、オーナー経路が merge 前に照合する **required 登録済み check 名の一覧**（`check-required-checks.sh` の `EXPECTED` が機械照合する対象）であって、鍵ではない（FP-5: fail-open は「チェックが通った」を意味しない）。
+
 ## バージョニング
 
 `@ci-v1` は handbook のリリースで維持する **moving major タグ**（`actions/checkout@v6` と同じ慣行 —
@@ -107,7 +111,7 @@ hardening として強く推奨する。
 
 ## 落とし穴
 
-- **required checks 未登録** — 門番は赤を出すが merge は止まらない。手順 6 の機械確認まで終えて「展開済み」
+- **required checks 未登録** — 門番は赤を出すが merge は止まらない。手順 6 の機械確認まで終えて「展開済み」。なお登録してもオーナーの merge 経路は止まらない（手順 6 直後の「required 登録が守る範囲」節）
 - **展開検証のダミー secret に bare な AWS access key ID（AKIA+16桁）を使わない** — gitleaks v8.30.1 の既定ルールでは access key ID 単体は検知されず、「門番が壊れている」ように見える偽陰性になる。検知確認済みフィクスチャ（例: 切り詰めた PEM 秘密鍵ブロック）を使う。仕込みはサーバーサイドコミット（contents API）推奨 — ローカルの secret 検知フックと手元 commit がデッドロックするため
 - **test/lint の充て先は「対象0件で緑」にならない形に** — 対象を数えて0件なら赤にする（導入例: 本リポ自身の Makefile は対象ファイルの非空ガード込み）。`with:` でコマンドを差し替えられるわけではない（reusable 側は Makefile の `test`/`lint` ターゲット固定）ので、この性質は reusable 側で保たれる
 - **シェルスクリプトの lint 充て先は `*.sh` glob だけにしない** — 拡張子なし（shebang のみ）のスクリプトが漏れる。shebang スキャン（例: `grep -rl '^#!.*sh' --exclude-dir=.git`）を併用して対象を組み立てる
