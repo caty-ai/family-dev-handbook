@@ -441,7 +441,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 
 ## ライセンス
 
-[MIT](LICENSE) © 2026 Caty
+[MIT](LICENSE) © 2026 Sho Jikumaru
 
 ルールは広まってこそ意味があるので、改変も再配布も自由な MIT にしています。fork して自分のチームに合わせて厳しくする使い方を想定しています。
 

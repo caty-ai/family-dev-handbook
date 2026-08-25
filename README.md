@@ -444,7 +444,7 @@ The terms of use are as loose as they get.
 
 ## License
 
-[MIT](LICENSE) © 2026 Caty
+[MIT](LICENSE) © 2026 Sho Jikumaru
 
 Rules are only worth anything if they spread, so this is MIT — modify and redistribute freely. Forking it and tightening it for your own team is exactly the intended use.
 
