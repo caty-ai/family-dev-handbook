@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/caty-ai/family-os/main/docs/repo-state/status.schema.json",
+  "schema_version": 1,
+  "generator_version": "repo-state-gen v1",
+  "repo": "caty-ai/family-dev-handbook",
+  "stamp_mode": "auto",
+  "generated_at": "2026-08-25T15:11:39Z",
+  "describes_commit": "a96b3bfba1ea1915eb38e3a11c7074850e84bef8",
+  "describes_commit_date": "2026-08-25T15:11:39Z",
+  "branch": "feat/repo-state-caller-128",
+  "latest_tag": null,
+  "latest_release_url": null,
+  "agents_entry": null,
+  "canonical_api": "https://api.github.com/repos/caty-ai/family-dev-handbook/commits/feat/repo-state-caller-128",
+  "canonical_raw": "https://raw.githubusercontent.com/caty-ai/family-dev-handbook/a96b3bfba1ea1915eb38e3a11c7074850e84bef8/status.json",
+  "freshness_contract": "SHA comparison only; dates may only ever trigger distrust. Protocol: docs/repo-state/spec.md, section 'Reader protocol'."
+}

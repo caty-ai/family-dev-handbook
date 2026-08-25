@@ -22,6 +22,9 @@
 🔧 [ルール本文 — L0 git 規律](docs/03-git-protocol.md) ｜ 📘 [様式の正本 — Issue テンプレート](templates/issue-template.md)
 
 </div>
+<!-- repo-state:begin (generated; do not edit) -->
+<p align="center"><sub>generation: <code>a96b3bf</code> (2026-08-25T15:11:39Z) · verify: <a href="https://api.github.com/repos/caty-ai/family-dev-handbook/commits/feat/repo-state-caller-128">API HEAD</a> · <a href="./status.json">status.json</a></sub></p>
+<!-- repo-state:end -->
 
 ---
 
