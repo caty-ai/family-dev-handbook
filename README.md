@@ -415,7 +415,7 @@ The way in for proposals sits on the same rules.
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 - CI: Local callers exercise the reusable `@ci-v1` set (five gates), including Test + Lint; suite-count reconciliation is enabled. Run the same CI entry points locally with `make test` and `make lint`.
-- 検証済み環境: `ubuntu-latest` and `macos-latest` are exercised in CI; macOS is also used for local development.
+- 検証済み環境: `ubuntu-latest` and `macos-latest` are exercised in CI; macOS is also used for local development. WSL2 is in scope as well — it runs the same GNU path the `ubuntu-latest` lane verifies (clone inside the Linux filesystem, not `/mnt/c`).
 - maturity: `stable` — the normative canonical handbook.
 - 既知の制約: This is a docs-only repository with no runtime code; two known links in the Thai mirror are tracked in [#89](https://github.com/caty-ai/family-dev-handbook/issues/89).
 

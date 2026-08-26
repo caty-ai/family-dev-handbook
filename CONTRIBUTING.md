@@ -3,11 +3,11 @@
 **このハンドブックは、自分自身のルールで更新される。** コントリビュートの手順そのものが、このリポが定めるプロトコル（L2/L1/L0）の実演になる。
 
 > **English summary**: This handbook is maintained under its own rules. To contribute: (1) file an Issue first with *Why / Done when / predicted files to touch*; (2) post a 4-field WIP declaration (`agent / date / Files to touch / Branch`) on the Issue before starting; (3) work in a dedicated worktree/branch, touching only declared files; (4) get a cross review — the merge-approving reviewer must be a different model or a different agent from the implementer (no self-approval); (5) put an L1-7 **completion record** (Done-when → PASS/FAIL/reasoned-N/A with inline evidence, candidate SHA, declared-vs-diff reconciliation, identity check) in the PR body. Field schemas: [templates/issue-template.md](templates/issue-template.md). Canonical docs are Japanese.
-> Prerequisites are Python 3.9+, `make`, and `git` on macOS or Linux; `make test` and `make lint` are the same entry points used by CI.
+> Prerequisites are Python 3.9+, `make`, and `git` on macOS or Linux — WSL2 included (clone inside the Linux filesystem, not `/mnt/c`); `make test` and `make lint` are the same entry points used by CI.
 
 ## Prerequisites / 前提ツール
 
-ローカルでの変更と検証には、次の環境が必要です。macOS と Linux をサポートしています。
+ローカルでの変更と検証には、次の環境が必要です。macOS と Linux（WSL2 を含む）をサポートしています。WSL2 では `/mnt/c` 配下ではなく Linux ファイルシステム側に clone してください（git の速度低下と CRLF の混入を避けるため）。
 
 | Requirement / 必要条件 | Notes / 補足 |
 |---|---|
