@@ -415,7 +415,7 @@ flowchart TD
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 - CI: caller ในรีโปจะเรียกใช้ชุด reusable `@ci-v1` (ห้า gate) ซึ่งรวม Test + Lint และเปิดใช้การกระทบยอด suite-count แล้ว หากต้องการใช้ entry point เดียวกับ CI ในเครื่อง ให้รัน `make test` และ `make lint`
-- 検証済み環境: CI รันบน `ubuntu-latest` และ `macos-latest` รวมทั้งมีการพัฒนาในเครื่องบน macOS
+- 検証済み環境: CI รันบน `ubuntu-latest` และ `macos-latest` รวมทั้งมีการพัฒนาในเครื่องบน macOS นอกจากนี้ WSL2 ก็อยู่ในขอบเขตการรองรับด้วย — ใช้เส้นทาง GNU เดียวกับที่เลน `ubuntu-latest` ตรวจสอบไว้ (ให้ clone ลงในไฟล์ซิสเต็มฝั่ง Linux ไม่ใช่ใต้ `/mnt/c`)
 - maturity: `stable` — เป็นฉบับหลักเชิงบรรทัดฐาน
 - 既知の制約: เป็นรีโปเอกสารล้วนที่ไม่มี runtime code และลิงก์ที่ทราบปัญหาสองรายการในมิเรอร์ภาษาไทยกำลังติดตามอยู่ใน [#89](https://github.com/caty-ai/family-dev-handbook/issues/89)
 

@@ -415,7 +415,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 [![Test + Lint](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml/badge.svg)](https://github.com/caty-ai/family-dev-handbook/actions/workflows/test-lint.yml)
 
 - CI: 本地 caller 会运行包含 Test + Lint 在内的 reusable `@ci-v1` 套件（五个关卡），并已启用 suite-count 对账。若要在本地运行与 CI 相同的入口，请使用 `make test` 和 `make lint`。
-- 検証済み環境: CI 会运行 `ubuntu-latest` 与 `macos-latest`，本地开发也使用 macOS。
+- 検証済み環境: CI 会运行 `ubuntu-latest` 与 `macos-latest`，本地开发也使用 macOS。WSL2 同样在支持范围内 — 它运行的正是 `ubuntu-latest` 通道所验证的同一条 GNU 路径（请把仓库 clone 到 Linux 文件系统内，而不是 `/mnt/c` 下）。
 - maturity: `stable` — 规范性正本。
 - 既知の制約: 这是一个不含运行时代码的纯文档仓库；泰语镜像中的两个已知链接由 [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) 跟踪。
 
