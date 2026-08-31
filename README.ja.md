@@ -414,7 +414,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 - CI: ローカル caller から Test + Lint を含む reusable `@ci-v1` セット（5ゲート）を実行し、suite-count 照合を有効にしています。CI と同じエントリーポイントをローカルで実行するには `make test` と `make lint` を使います。
 - 検証済み環境: CI で `ubuntu-latest` と `macos-latest` を実行し、macOS でのローカル開発も行っています。WSL2 も対象です — `ubuntu-latest` レーンが検証しているのと同じ GNU 経路で動きます（clone は `/mnt/c` 配下ではなく Linux ファイルシステム側に）。
 - maturity: `stable` — 規範の正本です。
-- 既知の制約: runtime code を持たない docs-only リポジトリです。また、タイ語ミラーの既知のリンク2件を [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) で追跡しています。
+- 既知の制約: 条文は docs のみですが、`templates/` と `scripts/` に配布用のゲートの型・検査スクリプト（YAML+Python）を含みます。また、タイ語ミラーの既知のリンク2件を [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) で追跡しています。
 
 ---
 
