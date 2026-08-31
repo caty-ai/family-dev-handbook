@@ -417,7 +417,7 @@ Epic 车道（`E-1`–`E-10`）是可选的。只有在负责人批准之后才�
 - CI: 本地 caller 会运行包含 Test + Lint 在内的 reusable `@ci-v1` 套件（五个关卡），并已启用 suite-count 对账。若要在本地运行与 CI 相同的入口，请使用 `make test` 和 `make lint`。
 - 検証済み環境: CI 会运行 `ubuntu-latest` 与 `macos-latest`，本地开发也使用 macOS。WSL2 同样在支持范围内 — 它运行的正是 `ubuntu-latest` 通道所验证的同一条 GNU 路径（请把仓库 clone 到 Linux 文件系统内，而不是 `/mnt/c` 下）。
 - maturity: `stable` — 规范性正本。
-- 既知の制約: 条文均为纯文档，但仓库在 `templates/` 与 `scripts/` 下同时附带可分发的门禁模板与检查脚本（YAML+Python）；泰语镜像中的两个已知链接由 [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) 跟踪。
+- 既知の制約: 条文均为纯文档。`templates/` 以样例形式附带供采用方复制到自己 CI 的范本（门禁模板，YAML+Python），`scripts/` 则是本仓库自身使用的检查脚本；泰语镜像中的两个已知链接由 [#89](https://github.com/caty-ai/family-dev-handbook/issues/89) 跟踪。
 
 ---
 
