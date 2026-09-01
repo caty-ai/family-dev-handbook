@@ -354,11 +354,12 @@ jobs:
             # risk-reviewed の labeled/unlabeled を全ページから集め、created_at (+ 同秒の .id) で
             # 新旧を確定する。API 応答順という契約外依存を排除し、後続 unlabeled なしまで照合する (FP-6・方式2(b))。
             # matched event に created_at が無ければ順序判定不能として赤にする。
+            # gh api は --slurp と --jq を併用できないため、slurp 後の [[...],[...]] をパイプ先の jq -r で一度だけ絞る。
             TIMELINE_DECISION=$(gh api --paginate --slurp \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/timeline?per_page=100" \
-              --jq '[ .[][]
+              | jq -r '[ .[][]
                 | select((.event == "labeled" or .event == "unlabeled") and (.label.name // "") == "risk-reviewed") ]
               | if length == 0 then "NOEVENT"
                 elif any(.[]; (.created_at // "") == "") then "AMBIGUOUS"
