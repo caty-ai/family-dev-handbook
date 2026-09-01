@@ -15,10 +15,13 @@
 | `gitleaks.yml` | 秘密情報の main 到達 | 検知あり・走査範囲が解決不能/空（fail-closed） | 新規 |
 | `pr-size.yml` | レビュー不能な巨大 PR | 除外後 250 行超（既定・**required 非登録の可視化ゲート**） | 新規 |
 | `history-check.yml` | 歴史切断 PR（blame 崩壊） | main と共通祖先なし | 翻案（hermes-agent） |
-| `review-labels.yml` | 高リスク領域の無確認 merge | 高リスクパス変更 + `risk-reviewed` ラベルなし・名簿/宣言の不備（fail-closed） | 翻案（hermes-agent） |
+| `review-labels.yml` | 高リスク領域の無確認 merge | 高リスクパス変更 + `risk-reviewed` ラベルなし・貼付 actor の名簿外/不明・名簿/宣言の不備（fail-closed） | 翻案（hermes-agent） |
 | `scripts/assemble_review_comment.py` | （Layer 2）門番報告の PR コメント1枚化 | —（合成器・ゲートではない） | そのまま（hermes-agent） |
 
-**review-labels の現時点の位置づけ**: オーナー確認の**可視化+監査**装置。赤止め（ラベルが付くまで merge 不可）は機能するが、全エージェントがオーナーの資格情報を共有する運用では「AI がラベルを貼れない」ことの機械的保証は **identity 分離の完了まで無い**。無断貼付はプロトコル違反（handbook E-5）として扱い、PR timeline の監査証跡で追及する — 検知は機械・判定と追及は人間（「検証済み」を装わない — FP-5）。
+**review-labels の現時点の位置づけ**: オーナー確認の**可視化+監査**装置。赤止めと最新の `risk-reviewed` 貼付 actor の base 側名簿照合は機械化されているが、全エージェントがオーナーの資格情報を共有する運用では actor 識別の強さも資格情報の分離の強さに限られ、**identity 分離後にはじめて完全に実効化する**。無断貼付はプロトコル違反（handbook E-5）として扱い、PR timeline の監査証跡で追及する（「検証済み」を装わない — FP-5）。
+
+- この変更を越えて `ci-v1` を前進させる前に、各 caller repo の base 側 `.github/risk-reviewers.txt` に、実際に `risk-reviewed` を貼る GitHub login が正確に載っていることを確認する（名簿と貼付者の不一致はそのリポのゲートを赤にする）。
+- 名簿は bare login を1行ずつ書く。比較は大文字小文字を区別しないが、先頭の `@` は許容せず一致しない。
 
 ## 展開手順（コピペ順）
 
