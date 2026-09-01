@@ -9,19 +9,18 @@
 #           人間 (オーナー) の確認ラベルなしに merge されないこと。検知は機械・判定は人間。
 #
 # ⚠ このゲートの現時点の位置づけ = 「オーナー確認の可視化・監査記録」装置 (FP-5: 装わない):
-#   赤止め (risk-reviewed ラベルが付くまでマージ不可) は機能するが、家族運用では全エージェントが
-#   オーナーの資格情報で API を叩くため、「AI がラベルを貼れない」ことの機械的保証は identity 分離
-#   (エージェント別 author/token) の完了までは無い。無断でラベルを貼る行為はプロトコル違反
-#   (handbook E-5「無承認チェックポイント実行の禁止」) として扱い、PR timeline に監査証跡が残る —
-#   検知は機械・判定と追及は人間。identity 分離の完了後に貼り手 (actor) 検証が実効化する。
+#   赤止めと最新の risk-reviewed 貼付 actor の base 側名簿照合は機械化済み。ただし家族運用では
+#   全エージェントがオーナーの資格情報を共有するため、actor 識別の強さは資格情報の分離の強さに限られる。
+#   この照合が完全に実効化するのは identity 分離 (エージェント別 author/token) 後であり、無断貼付は
+#   引き続きプロトコル違反 (handbook E-5「無承認チェックポイント実行の禁止」) として timeline で追及する。
 #
 # 設計姿勢 (handbook docs/05・docs/06・docs/09):
 # - 高リスク領域の定義の正本は handbook docs/06 (再定義しない)。本ファイルはパスへの写像だけを持つ。
 # - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: ゲート自身のイベント判定 —
 #   作者が単独で起こせるイベント (synchronize / reopened / ready_for_review) の run では承認ラベルを
 #   無効として赤にし、緑に戻せるのは triage 権限者しか起こせないイベント (labeled / unlabeled) だけにする。
-#   ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は可視化のための衛生で、判定はその成否に
-#   依存しない。代替 = 方式2 (タイムライン3条件 AND・末尾コメント参照)。
+#   緑候補では方式2の貼り手条件 (b) も機械照合する。ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は
+#   可視化のための衛生で、判定はその成否に依存しない。
 # - 確認者名簿は base (main) 側の .github/risk-reviewers.txt から読む。PR head から読んではならない —
 #   「PR が名簿に自分を足して自分で通す」循環が開く。名簿不在・空・プレースホルダ = 赤。
 # - ゲート判定は read 権限で完結し fork でも必ず赤/緑を出す。ラベル付与・剥がしの書き込みは
@@ -348,8 +347,37 @@ jobs:
 
           # 方式1 (既定): risk-reviewed の現在有無で判定する (上のイベント束縛と対で機能する)。
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
+            STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+            # API 不調を「貼り手不明のまま緑」へ変換しない (FP-6: 判定不能 = 赤)。
+            # 末尾 marker で command substitution による末尾改行の除去を防ぎ、最新 actor の null を過去の値にすり替えない。
+            TIMELINE_ACTORS=$(gh api --paginate -H "Accept: application/vnd.github+json" "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/timeline?per_page=100" --jq '.[] | select(.event == "labeled" and .label.name == "risk-reviewed") | (.actor.login // "")' && printf '\n__TIMELINE_END__') || {
+              echo "::error::timeline fetch failed — cannot verify who applied risk-reviewed, failing closed (FP-6)."
+              echo "review_status=${STATUS}" > review-status.json
+              exit 1
+            }
+            TIMELINE_ACTORS="${TIMELINE_ACTORS%$'\n'__TIMELINE_END__}"
+            if [ -z "$TIMELINE_ACTORS" ]; then
+              echo "::error::risk-reviewed is present but no matching labeled event was found in the full PR timeline — actor judgment is impossible, failing closed (FP-6)."
+              echo "review_status=${STATUS}" > review-status.json
+              exit 1
+            fi
+            LATEST_TIMELINE_ACTOR=$(printf '%s' "$TIMELINE_ACTORS" | tail -n 1)
+            ACTOR=$(printf '%s\n' "$TIMELINE_ACTORS" | sed '/^$/d' | tail -n 1)
+            if [ -z "$LATEST_TIMELINE_ACTOR" ] || [ -z "$ACTOR" ]; then
+              echo "::error::the most recent risk-reviewed labeled event has no actor — actor judgment is impossible, failing closed (FP-6)."
+              echo "review_status=${STATUS}" > review-status.json
+              exit 1
+            fi
+            ACTOR_FOLDED=$(printf '%s' "$ACTOR" | tr '[:upper:]' '[:lower:]')
+            ROSTER_FOLDED=$(printf '%s\n' "$ROSTER" | tr '[:upper:]' '[:lower:]')
+            if ! grep -Fxq "$ACTOR_FOLDED" <<<"$ROSTER_FOLDED"; then
+              echo "::error::risk-reviewed was most recently applied by '${ACTOR}', who is not in the base-side roster — a roster human must review the diff and re-apply the label."
+              echo "review_status=${STATUS}" > review-status.json
+              exit 1
+            fi
             echo "::notice::risk-reviewed label present — gate green."
             echo "audit: approval is bound to the current head SHA at the gate itself (synchronize/reopened runs go red regardless of the label); the strip job additionally removes the stale label for visibility."
+            echo "audit: risk-reviewed applied by '${ACTOR}' — verified against the base-side roster."
             echo "audit: roster (origin/${BASE_REF}:.github/risk-reviewers.txt):"
             printf '%s\n' "$ROSTER" | sed 's/^/  - /'
             STATUS='[{"source":"risk review","results":[]}]'
@@ -369,13 +397,9 @@ jobs:
           fi
           echo "review_status=${STATUS}" > review-status.json
 
-          # ── 方式2 (代替・採用する場合はこのコメントを実装に差し替える) ──────────
-          # 3条件 AND 判定: (a) risk-reviewed が現在付いている (pull_request.labels)
-          #   ∧ (b) 時系列で最後の labeled イベント (gh api --paginate で timeline 全件取得) の actor が
-          #        名簿に含まれ、それ以降に unlabeled が無い
-          #   ∧ (c) その labeled の created_at が head commit の push 時刻より後
-          # timeline API の取得失敗・空応答は赤 (判定不能扱い・FP-6)。
-          # 手動 re-run は実行時に timeline を再取得するので判定は最新化される (キャッシュしない)。
+          # ── 方式2との hybrid ──────────────────────────────────────────
+          # (a) は方式1のラベル現在有無、(b) は timeline 最新の labeled actor の名簿照合として実装済み。
+          # (c) labeled-after-push 時刻照合はイベント束縛で構造的にカバーするため、意図的に実装しない。
 
       - name: Upload review status artifact
         if: always()
