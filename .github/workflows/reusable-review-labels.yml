@@ -19,7 +19,8 @@
 # - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: ゲート自身のイベント判定 —
 #   作者が単独で起こせるイベント (synchronize / reopened / ready_for_review) の run では承認ラベルを
 #   無効として赤にし、緑に戻せるのは triage 権限者しか起こせないイベント (labeled / unlabeled) だけにする。
-#   緑候補では方式2の貼り手条件 (b) も機械照合する。ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は
+#   緑候補では方式2の貼り手条件 (b) (API 応答順でなく created_at 基準の最新 action が名簿内 actor の labeled で、後続 unlabeled なし) を完全に機械照合する。
+#   ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は
 #   可視化のための衛生で、判定はその成否に依存しない。
 # - 確認者名簿は base (main) 側の .github/risk-reviewers.txt から読む。PR head から読んではならない —
 #   「PR が名簿に自分を足して自分で通す」循環が開く。名簿不在・空・プレースホルダ = 赤。
@@ -296,6 +297,8 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # tr・grep の文字分類を runner の locale に依存させず決定論にする。
+          LC_ALL: C.UTF-8
           DETECT_RESULT: ${{ needs.detect.result }}
           EVENT_ACTION: ${{ github.event.action }}
           RISK_HIT: ${{ needs.detect.outputs.risk_hit }}
@@ -347,37 +350,75 @@ jobs:
 
           # 方式1 (既定): risk-reviewed の現在有無で判定する (上のイベント束縛と対で機能する)。
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
-            STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
             # API 不調を「貼り手不明のまま緑」へ変換しない (FP-6: 判定不能 = 赤)。
-            # 末尾 marker で command substitution による末尾改行の除去を防ぎ、最新 actor の null を過去の値にすり替えない。
-            TIMELINE_ACTORS=$(gh api --paginate -H "Accept: application/vnd.github+json" "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/timeline?per_page=100" --jq '.[] | select(.event == "labeled" and .label.name == "risk-reviewed") | (.actor.login // "")' && printf '\n__TIMELINE_END__') || {
+            # risk-reviewed の labeled/unlabeled を全ページから集め、created_at (+ 同秒の .id) で
+            # 新旧を確定する。API 応答順という契約外依存を排除し、後続 unlabeled なしまで照合する (FP-6・方式2(b))。
+            # matched event に created_at が無ければ順序判定不能として赤にする。
+            TIMELINE_DECISION=$(gh api --paginate --slurp \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/timeline?per_page=100" \
+              --jq '[ .[][]
+                | select((.event == "labeled" or .event == "unlabeled") and (.label.name // "") == "risk-reviewed") ]
+              | if length == 0 then "NOEVENT"
+                elif any(.[]; (.created_at // "") == "") then "AMBIGUOUS"
+                else ( sort_by(.created_at, (.id // 0)) | last
+                       | if .event != "labeled" then "UNLABELED_LATEST"
+                         else "ACTOR\t" + (.actor.login // "") end )
+                end') || {
               echo "::error::timeline fetch failed — cannot verify who applied risk-reviewed, failing closed (FP-6)."
+              STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
               echo "review_status=${STATUS}" > review-status.json
               exit 1
             }
-            TIMELINE_ACTORS="${TIMELINE_ACTORS%$'\n'__TIMELINE_END__}"
-            if [ -z "$TIMELINE_ACTORS" ]; then
-              echo "::error::risk-reviewed is present but no matching labeled event was found in the full PR timeline — actor judgment is impossible, failing closed (FP-6)."
-              echo "review_status=${STATUS}" > review-status.json
-              exit 1
-            fi
-            LATEST_TIMELINE_ACTOR=$(printf '%s' "$TIMELINE_ACTORS" | tail -n 1)
-            ACTOR=$(printf '%s\n' "$TIMELINE_ACTORS" | sed '/^$/d' | tail -n 1)
-            if [ -z "$LATEST_TIMELINE_ACTOR" ] || [ -z "$ACTOR" ]; then
-              echo "::error::the most recent risk-reviewed labeled event has no actor — actor judgment is impossible, failing closed (FP-6)."
-              echo "review_status=${STATUS}" > review-status.json
-              exit 1
-            fi
+            ACTOR_PREFIX=$(printf 'ACTOR\t')
+            # GitHub login は tab を含まず '-' で始まらないため、ACTOR<tab> framing は login と衝突しない。
+            case "$TIMELINE_DECISION" in
+              NOEVENT)
+                echo "::error::risk-reviewed is present but no labeled/unlabeled event for risk-reviewed was found in the full PR timeline — actor judgment is impossible, failing closed (FP-6)."
+                STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+                echo "review_status=${STATUS}" > review-status.json
+                exit 1
+                ;;
+              AMBIGUOUS)
+                echo "::error::risk-reviewed timeline event(s) are missing created_at — recency cannot be established, failing closed (FP-6)."
+                STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+                echo "review_status=${STATUS}" > review-status.json
+                exit 1
+                ;;
+              UNLABELED_LATEST)
+                echo "::error::the newest timeline action on risk-reviewed is a removal, which disagrees with the label-present snapshot — state judgment is impossible, failing closed (FP-6)."
+                STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The PR timeline shows risk-reviewed was removed after its last apply; the label state could not be confirmed. Re-apply the label.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+                echo "review_status=${STATUS}" > review-status.json
+                exit 1
+                ;;
+              "${ACTOR_PREFIX}"*)
+                ACTOR=${TIMELINE_DECISION#"$ACTOR_PREFIX"}
+                if [ -z "$ACTOR" ]; then
+                  echo "::error::the most recent risk-reviewed apply has no recorded actor — actor judgment is impossible, failing closed (FP-6)."
+                  STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The most recent risk-reviewed apply has no recorded actor.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+                  echo "review_status=${STATUS}" > review-status.json
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "::error::unrecognized risk-reviewed timeline decision — actor judgment is impossible, failing closed (FP-6)."
+                STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"The risk-reviewed label actor could not be verified against the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
+                echo "review_status=${STATUS}" > review-status.json
+                exit 1
+                ;;
+            esac
             ACTOR_FOLDED=$(printf '%s' "$ACTOR" | tr '[:upper:]' '[:lower:]')
             ROSTER_FOLDED=$(printf '%s\n' "$ROSTER" | tr '[:upper:]' '[:lower:]')
-            if ! grep -Fxq "$ACTOR_FOLDED" <<<"$ROSTER_FOLDED"; then
-              echo "::error::risk-reviewed was most recently applied by '${ACTOR}', who is not in the base-side roster — a roster human must review the diff and re-apply the label."
+            if ! grep -Fxq -- "$ACTOR_FOLDED" <<<"$ROSTER_FOLDED"; then
+              printf '%s\n' "::error::risk-reviewed was most recently applied by '${ACTOR}', who is not in the base-side roster — a roster human must review the diff and re-apply the label."
+              STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk reviewer verification required","summary":"risk-reviewed was applied by an actor who is not in the base-side roster.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the diff and re-apply the risk-reviewed label."}]}]'
               echo "review_status=${STATUS}" > review-status.json
               exit 1
             fi
             echo "::notice::risk-reviewed label present — gate green."
             echo "audit: approval is bound to the current head SHA at the gate itself (synchronize/reopened runs go red regardless of the label); the strip job additionally removes the stale label for visibility."
-            echo "audit: risk-reviewed applied by '${ACTOR}' — verified against the base-side roster."
+            printf '%s\n' "audit: risk-reviewed applied by '${ACTOR}' — verified against the base-side roster."
             echo "audit: roster (origin/${BASE_REF}:.github/risk-reviewers.txt):"
             printf '%s\n' "$ROSTER" | sed 's/^/  - /'
             STATUS='[{"source":"risk review","results":[]}]'
@@ -398,8 +439,10 @@ jobs:
           echo "review_status=${STATUS}" > review-status.json
 
           # ── 方式2との hybrid ──────────────────────────────────────────
-          # (a) は方式1のラベル現在有無、(b) は timeline 最新の labeled actor の名簿照合として実装済み。
-          # (c) labeled-after-push 時刻照合はイベント束縛で構造的にカバーするため、意図的に実装しない。
+          # (a) は方式1のラベル現在有無、(b) は created_at 基準の最新 risk-reviewed event が
+          # 名簿内 actor の labeled であること (後続 unlabeled なしを含む) まで完全実装済み。
+          # (c) labeled-after-push 時刻照合は意図的に未実装。synchronize / reopened / ready_for_review は
+          # イベント束縛で扱う一方、fork 403 で剥がせない古いラベルの既知残余は templates/ci/README.md に記載する。
 
       - name: Upload review status artifact
         if: always()

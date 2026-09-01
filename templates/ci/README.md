@@ -20,6 +20,9 @@
 
 **review-labels の現時点の位置づけ**: オーナー確認の**可視化+監査**装置。赤止めと最新の `risk-reviewed` 貼付 actor の base 側名簿照合は機械化されているが、全エージェントがオーナーの資格情報を共有する運用では actor 識別の強さも資格情報の分離の強さに限られ、**identity 分離後にはじめて完全に実効化する**。無断貼付はプロトコル違反（handbook E-5）として扱い、PR timeline の監査証跡で追及する（「検証済み」を装わない — FP-5）。
 
+- この変更を越えて `ci-v1` を前進させる前に、各 caller repo の base 側 `.github/risk-reviewers.txt` に、実際に `risk-reviewed` を貼る GitHub login が正確に載っていることを確認する（名簿と貼付者の不一致はそのリポのゲートを赤にする）。
+- 名簿は bare login を1行ずつ書く。比較は大文字小文字を区別しないが、先頭の `@` は許容せず一致しない。
+
 ## 展開手順（コピペ順）
 
 1. `templates/ci/*.yml`（**caller stencil**）を対象リポの `.github/workflows/` へ、`scripts/assemble_review_comment.py` を `scripts/ci/` へコピー（Layer 2 を使わないなら合成器は後回しでよく、`release-sync.yml` は下記 release-sync 節の導入順（handbook release + `ci-v1` 前進の確認）を満たすまでコピーしない）。各ファイルの `uses:` 行が `caty-ai/family-dev-handbook/.github/workflows/reusable-<gate>.yml@ci-v1` を pin していることを確認する（バージョニングは下記「バージョニング」節を参照）
