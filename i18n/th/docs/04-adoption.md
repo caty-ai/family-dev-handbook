@@ -111,7 +111,7 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 1. สร้างหัวข้อ "แผนที่ความปลอดภัยของการทำงานคู่ขนาน" ไว้ใน `ARCHITECTURE.md`（[เทมเพลต](../templates/architecture-parallel-map.md)）
 2. วางเทมเพลต Issue（[templates/issue-template.md](../templates/issue-template.md)）ไว้ใน `.github/ISSUE_TEMPLATE/`（ไม่บังคับแต่แนะนำ）
 3. ทุกคนต้องปฏิบัติตามแนวทางที่หลีกเลี่ยงการ push ตรงเข้า main（ถ้าตั้งค่า branch protection ได้ ให้ตั้งไว้）
-4. จัดเตรียมเทสต์รันเนอร์ + CI workflow แล้วลงทะเบียนไว้ใน required status checks（[T-1](10-test-ci-baseline.md)・รูปแบบดูที่ [templates/ci/](../templates/ci/README.md) รีโปที่ไม่มีโค้ดให้เขียน N/A พร้อมเหตุผลไว้ใน Issue 1 บรรทัด）
+4. จัดเตรียมเทสต์รันเนอร์ + CI workflow แล้วลงทะเบียนไว้ใน required status checks（[T-1](10-test-ci-baseline.md)・รูปแบบดูที่ [templates/ci/](../../../templates/ci/README.md) รีโปที่ไม่มีโค้ดให้เขียน N/A พร้อมเหตุผลไว้ใน Issue 1 บรรทัด）
 5. เมื่อจะเผยแพร่รีโพ ให้ใช้เช็คลิสต์การเผยแพร่（[PB-1](11-publication.md)・[templates/publication-checklist.md](../templates/publication-checklist.md)）เป็นประตูของเลน
 
 ## การแบ่งบทบาทเป็นอิสระของแต่ละเอเจนต์
