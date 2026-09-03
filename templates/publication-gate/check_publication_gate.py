@@ -374,26 +374,31 @@ def _nested_personal_urls(candidate, account_slug):
 
     def marker_positions(marker):
         if len(folded) != len(candidate):
-            return (match.start() for match in re.finditer(re.escape(marker), candidate, re.IGNORECASE))
+            return tuple(
+                match.start()
+                for match in re.finditer(re.escape(marker), candidate, re.IGNORECASE)
+            )
         positions = []
         index = folded.find(marker)
         while index >= 0:
             positions.append(index)
             index = folded.find(marker, index + 1)
-        return positions
+        return tuple(positions)
 
-    for marker in ("github.com", "www.github.com", "gist.github.com"):
-        for index in marker_positions(marker):
-            if index > 0 and candidate[index - 1] in split_characters:
-                starts.add(index)
-    github_io_positions = iter(marker_positions(".github.io"))
-    next_github_io = next(github_io_positions, None)
+    marker_indexes = sorted(
+        {
+            index
+            for marker in ("github.com", ".github.io")
+            for index in marker_positions(marker)
+        }
+    )
+    marker_indexes = iter(marker_indexes)
+    next_marker = next(marker_indexes, None)
     previous_split = -1
     for index, character in enumerate(candidate):
-        while next_github_io == index:
-            if previous_split >= 0:
-                starts.add(previous_split + 1)
-            next_github_io = next(github_io_positions, None)
+        while next_marker == index:
+            starts.add(previous_split + 1 if previous_split >= 0 else 0)
+            next_marker = next(marker_indexes, None)
         if character in split_characters:
             previous_split = index
     repo_name = _personal_url(candidate, account_slug)
@@ -882,6 +887,38 @@ def selftest_policy_parsers():
 
 
 def selftest_scanners():
+    def assert_single_personal_url(source, expected_fragment, message):
+        failures = []
+        _selftest_check(
+            check_personal_urls(
+                {"README.md": source}, "neutral-owner", None, failures
+            )
+            == 1
+            and len(failures) == 1
+            and expected_fragment in failures[0],
+            message,
+        )
+
+    def reference_nested_personal_urls(candidate, account_slug):
+        candidate = candidate.replace("\\", "/")
+        starts = {0}
+        starts.update(
+            index + 1
+            for index, character in enumerate(candidate)
+            if character in "/?#=&" and index + 1 < len(candidate)
+        )
+        field_end = -1
+        matches = set()
+        for start in sorted(starts):
+            if field_end < start:
+                field_end = start
+                while field_end < len(candidate) and candidate[field_end] not in "?#=&":
+                    field_end += 1
+            repo_name = _personal_url(candidate[start:field_end], account_slug)
+            if repo_name is not False:
+                matches.add(repo_name)
+        return matches
+
     rules = (("private marker", re.compile("private" + "[- ]marker", re.IGNORECASE)),)
     failures = []
     documents = {"README.md": "private%2Dmarker\n"}
@@ -1234,6 +1271,89 @@ def selftest_scanners():
         ],
         "nested query repository name excludes later fields",
     )
+    nested_userinfo_cases = (
+        (
+            "https://example.org/?u=user:pass@github." "com/neutral-owner/repo",
+            "neutral-owner/repo",
+            "nested query userinfo repository",
+        ),
+        (
+            "https://example.org/?u=www.gist.github." "com/neutral-owner/id",
+            "personal account profile",
+            "nested query gist profile with www prefix",
+        ),
+        (
+            "https://example.org/?u=User:Pass@GitHub." "com/neutral-owner/repo",
+            "neutral-owner/repo",
+            "nested query mixed-case userinfo repository",
+        ),
+        (
+            "https://example.org/?u=@github." "com/neutral-owner/bareat",
+            "neutral-owner/bareat",
+            "nested query bare-at repository",
+        ),
+        (
+            "https://example.org/?u=user@github." "com/neutral-owner/userinfo",
+            "neutral-owner/userinfo",
+            "nested query single-userinfo repository",
+        ),
+        (
+            "https://example.org/#a&user@github." "com/neutral-owner/frag",
+            "neutral-owner/frag",
+            "fragment ampersand userinfo repository",
+        ),
+    )
+    for source, expected_fragment, message in nested_userinfo_cases:
+        assert_single_personal_url(source, expected_fragment, message)
+    nested_notgithub_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/?u=notgithub." "com/neutral-owner/repo"},
+            "neutral-owner",
+            None,
+            nested_notgithub_failures,
+        )
+        == 0
+        and not nested_notgithub_failures,
+        "nested query notgithub control",
+    )
+    urlsplit_leading_at = urllib.parse.urlsplit(
+        "//@github." "com/neutral-owner/bareat"
+    )
+    _selftest_check(
+        urlsplit_leading_at.hostname == "github.com"
+        and urlsplit_leading_at.path == "/neutral-owner/bareat",
+        "urlsplit treats leading at-sign as userinfo without parser workaround",
+    )
+    nested_reference_cases = (
+        _fixture_personal_url("neutral-owner", "repo"),
+        "github." "com/neutral-owner/repo",
+        "@github." "com/neutral-owner/bareat",
+        "user@github." "com/neutral-owner/userinfo",
+        "user:pass@github." "com/neutral-owner/creds",
+        "User:Pass@GitHub." "com/neutral-owner/case",
+        "www.github." "com/neutral-owner/wwwrepo",
+        "gist.github." "com/neutral-owner/gist-id",
+        "www.gist.github." "com/neutral-owner/gist-id",
+        "github." "com./neutral-owner/trailing-dot",
+        "github." "com:443/neutral-owner/port",
+        "https://example.org/?u=github." "com/neutral-owner/query",
+        "https://example.org/?u=user@github." "com/neutral-owner/query-user",
+        "https://example.org/#github." "com/neutral-owner/frag",
+        "https://example.org/#a&user@github." "com/neutral-owner/frag",
+        "https://github." "com\\/neutral-owner\\/slashes",
+        "github." "com\\/neutral-owner\\/slashes",
+        "https://example.org/?u=%40github." "com/neutral-owner/encoded-at",
+        "https://example.org/?u=neutral-owner.github." "io/page",
+        "https://example.org/?u=notgithub." "com/neutral-owner/nope",
+        "https://example.org/?u=github." "com/neutral-owner/one&b=github." "com/neutral-owner/two",
+    )
+    for candidate in nested_reference_cases:
+        _selftest_check(
+            set(_nested_personal_urls(candidate, "neutral-owner"))
+            == reference_nested_personal_urls(candidate, "neutral-owner"),
+            "nested boundary walk matches reference: %s" % candidate,
+        )
     two_repo_registry = _fixture_registry()
     two_repo_registry["modules"].extend(
         (
