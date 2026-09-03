@@ -131,7 +131,7 @@ hardening として強く推奨する。
 - **ワークフロー自身の改変は機械的には止められない** — `pull_request` トリガは PR head 側のワークフロー定義（caller の `with:` 入力・呼び出し先タグを含む）で実行されるため、門番を無力化する PR はその無力化された門番で判定される（循環）。防御は PR timeline の監査＋可能なら `.github/workflows/` への CODEOWNERS 必須化。これがこのゲートを「可視化+監査」装置と位置づける理由の一つ
 - **`pr-size.yml` と `review-labels.yml` の caller types は削らない** — `labeled` / `unlabeled` / `ready_for_review` と `edited`（pr-size も購読）が無いと緑が古く残る。review-labels では `edited`（title/body edit・base retarget）も synchronize と同様に承認を無効化するため、作者側の PR metadata edit 後はオーナーが `risk-reviewed` を再適用する。`@ci-v1` pin 済みでも `edited` 未追加の caller はこの変更の影響を受けず従来どおり動くため、追随を推奨する (#99)
 - **死にパターン liveness はリポ固有宣言だけ** — `RISK_PATHS_REPO` のみを調べ、汎用網の DEFAULT は意図的に検査しない。網外の新規設定ファイルや別綴りの migrations dir は警告されないため、リポ宣言で補う (#99)
-- **可視化ラベルの失敗分類** — same-repo のラベル一覧取得失敗・`needs-risk-review` 不在・書き込み失敗は赤。fork のラベル一覧取得失敗・ラベル不在・書き込み失敗は、contributor がリポ設定を直せないため警告。`apply-visibility-labels` は visibility-only でゲート判定には影響しない (#94)
+- **可視化ラベルの失敗分類** — same-repo のラベル一覧取得失敗・`needs-risk-review` 不在・書き込み失敗は赤。fork のラベル一覧取得失敗・ラベル不在・書き込み失敗は、contributor がリポ設定を直せないため警告。剥がし（strip）step は衛生専用で失敗は常に警告（承認の無効化はゲートのイベント束縛が担う）。`apply-visibility-labels` は visibility-only でゲート判定には影響しない (#94)
 - **gate の赤は review_status を残す** — `Evaluate gate` step 内の全赤経路（明示的な script exit と EXIT trap が捕捉する予期しない error）で artifact を書く。対象外は、PR が無くコメント先も無い pre-checkout の non-`pull_request` event の赤と、script の前後で起きる infrastructure failure（actions/checkout failure・runner/cancellation kill）であり、これらは artifact を upload せず `if-no-files-found: warn` の warning として現れる (#142)
 
 ## Layer 2（合成器）の配線スケッチ

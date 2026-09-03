@@ -498,7 +498,8 @@ jobs:
           if-no-files-found: warn
 
   # ── 書き込み系 (可視化): 可視化ラベルの付与と、head/diff 変更時の機械剥がし ─────────
-  # fork の取得失敗・ラベル不在・書込失敗は警告、same-repo の取得失敗・ラベル不在・書込失敗は赤。visibility-only でゲート判定には影響しない。
+  # apply step: fork の取得失敗・ラベル不在・書込失敗は警告、same-repo の同失敗は赤。strip step は衛生専用で
+  # 失敗は fork/same-repo とも警告 (ゲートのイベント束縛が承認無効化の正本)。visibility-only でゲート判定には影響しない。
   labels:
     name: apply-visibility-labels
     needs: detect
@@ -529,9 +530,11 @@ jobs:
           LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
             echo "::warning::label fetch failed — skipping strip (hygiene only; gate judgment is unaffected)."; exit 0; }
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
-            gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label 'risk-reviewed' \
-              || echo "::warning::could not remove risk-reviewed — write failure on a fork PR (403 expected — any write failure on a fork is treated as the no-token case)."
-            echo "risk-reviewed removed: approval is bound to the head SHA the owner saw; a new push requires re-review."
+            if gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label 'risk-reviewed'; then
+              echo "risk-reviewed removed: approval is bound to the head SHA the owner saw; a new push / edit requires re-review."
+            else
+              echo "::warning::could not remove risk-reviewed (hygiene only — a fork PR has no write token, and the gate voids the approval on this event regardless). Gate judgment is unaffected."
+            fi
           fi
 
       - name: Apply needs-risk-review label (可視化専用・判定に影響しない)
