@@ -56,6 +56,8 @@ git worktree add ../<repo>-wt/<issue> -b fix/<issue>-<slug> origin/main
 让与 WIP 声明的差异（比声明多出/少了的文件）在 review 时能被看见。
 merge 时需将声明的文件集合与 `git diff --stat` 对照 — **diff 中存在但清单中没有的文件视为 blocking**（属于 [L1-7](02-issue-loop.md) 完成证据门槛的一部分）。
 
+**多阶段 PR 的正文中不得出现 `close(s|d) #N` / `fix(es|ed) #N` / `resolve(s|d) #N` 这样的字面字符串。** GitHub 的关键字解析既不读否定形也不读上下文 — 写成 `Does not close #18` 也会在 merge 时关闭 #18（sitter#18・handbook#80 出现过实际损害）。只有**该次 merge 本身就能满足 Done when 的全部项目**时才允许使用关闭关键字。bootstrap PR・多阶段 PR・merge 后仍有 Done when 未完成的 PR，请改写为 "leaves #N open" / "tracked in #N"，并由最后一阶段的完成记录（[L1-4](02-issue-loop.md) 的终止评论）来关闭 Issue。
+
 ## L0-7 一次只合并一个
 
 ```

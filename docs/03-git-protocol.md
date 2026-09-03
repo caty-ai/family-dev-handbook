@@ -54,6 +54,8 @@ main への直接 push 禁止。すべて PR 経由。
 WIP宣言との差分（宣言より増えた/減ったファイル）がレビューで見えるようにする。
 merge 時は宣言ファイル集合と `git diff --stat` を突き合わせる — **diff にあって一覧にないファイルは blocking**（[L1-7](02-issue-loop.md) 完了証拠ゲートの一部）。
 
+**多段レーンの PR 本文に `close(s|d) #N` / `fix(es|ed) #N` / `resolve(s|d) #N` の文字列を書かない。** GitHub のキーワード解析は否定形も文脈も読まず、`Does not close #18` と書いても merge 時に #18 を閉じる（sitter#18・handbook#80 で実害）。閉じるキーワードを使ってよいのは**その merge だけで Done when の全項目が満たされるとき**に限る。bootstrap PR・複数段の PR・merge 後に Done when が残る PR では「leaves #N open」「tracked in #N」のように書き、Issue の close は最終段の完了記録（[L1-4](02-issue-loop.md) の終端コメント）で行う。
+
 ## L0-7 マージは1本ずつ
 
 ```

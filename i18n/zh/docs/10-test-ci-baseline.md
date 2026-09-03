@@ -80,6 +80,7 @@ L 层（L2 / L1 / L0）是「如何推进工作」的契约，R 层是「接受�
 
 tag 的内容与签名：
 
+- **tag message 的格式 — 第 1 行 = 标题（120 字以内）・第 2 行 = 空行・第 3 行起 = 正文**。第 1 行是一句话点明该 release 的主题，release-sync 载体（[templates/ci/](../../../templates/ci/README.md)）会**去掉首尾空白后原样用作 Release 标题**。超过 120 字时 Release 标题会 fallback 为 tag 名，且事后无法恢复（改写 annotated tag 等于改写共享历史，因此不做 — [Issue #118](https://github.com/caty-ai/family-dev-handbook/issues/118) 中实测有 4 个 release 因此无法恢复）。120 这个值是按 git subject 惯例（约 50〜72 字）的约 2 倍设定的上限，并且**与 `reusable-release-sync.yml` 的实现值一致** — 不得只动其中一方；要改数值时，实现与本条须在同一 PR 中一起改。正文仍按下一项放置证据指针
 - release notes（tag message 或 Releases）须引用**至少一个可验证证据的指针**（CI run、带完成记录的 PR 等）——与「不放置无法验证的数字」这一原则（[R 层](09-rejection-rubric.md)）保持一致。这与完成记录本体的证据规律（[L1-7](02-issue-loop.md)②「仅有链接的证据不合格」）属于不同语境——记录本身以内联为准，tag 只需指针即可
 - **拥有签名验证机制的仓库（updater 等・由机器验证 tag 签名的场景）须使用签名 tag，密钥按仓库各自管理**。要求签名的仓库，应在 MERGED 的履行报告中用一个词写明是否已签名（让签名的缺失从记录层面就能看见）。其余情况 annotated 即可，签名为 SHOULD
 - 版本号的升幅（MAJOR / MINOR / PATCH）遵循 SemVer 的一般规则，本条不作约束
