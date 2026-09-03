@@ -18,15 +18,15 @@
 # 設計姿勢 (handbook docs/05・docs/06・docs/09):
 # - 高リスク領域の定義の正本は handbook docs/06 (再定義しない)。本ファイルはパスへの写像だけを持つ。
 # - 承認は「貼り手」と「head SHA」の両方に束縛する。既定 = 方式1: ゲート自身のイベント判定 —
-#   作者が単独で起こせるイベント (synchronize / reopened / ready_for_review) の run では承認ラベルを
+#   作者が単独で起こせるイベント (edited / synchronize / reopened / ready_for_review) の run では承認ラベルを
 #   無効として赤にし、緑に戻せるのは triage 権限者しか起こせないイベント (labeled / unlabeled) だけにする。
 #   緑候補では方式2の貼り手条件 (b) (API 応答順でなく created_at 基準の最新 action が名簿内 actor の labeled で、後続 unlabeled なし) を完全に機械照合する。
 #   ラベルの機械剥がし (「剥がしは機械・貼るのは人間」) は
 #   可視化のための衛生で、判定はその成否に依存しない。
 # - 確認者名簿は base (main) 側の .github/risk-reviewers.txt から読む。PR head から読んではならない —
 #   「PR が名簿に自分を足して自分で通す」循環が開く。名簿不在・空・プレースホルダ = 赤。
-# - ゲート判定は read 権限で完結し fork でも必ず赤/緑を出す。ラベル付与・剥がしの書き込みは
-#   fork では 403 になるため警告に留める (fail-open・ゲート判定には影響させない)。
+# - ゲート判定は read 権限で完結し fork でも必ず赤/緑を出す。fork のラベル取得失敗・ラベル不在・
+#   書き込み失敗は警告、same-repo のラベル取得失敗・ラベル不在・書き込み失敗は赤。visibility-only でゲート判定には影響しない。
 # - pull_request_target は使わない (untrusted コードに write トークンを渡す典型的脆弱形)。
 # - risk_paths_* 入力は宣言必須・fail-closed のカテゴリ入力であって pr-size の exclude_patterns
 #   とは性質が違う: review-labels は security gate なので、caller が __DECLARE_ME__ のまま渡す
@@ -329,11 +329,16 @@ jobs:
             write_action_required "Risk detection failed" "detect-risk-paths job result '${DETECT_RESULT}'; high-risk paths could not be judged; failing closed." "Fix the risk path declarations in the caller with: block, then re-run the workflow."
             exit 1
           fi
-          if [ "$RISK_HIT" != "true" ]; then
+          if [ "$RISK_HIT" = "false" ]; then
             echo "::notice::no high-risk paths touched — gate green."
             # 高リスク変更が無くても check は常に走って明示的な緑を出す (skipped の意味論に頼らない)。
             echo 'review_status=[]' > review-status.json
             exit 0
+          fi
+          if [ "$RISK_HIT" != "true" ]; then
+            echo "::error::risk_hit='${RISK_HIT}' is neither true nor false — cannot judge, failing closed (FP-6)."
+            write_action_required "Risk detection output invalid" "detect-risk-paths reported success but risk_hit='${RISK_HIT}' is neither true nor false; cannot judge, failing closed (FP-6)." "Open the detect-risk-paths job log; re-run the workflow."
+            exit 1
           fi
 
           # 確認者名簿: base (main) 側から読む。PR head から読まない (自己承認の循環封じ)。
@@ -354,28 +359,27 @@ jobs:
           fi
 
           # 承認の head SHA 束縛はイベント種別で行う (剥がしジョブの成功に依存しない):
-          # synchronize (新 push)・reopened (閉鎖中の push を挟みうる)・ready_for_review (draft⇄ready の
-          # 往復は PR 作者が単独で起こせる) では、承認ラベルの有無にかかわらず赤 — 「新しい head /
-          # 作者起点の再評価は未承認」。承認がラベル現在値で再評価されるのは labeled / unlabeled の run
-          # (どちらも triage 権限者にしか起こせない) に限られる。ラベル剥がし (書き込み) が 403 になる
-          # fork PR でも、作者単独の承認持ち回しは成立しない。
-          # base retarget も judged diff を差し替える: risky change 済み staging へ PR を開いて空 diff を緑にし、
-          # main へ付け替えると stale green を持ち回せる。caller が edited を購読した時だけここで再評価する (#99)。
-          if [ "$EVENT_ACTION" = "edited" ] && [ -n "$BASE_CHANGED_FROM" ]; then
-            echo "::error::base branch retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}' (event: edited) — the judged diff changed; any previous risk-reviewed approval is void for this head"
-            echo ""
-            echo "touched high-risk files:"
-            printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
-            write_action_required "Risk re-review required" "The base branch was retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}'; the judged diff changed and previous approval is void for this head." "Ask an owner listed in .github/risk-reviewers.txt to review the retargeted diff and re-apply the risk-reviewed label."
-            exit 1
-          fi
-          if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ] || [ "$EVENT_ACTION" = "ready_for_review" ]; then
-            echo "::error::new head SHA (event: ${EVENT_ACTION}) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
-            echo ""
-            echo "touched high-risk files:"
-            printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
-            STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk re-review required","summary":"The head changed; previous approval is void. Re-apply risk-reviewed for this head SHA.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the new diff and re-apply the risk-reviewed label."}]}]'
-            echo "review_status=${STATUS}" > review-status.json
+          # edited (title/body edit・base retarget)・synchronize (新 push)・reopened (閉鎖中の push を挟みうる)・
+          # ready_for_review (draft⇄ready の往復) はすべて PR 作者が単独で起こせるため、承認ラベルの
+          # 有無にかかわらず赤 — 「新しい head / 作者起点の再評価は未承認」。承認がラベル現在値で
+          # 再評価されるのは labeled / unlabeled の run (どちらも triage 権限者にしか起こせない) に
+          # 限られる。ラベル剥がし (書き込み) が 403 になる fork PR でも、作者単独の承認持ち回しは
+          # 成立しない。edited を購読していない caller はこの分岐を起動しないため従来どおり動く (#99)。
+          if [ "$EVENT_ACTION" = "edited" ] || [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ] || [ "$EVENT_ACTION" = "ready_for_review" ]; then
+            if [ "$EVENT_ACTION" = "edited" ] && [ -n "$BASE_CHANGED_FROM" ]; then
+              echo "::error::base branch retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}' (event: edited) — the judged diff changed; any previous risk-reviewed approval is void for this head"
+              echo ""
+              echo "touched high-risk files:"
+              printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
+              write_action_required "Risk re-review required" "The base branch was retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}'; the judged diff changed and previous approval is void for this head." "Ask an owner listed in .github/risk-reviewers.txt to review the retargeted diff and re-apply the risk-reviewed label."
+            else
+              echo "::error::new head SHA (event: ${EVENT_ACTION}) or author-editable PR metadata (edited) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
+              echo ""
+              echo "touched high-risk files:"
+              printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
+              STATUS='[{"source":"risk review","results":[{"kind":"action_required","title":"Risk re-review required","summary":"The head changed; previous approval is void. Re-apply risk-reviewed for this head SHA.","detail":"","how_to_fix":"Ask an owner listed in .github/risk-reviewers.txt to review the new diff and re-apply the risk-reviewed label."}]}]'
+              echo "review_status=${STATUS}" > review-status.json
+            fi
             exit 1
           fi
 
@@ -455,7 +459,7 @@ jobs:
               exit 1
             fi
             echo "::notice::risk-reviewed label present — gate green."
-            echo "audit: approval is bound to the current head SHA at the gate itself (synchronize/reopened runs go red regardless of the label); the strip job additionally removes the stale label for visibility."
+            echo "audit: approval is bound to the current head SHA at the gate itself (edited/synchronize/reopened/ready_for_review runs go red regardless of the label); the strip job additionally removes the stale label for visibility."
             printf '%s\n' "audit: risk-reviewed applied by '${ACTOR}' — verified against the base-side roster."
             echo "audit: roster (origin/${BASE_REF}:.github/risk-reviewers.txt):"
             printf '%s\n' "$ROSTER" | sed 's/^/  - /'
@@ -479,7 +483,7 @@ jobs:
           # ── 方式2との hybrid ──────────────────────────────────────────
           # (a) は方式1のラベル現在有無、(b) は created_at 基準の最新 risk-reviewed event が
           # 名簿内 actor の labeled であること (後続 unlabeled なしを含む) まで完全実装済み。
-          # (c) labeled-after-push 時刻照合は意図的に未実装。synchronize / reopened / ready_for_review は
+          # (c) labeled-after-push 時刻照合は意図的に未実装。edited / synchronize / reopened / ready_for_review は
           # イベント束縛で扱う一方、fork 403 で剥がせない古いラベルの既知残余は templates/ci/README.md に記載する。
 
       - name: Upload review status artifact
@@ -494,7 +498,7 @@ jobs:
           if-no-files-found: warn
 
   # ── 書き込み系 (可視化): 可視化ラベルの付与と、head/diff 変更時の機械剥がし ─────────
-  # fork 403 は警告、ラベル不在・same-repo 書込失敗は赤。visibility-only でゲート判定には影響しない。
+  # fork の取得失敗・ラベル不在・書込失敗は警告、same-repo の取得失敗・ラベル不在・書込失敗は赤。visibility-only でゲート判定には影響しない。
   labels:
     name: apply-visibility-labels
     needs: detect
@@ -512,9 +516,9 @@ jobs:
             exit 1
           fi
 
-      # 新 push に加え base retarget でも judged diff が変わるため、古い承認を可視化上も剥がす (#99)。
-      - name: Strip approval labels on new push (剥がしは機械・貼るのは人間)
-        if: github.event.action == 'synchronize' || (github.event.action == 'edited' && github.event.changes.base.ref.from != '')
+      # edited は title/body edit と base retarget の両方を含む。新 push / edit 後の古い承認を可視化上も剥がす (#99)。
+      - name: Strip approval labels on new push / edit (剥がしは機械・貼るのは人間)
+        if: github.event.action == 'synchronize' || github.event.action == 'edited'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -526,7 +530,7 @@ jobs:
             echo "::warning::label fetch failed — skipping strip (hygiene only; gate judgment is unaffected)."; exit 0; }
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
             gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label 'risk-reviewed' \
-              || echo "::warning::could not remove risk-reviewed (fork PR has no write token — 403 is expected there)."
+              || echo "::warning::could not remove risk-reviewed — write failure on a fork PR (403 expected — any write failure on a fork is treated as the no-token case)."
             echo "risk-reviewed removed: approval is bound to the head SHA the owner saw; a new push requires re-review."
           fi
 
@@ -539,17 +543,25 @@ jobs:
         run: |
           set -euo pipefail
           LABEL_NAMES=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/labels?per_page=100" --jq '.[].name') || {
+            if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+              echo "::warning::label list fetch failed for 'needs-risk-review' in ${GITHUB_REPOSITORY}; a fork contributor cannot fix repository labels, so continuing without the visibility label. Gate evaluation is unaffected."
+              exit 0
+            fi
             echo "::error::label list fetch failed — cannot verify that 'needs-risk-review' exists in ${GITHUB_REPOSITORY}; failing red (visibility job only — gate judgment is unaffected)"
             exit 1
           }
           if ! grep -Fxq 'needs-risk-review' <<<"$LABEL_NAMES"; then
+            if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+              echo "::warning::label 'needs-risk-review' is missing in ${GITHUB_REPOSITORY}; a fork contributor cannot fix repository labels, so continuing without the visibility label. Gate evaluation is unaffected."
+              exit 0
+            fi
             echo "::error::label 'needs-risk-review' is missing in ${GITHUB_REPOSITORY}; create it per templates/ci/README.md step 3: gh label create needs-risk-review --color D93F0B --description \"高リスク領域に触れた PR (機械が自動付与)\""
             exit 1
           fi
           if ! ERR=$(gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label 'needs-risk-review' 2>&1); then
             printf '%s\n' "$ERR"
             if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
-              echo "::warning::could not add needs-risk-review on a fork PR (no write token — 403 is expected there). Gate evaluation is unaffected."
+              echo "::warning::could not add needs-risk-review: write failure on a fork PR (403 expected — any write failure on a fork is treated as the no-token case). Gate evaluation is unaffected."
               exit 0
             fi
             echo "::error::could not add needs-risk-review on a same-repo PR — this is not the fork 403 case; failing red so the missing visibility label is not silently absent. Gate evaluation is unaffected."

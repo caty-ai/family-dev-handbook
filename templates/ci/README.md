@@ -124,15 +124,15 @@ hardening として強く推奨する。
 - **死にパターン警告は「緑だが守れていない」の唯一のシグナル** — 宣言パターンが HEAD の1ファイルにも解決しない時、detect-risk-paths ログに `::warning::` が出る（LC-5: 検知は機械・判断は人間 — check は赤にならない）。展開時（手順 6）と、リネーム・配置変更を含む PR のマージ時に確認し、出ていたら宣言を追随させる。例外は1つ: **auth コードが本当に無いリポの `risk_paths_auth: 'none'` は AUTH 警告が常在する（仕様）** — 「auth コード無し」を確認した記録を宣言行のコメントに残せば、その警告は既知として許容してよい
 - **v0.9.2 で `risk_paths_auth` が増えた（第4常設カテゴリ）** — v0.9.1 以前の展開済みリポにキャリアーを再コピーすると、AUTH を宣言するまで全 PR が赤になる（仕様・fail-closed）。更新 PR に AUTH 宣言（実パス列挙 or `none`）を必ず同梱する
 - **fetch-depth** — 履歴を使う門番（gitleaks / pr-size / history-check / review-labels）は `fetch-depth: 0` が必須（reusable 側に焼き込み済み・浅くすると「diff 解決不能 → 緑」の fail-open になる）
-- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除は**作者が単独で起こせるイベント（synchronize / reopened / ready_for_review、pr-size は edited も）の run では常に無効**で、緑に戻せるのは triage 権限者しか起こせないイベント（labeled / unlabeled）だけ — 作者単独の承認持ち回しは fork でも成立しない。ラベル付与・剥がし（write）は 403 で警告になる（可視化の劣化のみ）。**残余**: 剥がせない古いラベルが triage 権限者の別ラベル操作（labeled / unlabeled の run）で再び有効に見える経路は残る — 共有クレデンシャル環境ではこの線引き自体が identity 分離（機械的保証の前提）待ちであり、このゲートの「可視化+監査」位置づけの範囲内。厳密な SHA 束縛が要る場合は方式2（タイムライン3条件 AND）へ
+- **fork PR** — ゲート判定（read）は fork でも必ず走って赤/緑を出す。承認・免除は**作者が単独で起こせるイベント（edited〔title/body edit・base retarget〕/ synchronize / reopened / ready_for_review）の run では常に無効**で、緑に戻せるのは triage 権限者しか起こせないイベント（labeled / unlabeled）だけ — 作者単独の承認持ち回しは fork でも成立しない。ラベル付与・剥がし（write）は失敗時に警告になる（可視化の劣化のみ）。**残余**: 剥がせない古いラベルが triage 権限者の別ラベル操作（labeled / unlabeled の run）で再び有効に見える経路は残る — 共有クレデンシャル環境ではこの線引き自体が identity 分離（機械的保証の前提）待ちであり、このゲートの「可視化+監査」位置づけの範囲内。厳密な SHA 束縛が要る場合は方式2（タイムライン3条件 AND）へ
 - **`pull_request_target` は使わない** — untrusted コードに write トークンを渡す典型的脆弱形（全門番 `pull_request` トリガ）
 - **gitleaks の赤を消しても秘密は無効化されない** — 一度 push した秘密は必ず rotate する。本線は commit 前のローカル hook・CI は最後の網。検知の許容（allowlist）は base 側 `.gitleaks.toml` だけが効く — PR 側の設定・`.gitleaksignore`・inline `gitleaks:allow` は無効化してある（自己緩和封じ）
 - **承認後の push で承認が無効になるのは仕様** — 承認（`risk-reviewed` / `size-exempt`）は「オーナーが見た head SHA」に束縛される。無効化はゲート自身のイベント判定で行われ、ラベル剥がしジョブは可視化のための衛生（「剥がしは機械・貼るのは人間」）
 - **ワークフロー自身の改変は機械的には止められない** — `pull_request` トリガは PR head 側のワークフロー定義（caller の `with:` 入力・呼び出し先タグを含む）で実行されるため、門番を無力化する PR はその無力化された門番で判定される（循環）。防御は PR timeline の監査＋可能なら `.github/workflows/` への CODEOWNERS 必須化。これがこのゲートを「可視化+監査」装置と位置づける理由の一つ
-- **`pr-size.yml` と `review-labels.yml` の caller types は削らない** — `labeled` / `unlabeled` / `ready_for_review` と `edited`（review-labels は base retarget の再評価）が無いと緑が古く残る。`@ci-v1` pin 済みでも `edited` 未追加の caller は従来どおり retarget 防御なしで動くため、追随を推奨するが互換性には影響しない (#99)
+- **`pr-size.yml` と `review-labels.yml` の caller types は削らない** — `labeled` / `unlabeled` / `ready_for_review` と `edited`（pr-size も購読）が無いと緑が古く残る。review-labels では `edited`（title/body edit・base retarget）も synchronize と同様に承認を無効化するため、作者側の PR metadata edit 後はオーナーが `risk-reviewed` を再適用する。`@ci-v1` pin 済みでも `edited` 未追加の caller はこの変更の影響を受けず従来どおり動くため、追随を推奨する (#99)
 - **死にパターン liveness はリポ固有宣言だけ** — `RISK_PATHS_REPO` のみを調べ、汎用網の DEFAULT は意図的に検査しない。網外の新規設定ファイルや別綴りの migrations dir は警告されないため、リポ宣言で補う (#99)
-- **可視化ラベルの失敗分類** — `needs-risk-review` 不在と same-repo の書き込み失敗は赤、fork 403 だけは警告。`apply-visibility-labels` は visibility-only でゲート判定には影響しない (#94)
-- **gate の赤は review_status を残す** — detect 失敗・名簿不備・ラベル取得失敗を含む全赤経路で artifact を書く。PR が無くコメント先も無い pre-checkout の赤だけは対象外 (#142)
+- **可視化ラベルの失敗分類** — same-repo のラベル一覧取得失敗・`needs-risk-review` 不在・書き込み失敗は赤。fork のラベル一覧取得失敗・ラベル不在・書き込み失敗は、contributor がリポ設定を直せないため警告。`apply-visibility-labels` は visibility-only でゲート判定には影響しない (#94)
+- **gate の赤は review_status を残す** — `Evaluate gate` step 内の全赤経路（明示的な script exit と EXIT trap が捕捉する予期しない error）で artifact を書く。対象外は、PR が無くコメント先も無い pre-checkout の non-`pull_request` event の赤と、script の前後で起きる infrastructure failure（actions/checkout failure・runner/cancellation kill）であり、これらは artifact を upload せず `if-no-files-found: warn` の warning として現れる (#142)
 
 ## Layer 2（合成器）の配線スケッチ
 
