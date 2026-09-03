@@ -34,9 +34,14 @@ required status check に登録して初めて「保護済み」と扱う。
 個人用 URL は URL 候補を解析して host を正規化してから照合する。`github.com/<slug>` に加え、
 `github.com:443/<slug>`、`github.com./<slug>`、`gist.github.com/<slug>`、
 `<slug>.github.io` も対象になる。host の port は無視し、末尾の dot は1個だけ除く。
+URL 候補の path 内に `github.com/<slug>`・`gist.github.com/<slug>`・`<slug>.github.io` が現れる場合
+（`foo.bar/github.com/<slug>/<repo>`、`?u=github.com/<slug>/...`、`github.com\/<slug>\/...`）も
+personal-url として赤にする。`https://example.org/docs/github.com/<slug>/<repo>` のような無関係ホストの
+path に personal URL が現れる場合や、`<slug>.github.io` という segment があるだけでも赤になる fail-closed
+の設計であり、該当テキストを修正するか registry allowlist へ追加して対処する。
 `--account-slug` は前後の空白を除いた後、GitHub slug 形の
 `^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$` に一致しなければ設定不備として赤になる。
-`@` の直前が e-mail の local part を構成しない文字（空白・括弧・`!` など）の場合は bare
+`@` の直前が英数字または `_` の word character でない場合は bare
 `@host/...` として URL 検査の対象になる。
 
 ## 展開手順（コピペ順）
@@ -173,17 +178,18 @@ __pycache__
 
 列挙された regular file は suffix やファイル名で選別せず、`.env.local`、`.cs`、`.csproj`、`.ipynb`、
 `.txt`、`.csv`、`LICENSE`、`Dockerfile`、拡張子なしもすべて先に UTF-8 decode を試す。decode
-できなかった場合だけ、明示した既知の binary suffix または exact filename `.DS_Store` を binary として
-スキャン対象外にする。それ以外は未知の text-like file として
+できなかった場合だけ、明示した既知の binary suffix、exact filename `.DS_Store`、または先頭が
+`bplist00` の binary plist signature を持つファイルを binary としてスキャン対象外にする。それ以外は未知の
+text-like file として
 `source-read: ... is not valid UTF-8 text (fail-closed)` で赤にする。binary と判定したファイルは
 `binary files skipped: N` に集計した直後へ
 `  skipped (binary): <relative path>` と1ファイル1行で名前も表示する。Git mode の symlink は Git が
 公開する readlink text を検査する。`rglob-fallback` は symlink を follow せず、
 `symlinks skipped: N` に集計する。
 
-binary suffix の例には `.png` と `.plist` が含まれる。ただし suffix は decode 前の除外条件ではないため、
-UTF-8 XML の `.plist` は通常どおり全文を検査し、binary plist のように UTF-8 decode できないものだけを
-skip する。
+binary suffix の例には `.png` と `.icns` が含まれる。`.plist` は binary set に入れず、UTF-8 XML plist は
+通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は suffix にかかわらず
+`bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
 
 `BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
 調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
@@ -211,9 +217,15 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   `registry/modules.json` が disk 上にある状態、または非空の `.publication-label-whitelist` がある状態での
   `--no-registry` も赤になる。
 - bare `@github.com/<slug>/<repo>` と `@github.com/<slug>` も personal-url として検出する。
-  個人用 URL 検査は e-mail 形（`local@host/...`）を意図的に URL とみなさないため、採用リポの
+  `+@github.com/<slug>/<repo>` と `%@github.com/<slug>/<repo>` も検出する一方、`@` の直前が英数字または
+  `_` の word character の e-mail 形は意図的に URL とみなさないため、採用リポの
   `.publication-denylist` は e-mail ルールを**必ず**含めること。sample には `email-address` ルールを同梱し、
   sample を使わず自前 denylist を書く場合も同等のルールを載せる。
+- URL 候補の path 内に `github.com/<slug>`・`gist.github.com/<slug>`・`<slug>.github.io` が現れる場合
+  （`foo.bar/github.com/<slug>/<repo>`、`?u=github.com/<slug>/...`、`github.com\/<slug>\/...`）も
+  personal-url として赤にする。`https://example.org/docs/github.com/<slug>/<repo>` のような無関係ホストの
+  path に personal URL が現れる場合や、`<slug>.github.io` segment があるだけでも赤になる fail-closed のため、
+  該当テキストを修正するか registry allowlist へ追加して対処する。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.22.0` として切る）。
 
 ## family-os / organization `.github` からの移行

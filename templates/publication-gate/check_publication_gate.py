@@ -16,7 +16,6 @@ import io
 import json
 import os
 from pathlib import Path
-import plistlib
 import re
 import shutil
 import stat
@@ -34,25 +33,27 @@ WHITELIST_NAME = ".publication-label-whitelist"
 ACCOUNT_SLUG = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$")
 BINARY_SUFFIXES = frozenset(
     (
-        ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".bmp", ".tif",
-        ".tiff", ".avif", ".heic", ".heif", ".psd", ".svgz", ".woff", ".woff2",
-        ".ttf", ".otf", ".eot", ".zip", ".gz", ".tgz", ".tar", ".bz2", ".xz",
-        ".zst", ".7z", ".rar", ".jar", ".war", ".whl", ".egg", ".gem", ".nupkg",
+        ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".icns", ".bmp", ".tif",
+        ".tiff", ".avif", ".heic", ".heif", ".jfif", ".psd", ".ai", ".eps", ".sketch",
+        ".fig", ".glb", ".gltf", ".svgz", ".woff", ".woff2", ".ttf", ".ttc", ".otf",
+        ".eot", ".zip", ".gz", ".tgz", ".tar", ".bz2", ".xz", ".zst", ".lz4", ".7z",
+        ".rar", ".iso", ".img", ".jar", ".war", ".whl", ".egg", ".gem", ".nupkg",
         ".deb", ".rpm", ".dmg", ".pkg", ".apk", ".ipa", ".pdf", ".doc", ".docx",
-        ".xls", ".xlsx", ".ppt", ".pptx", ".key", ".numbers", ".pages", ".odt",
-        ".ods", ".odp", ".mp3", ".mp4", ".m4a", ".m4v", ".mov", ".avi", ".mkv",
-        ".webm", ".wav", ".flac", ".ogg", ".oga", ".ogv", ".aac", ".aif", ".aiff",
-        ".so", ".dylib", ".dll", ".exe", ".o", ".a", ".lib", ".obj", ".class",
-        ".pyc", ".pyd", ".wasm", ".bin", ".dat", ".db", ".sqlite", ".sqlite3",
-        ".pak", ".bundle", ".mo", ".pb", ".onnx", ".npy", ".npz", ".parquet",
-        ".arrow", ".pickle", ".pkl", ".h5", ".hdf5", ".plist",
+        ".xls", ".xlsx", ".ppt", ".pptx", ".numbers", ".pages", ".odt", ".ods", ".odp",
+        ".mp3", ".mp4", ".m4a", ".m4v", ".mov", ".avi", ".mkv", ".webm", ".wav",
+        ".flac", ".ogg", ".oga", ".ogv", ".aac", ".aif", ".aiff", ".flv", ".mpg",
+        ".mpeg", ".wmv", ".opus", ".mid", ".midi", ".swf", ".so", ".dylib", ".dll",
+        ".exe", ".o", ".a", ".lib", ".obj", ".class", ".node", ".pdb", ".rlib",
+        ".xcuserstate", ".pyc", ".pyd", ".wasm", ".bin", ".dat", ".db", ".mdb", ".rdb",
+        ".sqlite", ".sqlite3", ".pak", ".bundle", ".mo", ".pb", ".onnx", ".npy", ".npz",
+        ".parquet", ".arrow", ".pickle", ".pkl", ".h5", ".hdf5",
     )
 )
 URL_CANDIDATE = re.compile(
-    r"(?<![A-Za-z0-9._-])(?<![A-Za-z0-9_%+]@)"
+    r"(?<![A-Za-z0-9._-])(?<![A-Za-z0-9_]@)(?<![A-Za-z0-9_][%+]@)"
     r"(?:https?://(?:[A-Za-z0-9._~!$&'()*+,;=:%-]+@)?)?"
     r"(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+\.?(?::[0-9]+)?"
-    r"(?:/[^\s<>'\"`()\[\]{}]*)?",
+    r"(?:[\\/][^\s<>'\"`()\[\]{}]*)?",
     re.IGNORECASE,
 )
 LANG_SUFFIX = re.compile(r"\.(?P<lang>[a-z]{2}(?:-[a-z]{2})?)\.md$")
@@ -282,10 +283,15 @@ def read_sources(root, failures, excluded_policy_path):
             if not stat.S_ISREG(mode):
                 failures.append("source-read: %s is not a regular file" % relative)
                 continue
+            raw = path.read_bytes()
             try:
-                documents[relative] = path.read_bytes().decode("utf-8")
+                documents[relative] = raw.decode("utf-8")
             except UnicodeDecodeError:
-                if path.suffix.lower() in BINARY_SUFFIXES or path.name == ".DS_Store":
+                if (
+                    path.suffix.lower() in BINARY_SUFFIXES
+                    or path.name == ".DS_Store"
+                    or raw.startswith(b"bplist00")
+                ):
                     binary_skipped += 1
                     binary_skipped_paths.append(relative)
                 else:
@@ -322,6 +328,7 @@ def check_denylist(documents, rules, failures):
 
 
 def _personal_url(candidate, account_slug):
+    candidate = candidate.replace("\\", "/")
     candidate = candidate.rstrip(".,;:!?")
     parsed = urllib.parse.urlsplit(candidate if "://" in candidate else "//" + candidate)
     host = (parsed.hostname or "").casefold()
@@ -340,17 +347,26 @@ def _personal_url(candidate, account_slug):
     return False
 
 
-def _nested_personal_url(candidate, account_slug):
-    repo_name = _personal_url(candidate, account_slug)
-    if repo_name is not False:
-        return repo_name
-    for index, character in enumerate(candidate):
-        if character != "/":
+def _nested_personal_urls(candidate, account_slug):
+    """Yield every distinct personal URL found at a nested URL boundary."""
+    candidate = candidate.replace("\\", "/")
+    reported = set()
+    split_characters = "/?#=&\\"
+    for index in range(-1, len(candidate)):
+        if index >= 0 and candidate[index] not in split_characters:
             continue
         repo_name = _personal_url(candidate[index + 1 :], account_slug)
-        if repo_name is not False:
-            return repo_name
-    return False
+        if repo_name is False:
+            continue
+        folded = (
+            account_slug
+            if repo_name is None
+            else account_slug + "/" + repo_name
+        ).casefold()
+        if folded in reported:
+            continue
+        reported.add(folded)
+        yield repo_name
 
 
 def registry_allowlist(registry):
@@ -368,32 +384,30 @@ def check_personal_urls(documents, account_slug, registry, failures):
         reported = set()
         for view_index, view in enumerate(scan_views(text)):
             for match in URL_CANDIDATE.finditer(view):
-                repo_name = _nested_personal_url(match.group(0), account_slug)
-                if repo_name is False:
-                    continue
                 number = line_number(view, match.start())
-                repo = "%s/%s" % (account_slug, repo_name) if repo_name else account_slug
-                finding = (number, repo.casefold())
-                if finding in reported:
-                    continue
-                reported.add(finding)
-                checked += 1
-                view_marker = "" if view_index == 0 else " (decoded view)"
-                if repo_name is None:
-                    failures.append(
-                        "personal-url: %s:%d references personal account profile %s%s"
-                        % (path, number, account_slug, view_marker)
-                    )
-                elif allowlist is None:
-                    failures.append(
-                        "personal-url: %s:%d references personal account repository %s%s"
-                        % (path, number, repo, view_marker)
-                    )
-                elif repo.casefold() not in allowlist:
-                    failures.append(
-                        "personal-url: %s:%d references unknown repository %s%s"
-                        % (path, number, repo, view_marker)
-                    )
+                for repo_name in _nested_personal_urls(match.group(0), account_slug):
+                    repo = "%s/%s" % (account_slug, repo_name) if repo_name else account_slug
+                    finding = (number, repo.casefold())
+                    if finding in reported:
+                        continue
+                    reported.add(finding)
+                    checked += 1
+                    view_marker = "" if view_index == 0 else " (decoded view)"
+                    if repo_name is None:
+                        failures.append(
+                            "personal-url: %s:%d references personal account profile %s%s"
+                            % (path, number, account_slug, view_marker)
+                        )
+                    elif allowlist is None:
+                        failures.append(
+                            "personal-url: %s:%d references personal account repository %s%s"
+                            % (path, number, repo, view_marker)
+                        )
+                    elif repo.casefold() not in allowlist:
+                        failures.append(
+                            "personal-url: %s:%d references unknown repository %s%s"
+                            % (path, number, repo, view_marker)
+                        )
     return checked
 
 
@@ -954,6 +968,40 @@ def selftest_scanners():
         and not email_context_failures,
         "email-context personal URL remains denylist territory",
     )
+    for prefix in ("+@", "%@"):
+        prefixed_failures = []
+        _selftest_check(
+            check_personal_urls(
+                {
+                    "README.md": prefix
+                    + _fixture_personal_url("neutral-owner", "private-repo")[len("https://") :]
+                },
+                "neutral-owner",
+                None,
+                prefixed_failures,
+            )
+            == 1
+            and len(prefixed_failures) == 1
+            and "neutral-owner/private-repo" in prefixed_failures[0],
+            "%s prefixed bare personal repository URL" % prefix,
+        )
+    for local_part in ("bob+tag", "x%", "bob"):
+        tagged_email_failures = []
+        _selftest_check(
+            check_personal_urls(
+                {
+                    "README.md": local_part
+                    + "@"
+                    + _fixture_personal_url("neutral-owner", "private-repo")[len("https://") :]
+                },
+                "neutral-owner",
+                None,
+                tagged_email_failures,
+            )
+            == 0
+            and not tagged_email_failures,
+            "%s email remains denylist territory" % local_part,
+        )
     dash_at_failures = []
     _selftest_check(
         check_personal_urls(
@@ -1045,6 +1093,53 @@ def selftest_scanners():
         and not unrelated_nested_failures,
         "nested personal URL unrelated-host control",
     )
+    nested_separator_cases = (
+        (
+            "https://example.com/x?u=github." "com/neutral-owner/query",
+            "neutral-owner/query",
+            "query-string nested personal URL",
+        ),
+        (
+            "https://example.com/a#github." "com/neutral-owner/frag",
+            "neutral-owner/frag",
+            "fragment nested personal URL",
+        ),
+        (
+            "https://github." "com\\/neutral-owner\\/private-repo",
+            "neutral-owner/private-repo",
+            "backslash-separated absolute personal URL",
+        ),
+        (
+            "github." "com\\/neutral-owner\\/private-repo",
+            "neutral-owner/private-repo",
+            "backslash-separated bare personal URL",
+        ),
+    )
+    for source, expected_repo, description in nested_separator_cases:
+        separator_failures = []
+        candidates = tuple(match.group(0) for match in URL_CANDIDATE.finditer(source))
+        _selftest_check(
+            check_personal_urls(
+                {"README.md": source}, "neutral-owner", None, separator_failures
+            )
+            == 1
+            and len(separator_failures) == 1
+            and expected_repo in separator_failures[0]
+            and candidates == (source,),
+            description,
+        )
+    nested_query_control_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/docs?q=neutral-owner"},
+            "neutral-owner",
+            None,
+            nested_query_control_failures,
+        )
+        == 0
+        and not nested_query_control_failures,
+        "nested query unrelated-host control",
+    )
 
     normalized_failures = []
     normalized_documents = {
@@ -1097,6 +1192,20 @@ def selftest_scanners():
         ) == 1 and unknown_failures,
         "unknown personal repository",
     )
+    for source in (
+        "https://github." "com/neutral-owner/public-archive/github." "com/neutral-owner/private-repo",
+        "https://github." "com/neutral-owner/private-repo/github." "com/neutral-owner/public-archive",
+    ):
+        smuggle_failures = []
+        _selftest_check(
+            check_personal_urls(
+                {"README.md": source}, "neutral-owner", registry, smuggle_failures
+            )
+            == 2
+            and len(smuggle_failures) == 1
+            and "neutral-owner/private-repo" in smuggle_failures[0],
+            "allowlist cannot smuggle nested private repository: %s" % source,
+        )
 
 
 def selftest_registry_checks():
@@ -1152,6 +1261,8 @@ def _initialize_git_fixture(root, paths):
 
 
 def selftest_end_to_end():
+    import plistlib
+
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
@@ -1292,6 +1403,34 @@ def selftest_end_to_end():
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
+        (root / "id_rsa.key").write_bytes(b"\x30\x82\xff\x00")
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "source-read: id_rsa.key is not valid UTF-8 text (fail-closed)" in output
+            and "binary files skipped: 0" in output,
+            "non-UTF-8 key file fails closed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "icon.icns").write_bytes(b"\xff\xfe\x00")
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): icon.icns" in output,
+            "non-UTF-8 ICNS is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
         (root / "fixture.plist").write_bytes(
             plistlib.dumps({"note": "x"}, fmt=plistlib.FMT_BINARY)
         )
@@ -1303,6 +1442,22 @@ def selftest_end_to_end():
             and "binary files skipped: 1" in output
             and "  skipped (binary): fixture.plist" in output,
             "binary plist is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "fixture.xml").write_bytes(
+            plistlib.dumps({"note": "x"}, fmt=plistlib.FMT_BINARY)
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): fixture.xml" in output,
+            "binary plist signature skips any suffix: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
@@ -1333,6 +1488,24 @@ def selftest_end_to_end():
             and "denylist: fixture.plist:" in output
             and "binary files skipped: 0" in output,
             "UTF-8 plist is scanned before binary classification: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "fixture.plist").write_bytes(
+            plistlib.dumps({"note": "acme-" "secret"}, fmt=plistlib.FMT_XML)
+            .decode("utf-8")
+            .encode("utf-16")
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "source-read: fixture.plist is not valid UTF-8 text (fail-closed)" in output
+            and "binary files skipped: 0" in output,
+            "UTF-16 XML plist fails closed as source text: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
@@ -1562,6 +1735,25 @@ def selftest_end_to_end():
             and "denylist rules loaded : 3" in output
             and "denylist: README.md:1 contains email-address" in output,
             "shipped sample denylist catches slug-domain email fixture: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(
+            root,
+            "Contact bob+tag@"
+            + _fixture_personal_url("neutral-owner", "private-repo")[len("https://") :]
+            + "\n",
+            SELFTEST_SAMPLE_DENYLIST,
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "denylist: README.md:1 contains email-address" in output
+            and "personal-url:" not in output,
+            "shipped sample denylist catches tagged email fixture: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
