@@ -616,6 +616,11 @@ def run_gate(
             "gate-error: registry/modules.json exists under --root but --no-registry was passed "
             "(fail-closed)"
         )
+    if no_registry and registry_argument is None and whitelist:
+        failures.append(
+            "gate-error: .publication-label-whitelist has entries but --no-registry was passed "
+            "(fail-closed; whitelist staleness cannot be checked without a registry)"
+        )
 
     registry_path = None
     if registry_argument is not None:
@@ -673,7 +678,7 @@ def run_gate(
     print("module links checked : %d" % root_links)
     print("SVG names checked    : %d" % svg_names)
     print("label whitelist      : %d" % len(whitelist))
-    if no_registry and registry_argument is None and not conventional_registry_exists:
+    if no_registry and registry_argument is None and not conventional_registry_exists and not whitelist:
         for notice in SKIP_NOTICES:
             print(notice)
 
@@ -690,6 +695,13 @@ SELFTEST_DENYLIST = (
     "# Embedded policy fixture.\n"
     "private-marker\tacme[-_ ]" "secret\n"
     "private-host\tprivate\\.example\\.invalid\n"
+)
+SELFTEST_SAMPLE_DENYLIST = (
+    "# Copy this file to the repository root as .publication-denylist and customize it.\n"
+    "private-marker\tacme[-_ ]secret\n"
+    "private-host\tprivate\\.example\\.invalid\n"
+    "# Keep local@host/... coverage in denylist territory.\n"
+    "email-address\t\\b[A-Z0-9._%+\\-]+@[A-Z0-9.\\-]+\\.[A-Z]{2,}\\b\n"
 )
 SELFTEST_CLEAN_README = "# Public project\n\nPublication-safe example content.\n"
 SELFTEST_VIOLATING_README = (
@@ -789,6 +801,12 @@ def selftest_policy_parsers():
             encoding="utf-8",
         )
         _selftest_check(len(load_denylist(root)) == 1, "BOM comment and explicit whitespace regex")
+        shipped_sample = Path(__file__).resolve().parent / "fixtures" / "sample.publication-denylist"
+        if shipped_sample.is_file():
+            _selftest_check(
+                shipped_sample.read_bytes() == SELFTEST_SAMPLE_DENYLIST.encode("utf-8"),
+                "shipped sample denylist stays byte-identical",
+            )
         _selftest_check(load_label_whitelist(root) == frozenset(), "absent whitelist")
         (root / WHITELIST_NAME).write_text("README.md\tapproved exact line\n", encoding="utf-8")
         _selftest_check(("README.md", "approved exact line") in load_label_whitelist(root), "whitelist parser")
@@ -949,6 +967,21 @@ def selftest_scanners():
         == 1
         and "neutral-owner/private-repo" in dash_at_failures[0],
         "dash-at personal repository URL",
+    )
+    bang_at_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "bob!@" + _fixture_personal_url(
+                "neutral-owner", "private-repo"
+            )[len("https://") :]},
+            "neutral-owner",
+            None,
+            bang_at_failures,
+        )
+        == 1
+        and len(bang_at_failures) == 1
+        and "neutral-owner/private-repo" in bang_at_failures[0],
+        "bang-at personal repository URL",
     )
     encoded_at_failures = []
     encoded_at = _fixture_personal_url(
@@ -1188,15 +1221,15 @@ def selftest_end_to_end():
         root = Path(temporary)
         _materialize_fixture(root)
         protected_text = ("acme-" "secret\n").encode("utf-8") + b"\xff\n"
-        (root / "secret.md").write_bytes(protected_text)
+        (root / "SECRET.MD").write_bytes(protected_text)
         status, output = _capture_main(
             ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
         )
         _selftest_check(
             status == 1
-            and "source-read: secret.md is not valid UTF-8 text (fail-closed)" in output
+            and "source-read: SECRET.MD is not valid UTF-8 text (fail-closed)" in output
             and "binary files skipped: 0" in output,
-            "non-UTF-8 text suffix fails closed: %r" % output,
+            "case-folded non-UTF-8 text suffix fails closed: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
@@ -1396,6 +1429,24 @@ def selftest_end_to_end():
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
+        (root / WHITELIST_NAME).write_text(
+            "README.md\tapproved exact line\n",
+            encoding="utf-8",
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "gate-error: .publication-label-whitelist has entries but --no-registry was passed (fail-closed; whitelist staleness cannot be checked without a registry)"
+            in output
+            and "notice:" not in output,
+            "non-empty whitelist rejects explicit no-registry opt-out: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
         (root / ".gitignore").write_text("node_modules/\n*.txt\n", encoding="utf-8")
         (root / "node_modules").mkdir()
         (root / "node_modules" / "x.md").write_text(
@@ -1435,6 +1486,38 @@ def selftest_end_to_end():
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
+        (root / "notes.md").write_bytes(b"\x80\x81\x82")
+        _initialize_git_fixture(root, ("README.md", DENYLIST_NAME, "notes.md"))
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "enumeration: git" in output
+            and "source-read: notes.md is not valid UTF-8 text (fail-closed)" in output
+            and "binary files skipped: 0" in output,
+            "git non-UTF-8 text suffix fails closed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "logo.png").write_bytes(b"\x80\x81\x82")
+        _initialize_git_fixture(root, ("README.md", DENYLIST_NAME, "logo.png"))
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "enumeration: git" in output
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): logo.png" in output,
+            "git non-UTF-8 PNG is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
         os.symlink("https://github." "com/neutral-owner/private", root / "published-link")
         _initialize_git_fixture(root, ("README.md", DENYLIST_NAME, "published-link"))
         status, output = _capture_main(
@@ -1460,6 +1543,25 @@ def selftest_end_to_end():
         _selftest_check(
             status == 1 and "denylist: README.md:1 contains email-address" in output,
             "main-level slug-domain email denylist: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(
+            root,
+            "Contact bob@"
+            + _fixture_personal_url("neutral-owner", "private-repo")[len("https://") :]
+            + "\n",
+            SELFTEST_SAMPLE_DENYLIST,
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "denylist rules loaded : 3" in output
+            and "denylist: README.md:1 contains email-address" in output,
+            "shipped sample denylist catches slug-domain email fixture: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:

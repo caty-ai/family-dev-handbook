@@ -18,12 +18,15 @@ required status check に登録して初めて「保護済み」と扱う。
 | 個人 URL の registry allowlist | 台帳で公開対象と宣言した URL だけを個人用 URL 検査から免除すること | allowlist 検査を skip し、明示的な notice を出す |
 | 公開ラベル | 台帳の対象に公開ラベルが無い状態を残さないこと | 「ラベル欠落」検査を skip し、notice を出す |
 | SVG 状態 | README の表示と台帳の公開状態が食い違わないこと | 検査を skip し、notice を出す |
-| label whitelist の stale | 一時的な例外が台帳変更後も残らないこと | 検査を skip し、notice を出す |
+| label whitelist の stale | 一時的な例外が台帳変更後も残らないこと | whitelist が不在/空なら検査を skip して notice、1件以上なら赤 |
 
 通常検査では `--registry` か `--no-registry` のどちらかを明示する。両方を省略した場合と、両方を
 指定した場合は設定不備として赤になる。`--no-registry` を明示した場合も denylist と個人用 URL の
-検査は実行し、確認不能な4検査を黙って緑にせず、それぞれ skip notice を出す。さらに
-`<root>/registry/modules.json` が存在するのに `--no-registry` を指定した場合も赤になる。corpus の
+検査は実行し、`<root>/registry/modules.json` と非空の `.publication-label-whitelist` のどちらも無い時に限り、
+確認不能な4検査を黙って緑にせず、それぞれ skip notice を出す。`<root>/registry/modules.json` が存在する、
+または非空の `.publication-label-whitelist` がある状態で `--no-registry` を指定した場合は赤になる。
+`registry/modules.json` と非空の label whitelist だけが checker が
+知り得る on-disk signal であり、custom path の registry は caller が `--registry` で渡す責任を負う。corpus の
 アンカーは、レジストリ有りなら指定した JSON ファイル、明示的なレジストリなしなら
 `<root>/README.md` へ fallback する。カレントディレクトリ下の別 README を偶然拾って判定の起点には
 しない。レジストリなしで `<root>/README.md` も無い場合は、corpus floor を確立できないため赤になる。
@@ -33,6 +36,8 @@ required status check に登録して初めて「保護済み」と扱う。
 `<slug>.github.io` も対象になる。host の port は無視し、末尾の dot は1個だけ除く。
 `--account-slug` は前後の空白を除いた後、GitHub slug 形の
 `^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$` に一致しなければ設定不備として赤になる。
+`@` の直前が e-mail の local part を構成しない文字（空白・括弧・`!` など）の場合は bare
+`@host/...` として URL 検査の対象になる。
 
 ## 展開手順（コピペ順）
 
@@ -96,6 +101,10 @@ NAME<TAB>REGEX
   **malformed = 赤**。
 - `.publication-denylist` 自体の不在と、コメント/空行を除く有効ルール0件はどちらも**赤**。
 
+個人用 URL 検査は e-mail 形（`local@host/...`）を意図的に URL とみなさない。したがって採用リポの
+`.publication-denylist` は e-mail ルールを**必ず**含めること（sample には `email-address` ルールを同梱。
+sample を使わず自前 denylist を書く場合も同等のルールを載せる）。
+
 denylist は検出すべき禁止リテラルを必然的に含む。そのため checker は、スキャン対象から
 既定の `<root>/.publication-denylist`、または `--denylist` で明示したファイルが root 内にある場合は
 そのファイルを**パスで**自己除外する。この path-exclusion は、拡張子 allowlist を廃止して全 regular file を
@@ -127,8 +136,9 @@ PATH<TAB>EXACT_LINE
 `PATH` と、そのファイル内で許可する `EXACT_LINE` の完全一致だけを免除する。このファイルは
 **言い訳だけを追加する** allowlist であり、新しい問題を検出するポリシーではない。したがって不在時は
 fail-open（免除なしとして継続）でよい。denylist の不存を赤にするのとは非対称だが、意図的な設計である。
-`--no-registry` を明示した場合は whitelist-staleness を判定できないため、その検査は notice 付きで
-skip する。
+`--no-registry` を明示した場合、whitelist が不在または空なら whitelist-staleness を判定できないため
+その検査は notice 付きで skip する。一方、1件以上の whitelist がある場合は staleness を検査できない
+状態を許可せず、fail-closed で赤になる。
 
 ## CLI
 
@@ -198,9 +208,12 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   失敗した場合だけ skip し、`binary files skipped:` の直下へ相対パスを列挙する。caller 側の
   `binary files skipped: 0` grep guard は追加の guard として引き続き有効である。
 - `--registry` の省略は赤になる。レジストリを持たない caller は `--no-registry` を追加する。
-  `registry/modules.json` が disk 上にある状態での `--no-registry` も赤になる。
+  `registry/modules.json` が disk 上にある状態、または非空の `.publication-label-whitelist` がある状態での
+  `--no-registry` も赤になる。
 - bare `@github.com/<slug>/<repo>` と `@github.com/<slug>` も personal-url として検出する。
-  `local@github.com/...` は引き続き URL 検査ではなく e-mail denylist rule の担当とする。
+  個人用 URL 検査は e-mail 形（`local@host/...`）を意図的に URL とみなさないため、採用リポの
+  `.publication-denylist` は e-mail ルールを**必ず**含めること。sample には `email-address` ルールを同梱し、
+  sample を使わず自前 denylist を書く場合も同等のルールを載せる。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.22.0` として切る）。
 
 ## family-os / organization `.github` からの移行

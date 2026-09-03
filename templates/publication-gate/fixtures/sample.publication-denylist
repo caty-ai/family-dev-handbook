@@ -1,3 +1,5 @@
 # Copy this file to the repository root as .publication-denylist and customize it.
 private-marker	acme[-_ ]secret
 private-host	private\.example\.invalid
+# Keep local@host/... coverage in denylist territory.
+email-address	\b[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}\b
