@@ -38,7 +38,8 @@ URL 候補の path 内に `github.com/<slug>`・`gist.github.com/<slug>`・`<slu
 （`foo.bar/github.com/<slug>/<repo>`、`?u=github.com/<slug>/...`、`github.com\/<slug>\/...`）も
 personal-url として赤にする。`https://example.org/docs/github.com/<slug>/<repo>` のような無関係ホストの
 path に personal URL が現れる場合や、`<slug>.github.io` という segment があるだけでも赤になる fail-closed
-の設計であり、該当テキストを修正するか registry allowlist へ追加して対処する。
+の設計であり、nested URL は次の `?`・`#`・`=`・`&` query/fragment field 境界までを照合する。該当テキストを
+修正するか registry allowlist へ追加して対処する。
 `--account-slug` は前後の空白を除いた後、GitHub slug 形の
 `^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$` に一致しなければ設定不備として赤になる。
 `@` の直前が英数字または `_` の word character でない場合は bare
@@ -179,7 +180,7 @@ __pycache__
 列挙された regular file は suffix やファイル名で選別せず、`.env.local`、`.cs`、`.csproj`、`.ipynb`、
 `.txt`、`.csv`、`LICENSE`、`Dockerfile`、拡張子なしもすべて先に UTF-8 decode を試す。decode
 できなかった場合だけ、明示した既知の binary suffix、exact filename `.DS_Store`、または先頭が
-`bplist00` の binary plist signature を持つファイルを binary としてスキャン対象外にする。それ以外は未知の
+`bplist00` で suffix が `.plist` / `.bplist` の binary plist を binary としてスキャン対象外にする。それ以外は未知の
 text-like file として
 `source-read: ... is not valid UTF-8 text (fail-closed)` で赤にする。binary と判定したファイルは
 `binary files skipped: N` に集計した直後へ
@@ -188,8 +189,8 @@ text-like file として
 `symlinks skipped: N` に集計する。
 
 binary suffix の例には `.png` と `.icns` が含まれる。`.plist` は binary set に入れず、UTF-8 XML plist は
-通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は suffix にかかわらず
-`bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
+通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は `.plist` / `.bplist`
+の `bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
 
 `BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
 調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
@@ -221,11 +222,7 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   `_` の word character の e-mail 形は意図的に URL とみなさないため、採用リポの
   `.publication-denylist` は e-mail ルールを**必ず**含めること。sample には `email-address` ルールを同梱し、
   sample を使わず自前 denylist を書く場合も同等のルールを載せる。
-- URL 候補の path 内に `github.com/<slug>`・`gist.github.com/<slug>`・`<slug>.github.io` が現れる場合
-  （`foo.bar/github.com/<slug>/<repo>`、`?u=github.com/<slug>/...`、`github.com\/<slug>\/...`）も
-  personal-url として赤にする。`https://example.org/docs/github.com/<slug>/<repo>` のような無関係ホストの
-  path に personal URL が現れる場合や、`<slug>.github.io` segment があるだけでも赤になる fail-closed のため、
-  該当テキストを修正するか registry allowlist へ追加して対処する。
+- nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.22.0` として切る）。
 
 ## family-os / organization `.github` からの移行

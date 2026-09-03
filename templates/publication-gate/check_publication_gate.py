@@ -35,7 +35,7 @@ BINARY_SUFFIXES = frozenset(
     (
         ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".icns", ".bmp", ".tif",
         ".tiff", ".avif", ".heic", ".heif", ".jfif", ".psd", ".ai", ".eps", ".sketch",
-        ".fig", ".glb", ".gltf", ".svgz", ".woff", ".woff2", ".ttf", ".ttc", ".otf",
+        ".fig", ".glb", ".svgz", ".woff", ".woff2", ".ttf", ".ttc", ".otf",
         ".eot", ".zip", ".gz", ".tgz", ".tar", ".bz2", ".xz", ".zst", ".lz4", ".7z",
         ".rar", ".iso", ".img", ".jar", ".war", ".whl", ".egg", ".gem", ".nupkg",
         ".deb", ".rpm", ".dmg", ".pkg", ".apk", ".ipa", ".pdf", ".doc", ".docx",
@@ -290,7 +290,10 @@ def read_sources(root, failures, excluded_policy_path):
                 if (
                     path.suffix.lower() in BINARY_SUFFIXES
                     or path.name == ".DS_Store"
-                    or raw.startswith(b"bplist00")
+                    or (
+                        raw.startswith(b"bplist00")
+                        and path.suffix.lower() in (".plist", ".bplist")
+                    )
                 ):
                     binary_skipped += 1
                     binary_skipped_paths.append(relative)
@@ -350,22 +353,63 @@ def _personal_url(candidate, account_slug):
 def _nested_personal_urls(candidate, account_slug):
     """Yield every distinct personal URL found at a nested URL boundary."""
     candidate = candidate.replace("\\", "/")
+    folded = candidate.casefold()
+    # Every _personal_url host rule requires github.com or github.io, including gist.
+    if "github.com" not in folded and "github.io" not in folded:
+        return
     reported = set()
-    split_characters = "/?#=&\\"
-    for index in range(-1, len(candidate)):
-        if index >= 0 and candidate[index] not in split_characters:
-            continue
-        repo_name = _personal_url(candidate[index + 1 :], account_slug)
-        if repo_name is False:
-            continue
-        folded = (
+    split_characters = "/?#=&"
+    starts = set()
+
+    def unseen(repo_name):
+        name = (
             account_slug
             if repo_name is None
             else account_slug + "/" + repo_name
         ).casefold()
-        if folded in reported:
+        if name in reported:
+            return False
+        reported.add(name)
+        return True
+
+    def marker_positions(marker):
+        if len(folded) != len(candidate):
+            return (match.start() for match in re.finditer(re.escape(marker), candidate, re.IGNORECASE))
+        positions = []
+        index = folded.find(marker)
+        while index >= 0:
+            positions.append(index)
+            index = folded.find(marker, index + 1)
+        return positions
+
+    for marker in ("github.com", "www.github.com", "gist.github.com"):
+        for index in marker_positions(marker):
+            if index > 0 and candidate[index - 1] in split_characters:
+                starts.add(index)
+    github_io_positions = iter(marker_positions(".github.io"))
+    next_github_io = next(github_io_positions, None)
+    previous_split = -1
+    for index, character in enumerate(candidate):
+        while next_github_io == index:
+            if previous_split >= 0:
+                starts.add(previous_split + 1)
+            next_github_io = next(github_io_positions, None)
+        if character in split_characters:
+            previous_split = index
+    repo_name = _personal_url(candidate, account_slug)
+    if repo_name is not False and unseen(repo_name):
+        yield repo_name
+    field_end = 0
+    for start in range(len(candidate)):
+        if start not in starts:
             continue
-        reported.add(folded)
+        if field_end < start:
+            field_end = start
+            while field_end < len(candidate) and candidate[field_end] not in "?#=&":
+                field_end += 1
+        repo_name = _personal_url(candidate[start:field_end], account_slug)
+        if repo_name is False or not unseen(repo_name):
+            continue
         yield repo_name
 
 
@@ -904,6 +948,27 @@ def selftest_scanners():
         in userinfo_failures[0],
         "userinfo personal URL candidate",
     )
+    userinfo_field_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {
+                "README.md": "See "
+                + _fixture_userinfo_personal_url(
+                    "neutral-owner", "private", "viewer=token"
+                )
+            },
+            "neutral-owner",
+            None,
+            userinfo_field_failures,
+        )
+        == 1
+        and userinfo_field_failures
+        == [
+            "personal-url: README.md:1 references personal account repository "
+            "neutral-owner/private"
+        ],
+        "outer userinfo URL is not cut at an equals sign",
+    )
     clean_userinfo_failures = []
     _selftest_check(
         check_personal_urls(
@@ -1139,6 +1204,92 @@ def selftest_scanners():
         == 0
         and not nested_query_control_failures,
         "nested query unrelated-host control",
+    )
+    nested_profile_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/?u=github." "com/neutral-owner&x=safe"},
+            "neutral-owner",
+            None,
+            nested_profile_failures,
+        )
+        == 1
+        and len(nested_profile_failures) == 1
+        and "personal account profile" in nested_profile_failures[0],
+        "nested query profile stops at the next field",
+    )
+    nested_repo_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/?u=github." "com/neutral-owner/repo&x=1"},
+            "neutral-owner",
+            None,
+            nested_repo_failures,
+        )
+        == 1
+        and nested_repo_failures
+        == [
+            "personal-url: README.md:1 references personal account repository "
+            "neutral-owner/repo"
+        ],
+        "nested query repository name excludes later fields",
+    )
+    two_repo_registry = _fixture_registry()
+    two_repo_registry["modules"].extend(
+        (
+            {"name": "One", "repo": "neutral-owner/one", "status": "published"},
+            {"name": "Two", "repo": "neutral-owner/two", "status": "published"},
+        )
+    )
+    nested_allowlisted_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {
+                "README.md": (
+                    "https://example.org/?a=github." "com/neutral-owner/one"
+                    "&b=github." "com/neutral-owner/two"
+                )
+            },
+            "neutral-owner",
+            two_repo_registry,
+            nested_allowlisted_failures,
+        )
+        == 2
+        and not nested_allowlisted_failures,
+        "nested allowlisted repositories do not absorb later fields",
+    )
+    large_nested_token = "a/=" * (200000 // 3)
+    large_clean_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/" + large_nested_token},
+            "neutral-owner",
+            None,
+            large_clean_failures,
+        )
+        == 0
+        and not large_clean_failures,
+        "large separator-dense token without a GitHub marker",
+    )
+    midpoint = len(large_nested_token) // 2
+    large_nested_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {
+                "README.md": (
+                    "https://example.org/"
+                    + large_nested_token[:midpoint]
+                    + "github." "com/neutral-owner/x"
+                    + large_nested_token[midpoint:]
+                )
+            },
+            "neutral-owner",
+            None,
+            large_nested_failures,
+        )
+        == 1
+        and len(large_nested_failures) == 1,
+        "large separator-dense token finds one nested GitHub URL",
     )
 
     normalized_failures = []
@@ -1403,6 +1554,20 @@ def selftest_end_to_end():
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
+        (root / "scene.gltf").write_bytes(b"{\"note\": \"acme-" b"secret\"}\xff")
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "source-read: scene.gltf is not valid UTF-8 text (fail-closed)" in output
+            and "binary files skipped: 0" in output,
+            "non-UTF-8 glTF JSON fails closed as source text: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
         (root / "id_rsa.key").write_bytes(b"\x30\x82\xff\x00")
         status, output = _capture_main(
             ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
@@ -1431,7 +1596,7 @@ def selftest_end_to_end():
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
-        (root / "fixture.plist").write_bytes(
+        (root / "Info.plist").write_bytes(
             plistlib.dumps({"note": "x"}, fmt=plistlib.FMT_BINARY)
         )
         status, output = _capture_main(
@@ -1440,24 +1605,22 @@ def selftest_end_to_end():
         _selftest_check(
             status == 0
             and "binary files skipped: 1" in output
-            and "  skipped (binary): fixture.plist" in output,
+            and "  skipped (binary): Info.plist" in output,
             "binary plist is skipped and listed: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
         _materialize_fixture(root)
-        (root / "fixture.xml").write_bytes(
-            plistlib.dumps({"note": "x"}, fmt=plistlib.FMT_BINARY)
-        )
+        (root / "notes.md").write_bytes(b"bplist00acme-" b"secret\xff")
         status, output = _capture_main(
             ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
         )
         _selftest_check(
-            status == 0
-            and "binary files skipped: 1" in output
-            and "  skipped (binary): fixture.xml" in output,
-            "binary plist signature skips any suffix: %r" % output,
+            status == 1
+            and "source-read: notes.md is not valid UTF-8 text (fail-closed)" in output
+            and "binary files skipped: 0" in output,
+            "binary plist signature requires a plist suffix: %r" % output,
         )
 
     with tempfile.TemporaryDirectory() as temporary:
