@@ -58,7 +58,7 @@ on:
         type: string
         default: '20'
       node_version:
-        description: "指定時のみ test / test-macos / lint の直前に actions/setup-node を挿む (例: '20', '22.x', '.nvmrc' は不可・数値指定のみ)。未指定 = runner 既定 Node のまま (従来どおり)。push:main 側で Node を pin している caller は同じ値をここに渡して検証マトリクスを揃える (issue #101)。"
+        description: "指定時のみ test / test-macos / lint の直前に actions/setup-node を挿む。受理形は数値 pin のみ (例: '20', '20.11', '22.x')。空白だけ・lts/* 等の浮動指定・.nvmrc は赤。リテラルで渡す (変数経由で空に潰れると未指定と区別できず runner 既定 Node で走る)。未指定 = runner 既定 Node のまま (従来どおり)。push:main 側で Node を pin している caller は同じ値をここに渡して検証マトリクスを揃える (issue #101)。"
         type: string
         default: ''
       pre_test_setup_ubuntu:
@@ -90,11 +90,35 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate node_version (only when node_version is set)
+        # setup-node は空白だけの node-version を trim して「何も入れずに成功」する (v7.0.0 src/main.ts)。
+        # その緑は #101 が塞ぎたい「runner 既定 Node で走る門番」そのものなので、ここで赤にする (FP-5)。
+        # 受理形は数値 pin (例: 20 / 20.11 / 22.x) のみ — 'lts/*' 等の浮動指定は門番を再び浮かせるため不可。
+        # 3 job に同じ2ステップが並ぶ (test / test-macos / lint) — 改訂時は3箇所すべてを揃えること。
+        if: ${{ inputs.node_version != '' }}
+        env:
+          NODE_VERSION: ${{ inputs.node_version }}
+        run: |
+          set -euo pipefail
+          TRIMMED=$(printf '%s' "$NODE_VERSION" | tr -d '[:space:]')
+          if [ -z "$TRIMMED" ]; then
+            echo "::error::node_version is whitespace-only — setup-node would install nothing and the gate would silently run on the runner-default Node (fail-closed). Pass a literal like '20', or remove the input."
+            exit 1
+          fi
+          if ! [[ "$TRIMMED" =~ ^[0-9]+(\.([0-9]+|x)){0,2}$ ]]; then
+            echo "::error::node_version must be a numeric pin (e.g. '20', '20.11', '22.x'); received '${NODE_VERSION}'. Floating specs (lts/*, node, ranges, .nvmrc) are not accepted — they re-open the version drift this input exists to close."
+            exit 1
+          fi
+
       - name: Setup Node (only when node_version is set)
         if: ${{ inputs.node_version != '' }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ inputs.node_version }}
+          # この入力の役目は Node の pin だけ。setup-node v7 は package.json の packageManager を見て
+          # 既定で npm cache を復元/保存する (package-manager-cache: true) — 門番の結果を宣言外の cache に
+          # 依存させないため明示 off (Grok seat F3, 2026-09-04)。
+          package-manager-cache: false
 
       - name: Pre-test setup (ubuntu, only when pre_test_setup_ubuntu is set)
         if: ${{ inputs.pre_test_setup_ubuntu != '' }}
@@ -108,8 +132,11 @@ jobs:
             echo "::error::pre_test_setup_ubuntu is whitespace-only — a setup step that runs nothing must not pass silently (fail-closed). Remove the input or write the command."
             exit 1
           fi
-          # caller の with: pre_test_setup_ubuntu をそのまま実行する (caller 自身の CI 定義と同じ信頼境界)。
-          ${{ inputs.pre_test_setup_ubuntu }}
+          # 検証した値 (env) をそのまま実行する — run: へ二重に式展開しない (検証対象と実行対象を同一値に保つ・
+          # ログ面への展開も避ける)。caller 自身の CI 定義 (Makefile の test ターゲット) と同じ信頼境界。
+          # この入力に secrets を渡さないこと (reusable は secrets: を受けない設計・README 参照)。
+          printf '%s\n' "$PRE_TEST_SETUP" > "$RUNNER_TEMP/pre-test-setup.sh"
+          bash -euo pipefail "$RUNNER_TEMP/pre-test-setup.sh"
 
       - name: Run tests
         run: |
@@ -185,11 +212,35 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate node_version (only when node_version is set)
+        # setup-node は空白だけの node-version を trim して「何も入れずに成功」する (v7.0.0 src/main.ts)。
+        # その緑は #101 が塞ぎたい「runner 既定 Node で走る門番」そのものなので、ここで赤にする (FP-5)。
+        # 受理形は数値 pin (例: 20 / 20.11 / 22.x) のみ — 'lts/*' 等の浮動指定は門番を再び浮かせるため不可。
+        # 3 job に同じ2ステップが並ぶ (test / test-macos / lint) — 改訂時は3箇所すべてを揃えること。
+        if: ${{ inputs.node_version != '' }}
+        env:
+          NODE_VERSION: ${{ inputs.node_version }}
+        run: |
+          set -euo pipefail
+          TRIMMED=$(printf '%s' "$NODE_VERSION" | tr -d '[:space:]')
+          if [ -z "$TRIMMED" ]; then
+            echo "::error::node_version is whitespace-only — setup-node would install nothing and the gate would silently run on the runner-default Node (fail-closed). Pass a literal like '20', or remove the input."
+            exit 1
+          fi
+          if ! [[ "$TRIMMED" =~ ^[0-9]+(\.([0-9]+|x)){0,2}$ ]]; then
+            echo "::error::node_version must be a numeric pin (e.g. '20', '20.11', '22.x'); received '${NODE_VERSION}'. Floating specs (lts/*, node, ranges, .nvmrc) are not accepted — they re-open the version drift this input exists to close."
+            exit 1
+          fi
+
       - name: Setup Node (only when node_version is set)
         if: ${{ inputs.node_version != '' }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ inputs.node_version }}
+          # この入力の役目は Node の pin だけ。setup-node v7 は package.json の packageManager を見て
+          # 既定で npm cache を復元/保存する (package-manager-cache: true) — 門番の結果を宣言外の cache に
+          # 依存させないため明示 off (Grok seat F3, 2026-09-04)。
+          package-manager-cache: false
 
       - name: Pre-test setup (macOS, only when pre_test_setup_macos is set)
         if: ${{ inputs.pre_test_setup_macos != '' }}
@@ -203,8 +254,11 @@ jobs:
             echo "::error::pre_test_setup_macos is whitespace-only — a setup step that runs nothing must not pass silently (fail-closed). Remove the input or write the command."
             exit 1
           fi
-          # caller の with: pre_test_setup_macos をそのまま実行する (caller 自身の CI 定義と同じ信頼境界)。
-          ${{ inputs.pre_test_setup_macos }}
+          # 検証した値 (env) をそのまま実行する — run: へ二重に式展開しない (検証対象と実行対象を同一値に保つ・
+          # ログ面への展開も避ける)。caller 自身の CI 定義 (Makefile の test ターゲット) と同じ信頼境界。
+          # この入力に secrets を渡さないこと (reusable は secrets: を受けない設計・README 参照)。
+          printf '%s\n' "$PRE_TEST_SETUP" > "$RUNNER_TEMP/pre-test-setup.sh"
+          bash -euo pipefail "$RUNNER_TEMP/pre-test-setup.sh"
 
       - name: Run tests (macOS)
         run: |
@@ -268,11 +322,35 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate node_version (only when node_version is set)
+        # setup-node は空白だけの node-version を trim して「何も入れずに成功」する (v7.0.0 src/main.ts)。
+        # その緑は #101 が塞ぎたい「runner 既定 Node で走る門番」そのものなので、ここで赤にする (FP-5)。
+        # 受理形は数値 pin (例: 20 / 20.11 / 22.x) のみ — 'lts/*' 等の浮動指定は門番を再び浮かせるため不可。
+        # 3 job に同じ2ステップが並ぶ (test / test-macos / lint) — 改訂時は3箇所すべてを揃えること。
+        if: ${{ inputs.node_version != '' }}
+        env:
+          NODE_VERSION: ${{ inputs.node_version }}
+        run: |
+          set -euo pipefail
+          TRIMMED=$(printf '%s' "$NODE_VERSION" | tr -d '[:space:]')
+          if [ -z "$TRIMMED" ]; then
+            echo "::error::node_version is whitespace-only — setup-node would install nothing and the gate would silently run on the runner-default Node (fail-closed). Pass a literal like '20', or remove the input."
+            exit 1
+          fi
+          if ! [[ "$TRIMMED" =~ ^[0-9]+(\.([0-9]+|x)){0,2}$ ]]; then
+            echo "::error::node_version must be a numeric pin (e.g. '20', '20.11', '22.x'); received '${NODE_VERSION}'. Floating specs (lts/*, node, ranges, .nvmrc) are not accepted — they re-open the version drift this input exists to close."
+            exit 1
+          fi
+
       - name: Setup Node (only when node_version is set)
         if: ${{ inputs.node_version != '' }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ inputs.node_version }}
+          # この入力の役目は Node の pin だけ。setup-node v7 は package.json の packageManager を見て
+          # 既定で npm cache を復元/保存する (package-manager-cache: true) — 門番の結果を宣言外の cache に
+          # 依存させないため明示 off (Grok seat F3, 2026-09-04)。
+          package-manager-cache: false
 
       - name: Run lint
         run: |
