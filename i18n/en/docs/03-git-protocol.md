@@ -56,6 +56,8 @@ No direct pushes to main. Everything goes through PRs.
 Make sure the review can see any drift from the WIP declaration (files added/removed beyond what was declared).
 At merge time, cross-check the declared file set against `git diff --stat` — **a file present in the diff but absent from the list is blocking** (part of the [L1-7](02-issue-loop.md) completion-evidence gate).
 
+**Never write the literal string `close(s|d) #N` / `fix(es|ed) #N` / `resolve(s|d) #N` in the body of a multi-stage PR.** GitHub's keyword parser reads neither negation nor context — `Does not close #18` still closes #18 on merge (live damage in sitter#18 and handbook#80). Closing keywords are allowed **only when that merge alone satisfies every Done-when item**. In a bootstrap PR, a multi-stage PR, or any PR that leaves Done-when items open after merge, write "leaves #N open" or "tracked in #N" instead, and close the Issue from the final stage's completion record (the [L1-4](02-issue-loop.md) termination comment).
+
 ## L0-7 Merge one at a time
 
 ```

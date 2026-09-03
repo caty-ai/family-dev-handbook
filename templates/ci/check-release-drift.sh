@@ -6,6 +6,8 @@
 # Exemptions come only from .github/release-sync-ignore on the target's default branch:
 # exact tag names, one per line, # comments, no globs. The active list is printed every run.
 # Classes: RED = missing/draft/orphan Release; WARNING = legacy/non-SemVer tag, staged/stray draft.
+# Remediation flags never promote prereleases; only the highest stable SemVer tag may become
+# Latest, and every other backfill explicitly preserves the existing Latest badge.
 #
 # Fail posture: every gh read uses --paginate --slurp. All responses are parsed and shape-
 # checked before any finding is printed. Any failed read or unparseable payload exits 2 with
@@ -113,14 +115,6 @@ cut -f1 "$TMP_DIR/tags.tsv" > "$TMP_DIR/tag-names"
 jq -r '.[][] | [(.tag_name | @base64), (.draft | tostring)] | @tsv' \
   "$TMP_DIR/releases.json" > "$TMP_DIR/releases.tsv" || fail_read "Release list cannot be normalized"
 
-echo "Active release-sync exemptions for $REPO (default branch: $DEFAULT_BRANCH):"
-if [ -s "$TMP_DIR/ignore.active" ]; then
-  sed 's/^/  - /' "$TMP_DIR/ignore.active"
-else
-  echo "  (none)"
-fi
-echo "Scope: non-v*-named Releases are deliberately out of scope."
-
 is_ignored() {
   grep -Fxq -- "$1" "$TMP_DIR/ignore.active"
 }
@@ -130,6 +124,67 @@ is_semver() {
   local semver_re='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\+([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$'
   [[ "$tag" =~ $semver_re ]]
 }
+
+is_prerelease() {
+  local tag_without_build=${1%%+*}
+  [ "$tag_without_build" != "${tag_without_build%%-*}" ]
+}
+
+semver_core() {
+  local core=${1#v}
+  core=${core%%+*}
+  printf '%s\n' "${core%%-*}"
+}
+
+decimal_is_greater() {
+  local left=$1 right=$2
+  if [ "${#left}" -ne "${#right}" ]; then
+    [ "${#left}" -gt "${#right}" ]
+  else
+    [[ "$left" > "$right" ]]
+  fi
+}
+
+semver_core_is_greater() {
+  local left=$1 right=$2
+  local left_major=${left%%.*} right_major=${right%%.*}
+  local left_rest=${left#*.} right_rest=${right#*.}
+  local left_minor=${left_rest%%.*} right_minor=${right_rest%%.*}
+  local left_patch=${left_rest#*.} right_patch=${right_rest#*.}
+
+  if [ "$left_major" != "$right_major" ]; then
+    decimal_is_greater "$left_major" "$right_major"
+    return $?
+  fi
+  if [ "$left_minor" != "$right_minor" ]; then
+    decimal_is_greater "$left_minor" "$right_minor"
+    return $?
+  fi
+  decimal_is_greater "$left_patch" "$right_patch"
+}
+
+HIGHEST_STABLE_TAG=
+HIGHEST_STABLE_CORE=
+while IFS= read -r TAG; do
+  if ! is_semver "$TAG" || is_prerelease "$TAG"; then
+    continue
+  fi
+  CORE=$(semver_core "$TAG")
+  if [ -z "$HIGHEST_STABLE_TAG" ] || semver_core_is_greater "$CORE" "$HIGHEST_STABLE_CORE" || \
+     { [ "$CORE" = "$HIGHEST_STABLE_CORE" ] && [[ "$TAG" < "$HIGHEST_STABLE_TAG" ]]; }; then
+    HIGHEST_STABLE_TAG=$TAG
+    HIGHEST_STABLE_CORE=$CORE
+  fi
+done < "$TMP_DIR/tag-names"
+
+echo "Active release-sync exemptions for $REPO (default branch: $DEFAULT_BRANCH):"
+if [ -s "$TMP_DIR/ignore.active" ]; then
+  sed 's/^/  - /' "$TMP_DIR/ignore.active"
+else
+  echo "  (none)"
+fi
+echo "Scope: non-v*-named Releases are deliberately out of scope."
+echo "Latest policy: prerelease tags get --prerelease --latest=false; only the highest stable SemVer tag (${HIGHEST_STABLE_TAG:-none}) gets --latest; every other tag gets --latest=false."
 
 release_state() {
   local tag=$1
@@ -163,7 +218,14 @@ while IFS=$'\t' read -r TAG OBJECT_TYPE; do
     RED_COUNT=$((RED_COUNT + 1))
   elif [ "$OBJECT_TYPE" = "tag" ] && is_semver "$TAG" && [ "$STATE" = "none" ]; then
     echo "RED: annotated SemVer tag $TAG has no GitHub Release."
-    echo "  remediation: cd <clone> && gh release create $TAG --verify-tag --notes-from-tag"
+    if is_prerelease "$TAG"; then
+      RELEASE_FLAGS="--prerelease --latest=false"
+    elif [ "$TAG" = "$HIGHEST_STABLE_TAG" ]; then
+      RELEASE_FLAGS="--latest"
+    else
+      RELEASE_FLAGS="--latest=false"
+    fi
+    echo "  remediation: cd <clone> && gh release create $TAG --verify-tag --notes-from-tag $RELEASE_FLAGS"
     RED_COUNT=$((RED_COUNT + 1))
   fi
 

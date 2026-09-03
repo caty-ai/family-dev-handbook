@@ -56,6 +56,8 @@ git worktree add ../<repo>-wt/<issue> -b fix/<issue>-<slug> origin/main
 ให้ผู้รีวิวเห็นความต่างจากที่ประกาศ WIP (ไฟล์ที่เพิ่มขึ้น/ลดลงจากที่ประกาศไว้)
 ตอน merge ให้เทียบชุดไฟล์ที่ประกาศกับ `git diff --stat` — **ไฟล์ที่อยู่ใน diff แต่ไม่อยู่ในรายการถือว่า blocking** (ส่วนหนึ่งของ completion evidence gate ตาม [L1-7](02-issue-loop.md))
 
+**ห้ามเขียนสตริง `close(s|d) #N` / `fix(es|ed) #N` / `resolve(s|d) #N` ตามตัวอักษรใน PR body ของเลนหลายขั้น** ตัวแยกคีย์เวิร์ดของ GitHub ไม่อ่านทั้งรูปปฏิเสธและบริบท — เขียนว่า `Does not close #18` ก็ยังปิด #18 ตอน merge อยู่ดี (เกิดความเสียหายจริงใน sitter#18 และ handbook#80) ใช้คีย์เวิร์ดปิด Issue ได้**เฉพาะเมื่อ merge นั้นเพียงครั้งเดียวทำให้ทุกข้อของ Done when ครบ**เท่านั้น สำหรับ bootstrap PR・PR หลายขั้น・PR ที่ merge แล้วยังเหลือข้อ Done when ให้เขียนว่า "leaves #N open" หรือ "tracked in #N" แทน และปิด Issue ด้วยบันทึกความเสร็จสมบูรณ์ของขั้นสุดท้าย (คอมเมนต์สิ้นสุดตาม [L1-4](02-issue-loop.md))
+
 ## L0-7 merge ทีละอันเท่านั้น
 
 ```
