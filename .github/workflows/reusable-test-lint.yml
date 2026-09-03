@@ -27,6 +27,16 @@
 # オーナー決裁 2026-08-19 が2つの昇格の起源):
 # - promotion ①: OS matrix の run_macos / macos_skip_reason (上記)。
 # - promotion ②: ubuntu の test job で suite-count reconciliation (下記) を行う。
+#
+# 追加入力 (issue #101 / context-kit#52・すべて additive・未設定 = 従来どおり):
+# - node_version: 指定時のみ actions/setup-node をテスト・lint の前に挿む。caller が push:main 側で
+#   Node を pin しているのに PR 門番だけ runner 既定 Node で走る「検証マトリクスの割れ」を塞ぐ
+#   (x-collector#43 3席収束)。未指定 = setup-node を挿まない (runner 既定 Node のまま)。
+# - pre_test_setup_ubuntu / pre_test_setup_macos: テスト直前に走らせる OS 別のセットアップ shell
+#   (apt/brew でテストが依存する OS パッケージを入れる等。例: Linux の xattr テストに `attr`)。
+#   これは caller のリポが自分の CI に置くのと同じ信頼境界 (Makefile の test ターゲットと同じ) であり、
+#   reusable の権限 (contents: read) を広げない。空 = ステップ自体を置かない。非空で失敗 = 赤 (set -e)。
+#   Makefile 側で `apt-get` を叩く回避策を置くと macOS レグと乖離するため、OS 別入力として型に置く。
 
 on:
   workflow_call:
@@ -47,6 +57,18 @@ on:
         description: "T-6 (handbook#81) の declared=executed+skipped に許容する skipped の上限率。LC-3-style の caller-local/local-value として caller の with: で指定する。"
         type: string
         default: '20'
+      node_version:
+        description: "指定時のみ test / test-macos / lint の直前に actions/setup-node を挿む (例: '20', '22.x', '.nvmrc' は不可・数値指定のみ)。未指定 = runner 既定 Node のまま (従来どおり)。push:main 側で Node を pin している caller は同じ値をここに渡して検証マトリクスを揃える (issue #101)。"
+        type: string
+        default: ''
+      pre_test_setup_ubuntu:
+        description: "ubuntu の test job で make test の直前に走らせる shell (bash, set -euo pipefail)。テストが依存する OS パッケージの導入等 (例: sudo apt-get install -y attr)。空 = ステップを置かない。失敗 = 赤。"
+        type: string
+        default: ''
+      pre_test_setup_macos:
+        description: "macOS の test-macos job で make test の直前に走らせる shell (bash, set -euo pipefail)。例: brew install <pkg>。空 = ステップを置かない。失敗 = 赤。"
+        type: string
+        default: ''
 
 jobs:
   test:
@@ -67,6 +89,27 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - name: Setup Node (only when node_version is set)
+        if: ${{ inputs.node_version != '' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Pre-test setup (ubuntu, only when pre_test_setup_ubuntu is set)
+        if: ${{ inputs.pre_test_setup_ubuntu != '' }}
+        shell: bash
+        env:
+          PRE_TEST_SETUP: ${{ inputs.pre_test_setup_ubuntu }}
+        run: |
+          set -euo pipefail
+          # 空白だけの入力は「置いただけ」の緑になるため赤にする (macos_skip_reason と同じ扱い・FP-5)。
+          if [ -z "$(printf '%s' "$PRE_TEST_SETUP" | tr -d '[:space:]')" ]; then
+            echo "::error::pre_test_setup_ubuntu is whitespace-only — a setup step that runs nothing must not pass silently (fail-closed). Remove the input or write the command."
+            exit 1
+          fi
+          # caller の with: pre_test_setup_ubuntu をそのまま実行する (caller 自身の CI 定義と同じ信頼境界)。
+          ${{ inputs.pre_test_setup_ubuntu }}
 
       - name: Run tests
         run: |
@@ -142,6 +185,27 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Setup Node (only when node_version is set)
+        if: ${{ inputs.node_version != '' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Pre-test setup (macOS, only when pre_test_setup_macos is set)
+        if: ${{ inputs.pre_test_setup_macos != '' }}
+        shell: bash
+        env:
+          PRE_TEST_SETUP: ${{ inputs.pre_test_setup_macos }}
+        run: |
+          set -euo pipefail
+          # 空白だけの入力は「置いただけ」の緑になるため赤にする (macos_skip_reason と同じ扱い・FP-5)。
+          if [ -z "$(printf '%s' "$PRE_TEST_SETUP" | tr -d '[:space:]')" ]; then
+            echo "::error::pre_test_setup_macos is whitespace-only — a setup step that runs nothing must not pass silently (fail-closed). Remove the input or write the command."
+            exit 1
+          fi
+          # caller の with: pre_test_setup_macos をそのまま実行する (caller 自身の CI 定義と同じ信頼境界)。
+          ${{ inputs.pre_test_setup_macos }}
+
       - name: Run tests (macOS)
         run: |
           set -euo pipefail
@@ -203,6 +267,12 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - name: Setup Node (only when node_version is set)
+        if: ${{ inputs.node_version != '' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ inputs.node_version }}
 
       - name: Run lint
         run: |
