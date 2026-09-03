@@ -161,13 +161,24 @@ node_modules
 __pycache__
 ```
 
-列挙された regular file は suffix やファイル名で選別せず、`.env`、`LICENSE`、`Dockerfile`、`.txt`、
-拡張子なしもすべて UTF-8 decode を試す。既知の text suffix または拡張子なしのファイルを decode
-できなければ `source-read: ... is not valid UTF-8 text (fail-closed)` で赤にする。それ以外の genuinely
-binary な suffix はスキャンを飛ばし、`binary files skipped: N` に集計した直後へ
+列挙された regular file は suffix やファイル名で選別せず、`.env.local`、`.cs`、`.csproj`、`.ipynb`、
+`.txt`、`.csv`、`LICENSE`、`Dockerfile`、拡張子なしもすべて先に UTF-8 decode を試す。decode
+できなかった場合だけ、明示した既知の binary suffix または exact filename `.DS_Store` を binary として
+スキャン対象外にする。それ以外は未知の text-like file として
+`source-read: ... is not valid UTF-8 text (fail-closed)` で赤にする。binary と判定したファイルは
+`binary files skipped: N` に集計した直後へ
 `  skipped (binary): <relative path>` と1ファイル1行で名前も表示する。Git mode の symlink は Git が
 公開する readlink text を検査する。`rglob-fallback` は symlink を follow せず、
 `symlinks skipped: N` に集計する。
+
+binary suffix の例には `.png` と `.plist` が含まれる。ただし suffix は decode 前の除外条件ではないため、
+UTF-8 XML の `.plist` は通常どおり全文を検査し、binary plist のように UTF-8 decode できないものだけを
+skip する。
+
+`BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
+調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
+Git mode なら publishable corpus から untrack する、または suffix 追加の upstream PR を開く、のいずれかで
+対処する。
 
 summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と、
 `denylist rules loaded : N` を表示する。raw view の hit は raw text の行番号を使い、percent/HTML decode 後に
@@ -179,18 +190,18 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
 
 ## 2026-09 改訂（#97 / #98）— 採用リポの再コピー差分
 
-`2d2d4b3` の byte-identical copy を保持している採用リポは、`v0.22.0` で配布される checker を
-再コピーし、次の caller-visible な差分を取り込む。
+`2d2d4b3` の byte-identical copy を保持している採用リポは、この変更を含む handbook release
+（この PR の merge 時に `v0.22.0` として切る）の checker を再コピーし、次の caller-visible な差分を取り込む。
 
-- text suffix または拡張子なしのファイルが UTF-8 でなければ、
-  `source-read: ... is not valid UTF-8 text (fail-closed)` で赤になる。genuinely binary な suffix は従来どおり
-  skip するが、`binary files skipped:` の直下へ相対パスを列挙する。caller 側の
-  `binary files skipped: 0` grep guard は不要になったが、残しても害はない。
+- 既知の binary suffix または exact filename `.DS_Store` 以外のファイルが UTF-8 でなければ、
+  `source-read: ... is not valid UTF-8 text (fail-closed)` で赤になる。既知の binary file は decode に
+  失敗した場合だけ skip し、`binary files skipped:` の直下へ相対パスを列挙する。caller 側の
+  `binary files skipped: 0` grep guard は追加の guard として引き続き有効である。
 - `--registry` の省略は赤になる。レジストリを持たない caller は `--no-registry` を追加する。
   `registry/modules.json` が disk 上にある状態での `--no-registry` も赤になる。
 - bare `@github.com/<slug>/<repo>` と `@github.com/<slug>` も personal-url として検出する。
   `local@github.com/...` は引き続き URL 検査ではなく e-mail denylist rule の担当とする。
-- 再コピー対象は、この変更を含む handbook release `v0.22.0`。
+- 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.22.0` として切る）。
 
 ## family-os / organization `.github` からの移行
 
@@ -203,8 +214,8 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   新しく赤になった場合、検知退行ではなく bug fix の結果として対象テキストを直す。
 - 外部 `.publication-denylist` は必須。先にファイルを配置・カスタマイズせず checker だけを切り替えると、
   ゲートは意図的に赤のままになる。
-- text suffix または拡張子なしのファイルの decode failure は binary skip にせず赤にする。これは旧コピーの
-  fail-closed な挙動と一致し、template 化の途中で生じた検査姿勢の緩みを戻す差分である。
+- 既知の binary suffix または exact filename `.DS_Store` 以外の decode failure は binary skip にせず赤にする。
+  これは旧コピーの fail-closed な挙動と一致し、template 化の途中で生じた検査姿勢の緩みを戻す差分である。
 - 通常実行では `--registry` か `--no-registry` の明示が必須。レジストリを持たない移行先は CI と
   ローカルの呼び出しへ `--no-registry` を追加する。
 

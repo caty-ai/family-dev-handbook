@@ -16,6 +16,7 @@ import io
 import json
 import os
 from pathlib import Path
+import plistlib
 import re
 import shutil
 import stat
@@ -31,24 +32,24 @@ EXCLUDED_DIRS = frozenset(
 DENYLIST_NAME = ".publication-denylist"
 WHITELIST_NAME = ".publication-label-whitelist"
 ACCOUNT_SLUG = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$")
-TEXT_SUFFIXES = frozenset(
+BINARY_SUFFIXES = frozenset(
     (
-        ".md", ".markdown", ".mdx", ".txt", ".text", ".rst", ".adoc", ".svg",
-        ".json", ".jsonc", ".json5", ".yml", ".yaml", ".toml", ".ini", ".cfg",
-        ".conf", ".env", ".xml", ".html", ".htm", ".css", ".scss", ".less",
-        ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".py", ".pyi", ".sh",
-        ".bash", ".zsh", ".fish", ".rb", ".go", ".rs", ".java", ".kt", ".kts",
-        ".swift", ".c", ".h", ".cc", ".cpp", ".hpp", ".m", ".mm", ".php",
-        ".pl", ".lua", ".sql", ".csv", ".tsv", ".tex", ".bib", ".ps1", ".bat",
-        ".cmd", ".properties", ".lock", ".mk", ".cmake", ".gradle", ".plist",
-        ".graphql", ".proto", ".tf", ".hcl", ".vue", ".svelte", ".astro", ".njk",
-        ".hbs", ".ejs", ".pug", ".diff", ".patch", ".log", ".cff", ".bzl", ".nix",
-        ".dart", ".scala", ".clj", ".ex", ".exs", ".erl", ".hs", ".ml", ".r",
-        ".jl",
+        ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".bmp", ".tif",
+        ".tiff", ".avif", ".heic", ".heif", ".psd", ".svgz", ".woff", ".woff2",
+        ".ttf", ".otf", ".eot", ".zip", ".gz", ".tgz", ".tar", ".bz2", ".xz",
+        ".zst", ".7z", ".rar", ".jar", ".war", ".whl", ".egg", ".gem", ".nupkg",
+        ".deb", ".rpm", ".dmg", ".pkg", ".apk", ".ipa", ".pdf", ".doc", ".docx",
+        ".xls", ".xlsx", ".ppt", ".pptx", ".key", ".numbers", ".pages", ".odt",
+        ".ods", ".odp", ".mp3", ".mp4", ".m4a", ".m4v", ".mov", ".avi", ".mkv",
+        ".webm", ".wav", ".flac", ".ogg", ".oga", ".ogv", ".aac", ".aif", ".aiff",
+        ".so", ".dylib", ".dll", ".exe", ".o", ".a", ".lib", ".obj", ".class",
+        ".pyc", ".pyd", ".wasm", ".bin", ".dat", ".db", ".sqlite", ".sqlite3",
+        ".pak", ".bundle", ".mo", ".pb", ".onnx", ".npy", ".npz", ".parquet",
+        ".arrow", ".pickle", ".pkl", ".h5", ".hdf5", ".plist",
     )
 )
 URL_CANDIDATE = re.compile(
-    r"(?<![A-Za-z0-9._-])(?<![A-Za-z0-9._%+-]@)"
+    r"(?<![A-Za-z0-9._-])(?<![A-Za-z0-9_%+]@)"
     r"(?:https?://(?:[A-Za-z0-9._~!$&'()*+,;=:%-]+@)?)?"
     r"(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9-]+\.?(?::[0-9]+)?"
     r"(?:/[^\s<>'\"`()\[\]{}]*)?",
@@ -284,13 +285,13 @@ def read_sources(root, failures, excluded_policy_path):
             try:
                 documents[relative] = path.read_bytes().decode("utf-8")
             except UnicodeDecodeError:
-                if path.suffix.lower() in TEXT_SUFFIXES or path.suffix == "":
+                if path.suffix.lower() in BINARY_SUFFIXES or path.name == ".DS_Store":
+                    binary_skipped += 1
+                    binary_skipped_paths.append(relative)
+                else:
                     failures.append(
                         "source-read: %s is not valid UTF-8 text (fail-closed)" % relative
                     )
-                else:
-                    binary_skipped += 1
-                    binary_skipped_paths.append(relative)
         except OSError as exc:
             failures.append("source-read: %s could not be read: %s" % (relative, exc))
     return documents, enumeration_mode, binary_skipped, symlinks_skipped, binary_skipped_paths
@@ -339,6 +340,19 @@ def _personal_url(candidate, account_slug):
     return False
 
 
+def _nested_personal_url(candidate, account_slug):
+    repo_name = _personal_url(candidate, account_slug)
+    if repo_name is not False:
+        return repo_name
+    for index, character in enumerate(candidate):
+        if character != "/":
+            continue
+        repo_name = _personal_url(candidate[index + 1 :], account_slug)
+        if repo_name is not False:
+            return repo_name
+    return False
+
+
 def registry_allowlist(registry):
     repos = {module["repo"] for module in registry["modules"]}
     repos.update(entry["repo"] for entry in registry.get("retired_repos", []))
@@ -354,7 +368,7 @@ def check_personal_urls(documents, account_slug, registry, failures):
         reported = set()
         for view_index, view in enumerate(scan_views(text)):
             for match in URL_CANDIDATE.finditer(view):
-                repo_name = _personal_url(match.group(0), account_slug)
+                repo_name = _nested_personal_url(match.group(0), account_slug)
                 if repo_name is False:
                     continue
                 number = line_number(view, match.start())
@@ -533,10 +547,10 @@ def partition_documents(documents):
 
 
 SKIP_NOTICES = (
-    "notice: registry allowlist check skipped (--registry not provided)",
-    "notice: missing-label check skipped (--registry not provided)",
-    "notice: SVG-state check skipped (--registry not provided)",
-    "notice: whitelist-staleness check skipped (--registry not provided)",
+    "notice: registry allowlist check skipped (--no-registry declared)",
+    "notice: missing-label check skipped (--no-registry declared)",
+    "notice: SVG-state check skipped (--no-registry declared)",
+    "notice: whitelist-staleness check skipped (--no-registry declared)",
 )
 
 
@@ -564,6 +578,7 @@ def run_gate(
     binary_skipped_paths = []
     symlinks_skipped = 0
     policy_path = denylist_path(root, denylist_argument)
+    conventional_registry_exists = (root / "registry" / "modules.json").is_file()
 
     normalized_slug = account_slug.strip() if account_slug is not None else ""
     if not normalized_slug:
@@ -595,7 +610,7 @@ def run_gate(
     if (
         no_registry
         and registry_argument is None
-        and (root / "registry" / "modules.json").is_file()
+        and conventional_registry_exists
     ):
         failures.append(
             "gate-error: registry/modules.json exists under --root but --no-registry was passed "
@@ -658,7 +673,7 @@ def run_gate(
     print("module links checked : %d" % root_links)
     print("SVG names checked    : %d" % svg_names)
     print("label whitelist      : %d" % len(whitelist))
-    if no_registry and registry_argument is None:
+    if no_registry and registry_argument is None and not conventional_registry_exists:
         for notice in SKIP_NOTICES:
             print(notice)
 
@@ -921,6 +936,82 @@ def selftest_scanners():
         and not email_context_failures,
         "email-context personal URL remains denylist territory",
     )
+    dash_at_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "-@" + _fixture_personal_url(
+                "neutral-owner", "private-repo"
+            )[len("https://") :]},
+            "neutral-owner",
+            None,
+            dash_at_failures,
+        )
+        == 1
+        and "neutral-owner/private-repo" in dash_at_failures[0],
+        "dash-at personal repository URL",
+    )
+    encoded_at_failures = []
+    encoded_at = _fixture_personal_url(
+        "neutral-owner", "private-repo"
+    ).replace("https://", "%40", 1)
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": encoded_at},
+            "neutral-owner",
+            None,
+            encoded_at_failures,
+        )
+        == 1
+        and "(decoded view)" in encoded_at_failures[0],
+        "percent-encoded-at personal repository URL",
+    )
+
+    nested_cases = (
+        (
+            "see @foo.bar/" + _fixture_personal_url(
+                "neutral-owner", "private-repo"
+            )[len("https://") :],
+            "neutral-owner/private-repo",
+        ),
+        (
+            "foo.bar/" + _fixture_personal_url(
+                "neutral-owner", "private-repo"
+            )[len("https://") :],
+            "neutral-owner/private-repo",
+        ),
+        (
+            "@x.io/"
+            + _fixture_personal_url("neutral-owner", "abc")
+            .replace("https://", "", 1)
+            .replace("github.", "gist.github.", 1),
+            "personal account profile",
+        ),
+    )
+    for source, expected in nested_cases:
+        nested_failures = []
+        _selftest_check(
+            check_personal_urls(
+                {"README.md": source},
+                "neutral-owner",
+                None,
+                nested_failures,
+            )
+            == 1
+            and expected in nested_failures[0],
+            "nested personal URL suffix: %s" % source,
+        )
+    unrelated_nested_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "https://example.org/docs/neutral-owner/notes"},
+            "neutral-owner",
+            None,
+            unrelated_nested_failures,
+        )
+        == 0
+        and not unrelated_nested_failures,
+        "nested personal URL unrelated-host control",
+    )
 
     normalized_failures = []
     normalized_documents = {
@@ -1124,6 +1215,95 @@ def selftest_end_to_end():
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
+        _materialize_fixture(root)
+        text_like_paths = (
+            "Program.cs",
+            "Example.csproj",
+            "notebook.ipynb",
+            ".env.local",
+            "notes.txt",
+            "table.csv",
+        )
+        for relative in text_like_paths:
+            (root / relative).write_bytes(
+                ("acme-" "secret").encode("utf-8") + b"\xff\n"
+            )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and all(
+                "source-read: %s is not valid UTF-8 text (fail-closed)" % relative
+                in output
+                for relative in text_like_paths
+            )
+            and "binary files skipped: 0" in output,
+            "non-UTF-8 files use the explicit binary allowlist: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "logo.png").write_bytes(b"\xff\xfe\x00")
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): logo.png" in output,
+            "non-UTF-8 PNG is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "fixture.plist").write_bytes(
+            plistlib.dumps({"note": "x"}, fmt=plistlib.FMT_BINARY)
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): fixture.plist" in output,
+            "binary plist is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / ".DS_Store").write_bytes(b"\xff\xfe\x00")
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 0
+            and "binary files skipped: 1" in output
+            and "  skipped (binary): .DS_Store" in output,
+            "exact .DS_Store filename is skipped and listed: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        _materialize_fixture(root)
+        (root / "fixture.plist").write_bytes(
+            plistlib.dumps({"note": "acme-" "secret"}, fmt=plistlib.FMT_XML)
+        )
+        status, output = _capture_main(
+            ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+        )
+        _selftest_check(
+            status == 1
+            and "denylist: fixture.plist:" in output
+            and "binary files skipped: 0" in output,
+            "UTF-8 plist is scanned before binary classification: %r" % output,
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
         _materialize_fixture(root, SELFTEST_VIOLATING_README)
         status, output = _capture_main(
             ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
@@ -1166,7 +1346,8 @@ def selftest_end_to_end():
         _selftest_check(
             no_registry_status == 1
             and "gate-error: registry/modules.json exists under --root but --no-registry was passed (fail-closed)"
-            in no_registry_output,
+            in no_registry_output
+            and "notice:" not in no_registry_output,
             "conventional registry rejects explicit opt-out: %r" % no_registry_output,
         )
         conflicting_status, conflicting_output = _capture_main(
