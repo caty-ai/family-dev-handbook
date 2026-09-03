@@ -208,7 +208,7 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
 ## 2026-09 改訂（#97 / #98）— 採用リポの再コピー差分
 
 `2d2d4b3` の byte-identical copy を保持している採用リポは、この変更を含む handbook release
-（この PR の merge 時に `v0.22.0` として切る）の checker を再コピーし、次の caller-visible な差分を取り込む。
+（この PR の merge 時に `v0.24.0` として切る）の checker を再コピーし、次の caller-visible な差分を取り込む。
 
 - 既知の binary suffix または exact filename `.DS_Store` 以外のファイルが UTF-8 でなければ、
   `source-read: ... is not valid UTF-8 text (fail-closed)` で赤になる。既知の binary file は decode に
@@ -223,7 +223,7 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   `.publication-denylist` は e-mail ルールを**必ず**含めること。sample には `email-address` ルールを同梱し、
   sample を使わず自前 denylist を書く場合も同等のルールを載せる。
 - nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
-- 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.22.0` として切る）。
+- 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.24.0` として切る）。
 
 ## family-os / organization `.github` からの移行
 
