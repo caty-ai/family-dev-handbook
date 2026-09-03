@@ -4,6 +4,7 @@
 #   emit_review_status.py 依存を外しインライン生成に統一・ラベル語彙と承認判定を家庭版に翻案。
 #   2026-08-19: handbook#80 で workflow_call の reusable 正本へ再変換 (pull_request → workflow_call)。
 #   高リスクパスのカテゴリ宣言 (RISK_PATHS_BILLING/OUTBOUND/GATES/AUTH) を caller の with: 入力へ移動。
+#   2026-09-04: #121/#94/#142/#99 — risk path・status artifact・visibility label・base retarget を harden。
 #
 # 守るもの: 高リスク領域 (enforcement/権限境界・認証・課金・不可逆操作・対外送信) に触れる PR が、
 #           人間 (オーナー) の確認ラベルなしに merge されないこと。検知は機械・判定は人間。
@@ -98,10 +99,14 @@ jobs:
           # 高リスク領域のパス写像 (定義の正本は handbook docs/06 — ここは写像だけ)。
           # パターンは git pathspec :(glob) 意味論・大文字小文字非依存で照合する
           # (名前でなく本質でマッチさせる — Migrations/ を取り逃さない)。
+          # release-sync-ignore は tag ごとの T-5 履行要否を決める。reusable-release-sync.yml と
+          # check-release-drift.sh は default branch から読み tagged commit の自己免除を防ぐが、
+          # 免除追加 PR 自体も risk-reviewers.txt と同形で人間確認が必要 (#121)。
           RISK_PATHS_DEFAULT='
             .github/workflows/**
             .github/actions/**
             .github/risk-reviewers.txt
+            .github/release-sync-ignore
             .gitleaks.toml
             gitleaks.toml
             .gitleaksignore
@@ -211,6 +216,9 @@ jobs:
           # 1ファイルにも解決しない場合、リネーム・配置変更で写像が乖離した兆候 — 「存在しない
           # 敵を守れているように見える」まさに #31 の形。ログの警告で人間の判断に回す。
           # 展開手順の機械確認にはこのログの ::warning:: 確認を含める (README 手順 6)。
+          # liveness は RISK_PATHS_REPO だけを調べ、DEFAULT は汎用網なので意図的に調べない。
+          # そのため DEFAULT が覆わない新しい設定ファイルや別綴りの migrations dir は警告にならず、
+          # リポ固有宣言で補う必要がある (#99 の記録済み制約)。
           while IFS= read -r pat; do
             pat="$(echo "$pat" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
             [ -n "$pat" ] || continue
@@ -284,6 +292,7 @@ jobs:
           set -euo pipefail
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            # PR が無ければ Layer-2 コメント先も無いため、この pre-checkout の赤だけ artifact 対象外 (#142)。
             exit 1
           fi
 
@@ -301,13 +310,23 @@ jobs:
           LC_ALL: C.UTF-8
           DETECT_RESULT: ${{ needs.detect.result }}
           EVENT_ACTION: ${{ github.event.action }}
+          BASE_CHANGED_FROM: ${{ github.event.changes.base.ref.from || '' }}
           RISK_HIT: ${{ needs.detect.outputs.risk_hit }}
           RISK_FILES: ${{ needs.detect.outputs.risk_files }}
         run: |
           set -euo pipefail
+          # 赤で終わる経路は必ず review_status を残す (#142): Layer-2 合成器が「該当なし」と誤読しない。
+          write_action_required() {  # title summary how_to_fix — JSON は jq で組む (引用の安全)
+            STATUS=$(jq -cn --arg t "$1" --arg s "$2" --arg h "$3" \
+              '[{"source":"risk review","results":[{"kind":"action_required","title":$t,"summary":$s,"detail":"","how_to_fix":$h}]}]')
+            echo "review_status=${STATUS}" > review-status.json
+          }
+          rm -f review-status.json
+          trap 'rc=$?; if [ "$rc" -ne 0 ] && [ ! -s review-status.json ]; then write_action_required "Risk review gate error" "The risk-review gate exited unexpectedly (exit ${rc}) before reaching a decision; treat this head as unreviewed." "Open the risk-review-gate job log, fix the cause, and re-run; a human on .github/risk-reviewers.txt must still apply risk-reviewed for this head SHA."; fi' EXIT
           # detect が success 以外 (宣言忘れの赤・範囲解決失敗・キャンセル) なら本ジョブも赤 (fail-closed)。
           if [ "$DETECT_RESULT" != "success" ]; then
             echo "::error::detect job result is '${DETECT_RESULT}' — cannot judge risk paths, failing closed. See the detect-risk-paths job log (undeclared RISK_PATHS_REPO placeholder, unresolved diff range, etc.)."
+            write_action_required "Risk detection failed" "detect-risk-paths job result '${DETECT_RESULT}'; high-risk paths could not be judged; failing closed." "Fix the risk path declarations in the caller with: block, then re-run the workflow."
             exit 1
           fi
           if [ "$RISK_HIT" != "true" ]; then
@@ -319,13 +338,19 @@ jobs:
 
           # 確認者名簿: base (main) 側から読む。PR head から読まない (自己承認の循環封じ)。
           ROSTER=$(git show "origin/${BASE_REF}:.github/risk-reviewers.txt" 2>/dev/null) || {
-            echo "::error::.github/risk-reviewers.txt not found on origin/${BASE_REF} — roster missing, failing closed. Copy templates/ci/risk-reviewers.txt.example and commit it on main."; exit 1; }
+            echo "::error::.github/risk-reviewers.txt not found on origin/${BASE_REF} — roster missing, failing closed. Copy templates/ci/risk-reviewers.txt.example and commit it on main."
+            write_action_required "Risk reviewer roster missing" ".github/risk-reviewers.txt is missing on the base branch origin/${BASE_REF}; risk reviewer authorization cannot be judged." "Copy templates/ci/risk-reviewers.txt.example, add the authorized reviewers, and commit it on main."
+            exit 1; }
           ROSTER=$(printf '%s\n' "$ROSTER" | sed 's/#.*//' | sed 's/[[:space:]]//g' | sed '/^$/d')
           if [ -z "$ROSTER" ]; then
-            echo "::error::risk reviewer roster is empty — failing closed."; exit 1;
+            echo "::error::risk reviewer roster is empty — failing closed."
+            write_action_required "Risk reviewer roster empty" ".github/risk-reviewers.txt on the base branch contains no authorized reviewers; failing closed." "Copy templates/ci/risk-reviewers.txt.example, add the authorized reviewers, and commit it on main."
+            exit 1
           fi
           if grep -Fxq 'REPLACE_ME' <<<"$ROSTER"; then
-            echo "::error::risk reviewer roster still contains the REPLACE_ME placeholder — failing closed."; exit 1;
+            echo "::error::risk reviewer roster still contains the REPLACE_ME placeholder — failing closed."
+            write_action_required "Risk reviewer roster placeholder" ".github/risk-reviewers.txt on the base branch still contains REPLACE_ME; reviewer authorization is not configured." "Replace REPLACE_ME with authorized GitHub logins and commit the roster on main."
+            exit 1
           fi
 
           # 承認の head SHA 束縛はイベント種別で行う (剥がしジョブの成功に依存しない):
@@ -334,6 +359,16 @@ jobs:
           # 作者起点の再評価は未承認」。承認がラベル現在値で再評価されるのは labeled / unlabeled の run
           # (どちらも triage 権限者にしか起こせない) に限られる。ラベル剥がし (書き込み) が 403 になる
           # fork PR でも、作者単独の承認持ち回しは成立しない。
+          # base retarget も judged diff を差し替える: risky change 済み staging へ PR を開いて空 diff を緑にし、
+          # main へ付け替えると stale green を持ち回せる。caller が edited を購読した時だけここで再評価する (#99)。
+          if [ "$EVENT_ACTION" = "edited" ] && [ -n "$BASE_CHANGED_FROM" ]; then
+            echo "::error::base branch retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}' (event: edited) — the judged diff changed; any previous risk-reviewed approval is void for this head"
+            echo ""
+            echo "touched high-risk files:"
+            printf '%s\n' "$RISK_FILES" | sed 's/^/  - /'
+            write_action_required "Risk re-review required" "The base branch was retargeted from '${BASE_CHANGED_FROM}' to '${BASE_REF}'; the judged diff changed and previous approval is void for this head." "Ask an owner listed in .github/risk-reviewers.txt to review the retargeted diff and re-apply the risk-reviewed label."
+            exit 1
+          fi
           if [ "$EVENT_ACTION" = "synchronize" ] || [ "$EVENT_ACTION" = "reopened" ] || [ "$EVENT_ACTION" = "ready_for_review" ]; then
             echo "::error::new head SHA (event: ${EVENT_ACTION}) — any previous risk-reviewed approval is void for this head. A human on the roster must re-review the diff and re-apply the label."
             echo ""
@@ -346,7 +381,9 @@ jobs:
 
           # ラベル取得の失敗・空応答は赤 (FP-6: 判定不能 = 赤)。
           LABELS=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json labels --jq '.labels[].name') || {
-            echo "::error::label fetch failed — cannot judge, failing closed (FP-6)."; exit 1; }
+            echo "::error::label fetch failed — cannot judge, failing closed (FP-6)."
+            write_action_required "Risk review label fetch failed" "The risk review label state could not be fetched; failing closed." "Open the risk-review-gate job log, fix the GitHub API failure, and re-run."
+            exit 1; }
 
           # 方式1 (既定): risk-reviewed の現在有無で判定する (上のイベント束縛と対で機能する)。
           if grep -Fxq 'risk-reviewed' <<<"$LABELS"; then
@@ -454,10 +491,10 @@ jobs:
           path: review-status.json
           retention-days: 1
           overwrite: true
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
-  # ── 書き込み系 (fail-open): 可視化ラベルの付与と、push 時の機械剥がし ─────────────
-  # fork PR では 403 になるため警告に留める。ゲート判定はこのジョブの成否に依存しない。
+  # ── 書き込み系 (可視化): 可視化ラベルの付与と、head/diff 変更時の機械剥がし ─────────
+  # fork 403 は警告、ラベル不在・same-repo 書込失敗は赤。visibility-only でゲート判定には影響しない。
   labels:
     name: apply-visibility-labels
     needs: detect
@@ -475,8 +512,9 @@ jobs:
             exit 1
           fi
 
+      # 新 push に加え base retarget でも judged diff が変わるため、古い承認を可視化上も剥がす (#99)。
       - name: Strip approval labels on new push (剥がしは機械・貼るのは人間)
-        if: github.event.action == 'synchronize'
+        if: github.event.action == 'synchronize' || (github.event.action == 'edited' && github.event.changes.base.ref.from != '')
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -494,11 +532,27 @@ jobs:
 
       - name: Apply needs-risk-review label (可視化専用・判定に影響しない)
         if: needs.detect.outputs.risk_hit == 'true'
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
           set -euo pipefail
-          gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label 'needs-risk-review' \
-            || echo "::warning::could not add needs-risk-review (fork PR has no write token — 403 is expected there). Gate evaluation is unaffected."
+          LABEL_NAMES=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/labels?per_page=100" --jq '.[].name') || {
+            echo "::error::label list fetch failed — cannot verify that 'needs-risk-review' exists in ${GITHUB_REPOSITORY}; failing red (visibility job only — gate judgment is unaffected)"
+            exit 1
+          }
+          if ! grep -Fxq 'needs-risk-review' <<<"$LABEL_NAMES"; then
+            echo "::error::label 'needs-risk-review' is missing in ${GITHUB_REPOSITORY}; create it per templates/ci/README.md step 3: gh label create needs-risk-review --color D93F0B --description \"高リスク領域に触れた PR (機械が自動付与)\""
+            exit 1
+          fi
+          if ! ERR=$(gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label 'needs-risk-review' 2>&1); then
+            printf '%s\n' "$ERR"
+            if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+              echo "::warning::could not add needs-risk-review on a fork PR (no write token — 403 is expected there). Gate evaluation is unaffected."
+              exit 0
+            fi
+            echo "::error::could not add needs-risk-review on a same-repo PR — this is not the fork 403 case; failing red so the missing visibility label is not silently absent. Gate evaluation is unaffected."
+            exit 1
+          fi
+          echo "::notice::needs-risk-review label attached to PR #${PR_NUMBER}."

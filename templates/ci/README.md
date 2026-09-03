@@ -34,6 +34,7 @@
    gh label create risk-reviewed    --color 0E8A16 --description "オーナー確認済み (人間のみが貼る・push で自動剥がし)"
    gh label create size-exempt     --color FBCA04 --description "サイズ上限の免除 (オーナーのみが貼る・push で自動剥がし)"
    ```
+   この変更以降、`needs-risk-review` が無い場合は `apply-visibility-labels` が silent no-op でなく赤になる (#94)。
 4. 各キャリアーの `with:` ブロックを必要に応じて埋める（stencil 自体は薄く保ち、説明はここに集約する）:
    - `test-lint.yml` — `run_macos` / `macos_skip_reason`（macOS 分を落とすなら理由をセットで明示。空または空白だけだと赤）/ `require_suite_reconciliation`（既定 `false`。照合行は T-6（handbook#81）の3値形式 `suites: declared=N executed=M skipped=K` のみ。行が無い場合は `::notice::` を出して通し、`true` のときは行が無いだけで赤。行がある場合は `executed + skipped != declared`・`executed == 0`・skip 率超過（`skipped×100 > declared×max_skip_percent`）のいずれも常に赤）/ `max_skip_percent`（skip 率上限・既定 `'20'`・整数のみ。値の変更は T-6 の記録規律に従う。テスト/lint コマンド自体は reusable 側が Makefile の `test`/`lint` ターゲットを試す）
    - `pr-size.yml` — `max_lines` / `exclude_patterns`（サイズ計測の除外パターン。既定の除外〔lockfile・`i18n/**`〕は reusable 側に内蔵済み）
@@ -80,6 +81,7 @@ advance 済みであることを先に確認してから**、`templates/ci/relea
 **免除する tag の正確な名前を1行に1つ**、`#` で始まる行はコメント、空行は無視、glob は不可。
 ファイルが無ければ空リストとして扱い、default branch から読めない場合は赤になる。移動する major
 tag 等、明示的に Release を作らない tag だけを列挙し、legacy lightweight tag は免除に入れない。
+`.github/release-sync-ignore` は既定の高リスクパスであり、触れる PR には `risk-reviewed` が必要になる (#121)。
 
 これは family の CI キャリアーで初めて `contents: write` を要求する門番であり、moving tag の
 `ci-v1` が初めて書き込み経路を守る。reusable は checkout せず、tag 側のリポ内容を実行せず、
@@ -127,7 +129,10 @@ hardening として強く推奨する。
 - **gitleaks の赤を消しても秘密は無効化されない** — 一度 push した秘密は必ず rotate する。本線は commit 前のローカル hook・CI は最後の網。検知の許容（allowlist）は base 側 `.gitleaks.toml` だけが効く — PR 側の設定・`.gitleaksignore`・inline `gitleaks:allow` は無効化してある（自己緩和封じ）
 - **承認後の push で承認が無効になるのは仕様** — 承認（`risk-reviewed` / `size-exempt`）は「オーナーが見た head SHA」に束縛される。無効化はゲート自身のイベント判定で行われ、ラベル剥がしジョブは可視化のための衛生（「剥がしは機械・貼るのは人間」）
 - **ワークフロー自身の改変は機械的には止められない** — `pull_request` トリガは PR head 側のワークフロー定義（caller の `with:` 入力・呼び出し先タグを含む）で実行されるため、門番を無力化する PR はその無力化された門番で判定される（循環）。防御は PR timeline の監査＋可能なら `.github/workflows/` への CODEOWNERS 必須化。これがこのゲートを「可視化+監査」装置と位置づける理由の一つ
-- **`pr-size.yml` と `review-labels.yml` の caller types は削らない** — `labeled` / `unlabeled` / `ready_for_review`（`pr-size` は `edited` も）が無いと、免除や承認の付与・剥奪や PR 本文更新で再評価されず、緑が古く残る
+- **`pr-size.yml` と `review-labels.yml` の caller types は削らない** — `labeled` / `unlabeled` / `ready_for_review` と `edited`（review-labels は base retarget の再評価）が無いと緑が古く残る。`@ci-v1` pin 済みでも `edited` 未追加の caller は従来どおり retarget 防御なしで動くため、追随を推奨するが互換性には影響しない (#99)
+- **死にパターン liveness はリポ固有宣言だけ** — `RISK_PATHS_REPO` のみを調べ、汎用網の DEFAULT は意図的に検査しない。網外の新規設定ファイルや別綴りの migrations dir は警告されないため、リポ宣言で補う (#99)
+- **可視化ラベルの失敗分類** — `needs-risk-review` 不在と same-repo の書き込み失敗は赤、fork 403 だけは警告。`apply-visibility-labels` は visibility-only でゲート判定には影響しない (#94)
+- **gate の赤は review_status を残す** — detect 失敗・名簿不備・ラベル取得失敗を含む全赤経路で artifact を書く。PR が無くコメント先も無い pre-checkout の赤だけは対象外 (#142)
 
 ## Layer 2（合成器）の配線スケッチ
 

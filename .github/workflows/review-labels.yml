@@ -8,7 +8,8 @@ on:
   pull_request:
     # 既定 types に labeled/unlabeled は含まれない。省くと「人間が承認しても再評価されない」
     # 「剥がしても緑が残る」の両不具合になるため明示する。
-    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+    # edited = base retarget 時に judged diff を再評価する (#99)。
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review]
 
 permissions:
   contents: read
