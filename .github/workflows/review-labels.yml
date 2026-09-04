@@ -8,7 +8,8 @@ on:
   pull_request:
     # 既定 types に labeled/unlabeled は含まれない。省くと「人間が承認しても再評価されない」
     # 「剥がしても緑が残る」の両不具合になるため明示する。
-    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+    # edited = title/body 編集・base retarget を作者起点イベントとして承認無効化の対象にする (#99)。
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review]
 
 permissions:
   contents: read
