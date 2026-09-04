@@ -414,7 +414,7 @@ docs と templates の機械翻訳版（English / 简体中文 / ไทย）は
 - CI: ローカル caller から Test + Lint を含む reusable `@ci-v1` セット（5ゲート）を実行し、suite-count 照合を有効にしています。CI と同じエントリーポイントをローカルで実行するには `make test` と `make lint` を使います。
 - 検証済み環境: CI で `ubuntu-latest` と `macos-latest` を実行し、macOS でのローカル開発も行っています。WSL2 も対象です — `ubuntu-latest` レーンが検証しているのと同じ GNU 経路で動きます（clone は `/mnt/c` 配下ではなく Linux ファイルシステム側に）。
 - maturity: `stable` — 規範の正本です。
-- 既知の制約: 条文は docs のみです。`templates/` には採用先が自分の CI にコピーして使うお手本（ゲートの型・YAML+Python）をサンプルとして同梱し、`scripts/` はこのリポジトリ自身の検査用スクリプトです。各言語ミラーのリンク整合性は CI の `make lint` で検査しています。
+- 既知の制約: 条文は docs のみです。`templates/` には採用先が自分の CI にコピーして使うお手本（ゲートの型・YAML+Python）をサンプルとして同梱し、`scripts/` はこのリポジトリ自身の検査用スクリプトです。4 言語の README ミラーの相対リンクとアンカーは CI の `make lint` で検査しています。
 
 ---
 
