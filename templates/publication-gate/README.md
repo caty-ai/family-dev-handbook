@@ -229,15 +229,21 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
 - nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.24.0` として切る）。
 
-## 2026-09 改訂（#150）— 再コピーは任意
+## 2026-09 改訂（#150）— 再コピーは任意（1形状のみ推奨）
 
 - この改訂は、この PR の merge 時に handbook release `v0.26.0` として切る。
-- `--no-registry` の caller では red/green は変わらず、finding だけが `&` / `=` の直後で
-  field-cut した名前（`repo&x=1` → `repo`）を報告する。`--registry` の caller では
-  `&` / `=` cut 名も `?` / `#` と同様に registry allowlist と照合されるため、登録済み repo
-  への `github.com/<slug>/<repo>&…` 参照は旧版の誤検知（赤）が解消して緑になり、未登録 repo は cut 名のまま赤である。GitHub の repository 名は `&` / `=` を含めないので真の違反が緑になることはなく、scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…`（gist 含む）は新たに personal account profile として赤になる（fail-closed 側の変更）。
+- registry の有無によらず、scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…`
+  （`www.` 付き・大小文字違い・gist 含む）は新たに personal account profile として赤になる
+  （fail-closed 側の変更。scheme 付きの同形は旧版から赤）。それ以外の `--no-registry` の caller では
+  red/green は変わらず、finding だけが `&` / `=` の直後で field-cut した名前（`repo&x=1` → `repo`）を
+  報告する。`--registry` の caller では `&` / `=` cut 名も `?` / `#` と同様に registry allowlist と
+  照合されるため、登録済み repo への `github.com/<slug>/<repo>&…` 参照は旧版の誤検知（赤）が解消して
+  緑になり、未登録 repo は cut 名のまま赤である。GitHub の repository 名は `&` / `=` を含めないので、
+  真の違反が緑になることはない。
 - 項目 2–4 は上記「スキャン対象と Git の無い環境」に accepted posture として記録した整理であり、この改訂の caller-visible な差分は前項の nested candidate まわりに限られる。
-- `v0.24.0` に pinned の adopter も再コピーは任意であり、真の違反の red/green は変わらないが、registry を使う CI では上記の誤検知解消と scheme 無し profile の追加赤が出うるため outcome-neutral ではない。
+- `v0.24.0` に pinned の adopter も再コピーは任意であり、真の違反の red/green は変わらないが、
+  scheme 無し profile の追加赤（モード共通）と、registry を使う CI での上記の誤検知解消が出うるため
+  outcome-neutral ではない。
   ただし、公開済みテキストに scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…` を含む adopter は、旧版では緑・再コピー後に赤になる形のため再コピーを推奨し、それ以外は引き続き任意とする。
 
 ## family-os / organization `.github` からの移行
