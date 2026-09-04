@@ -111,7 +111,7 @@ FP: 検証不能なら直列（書き込み・merge も停止側に倒す）。f
 1. 在 `ARCHITECTURE.md` 中新建"并行安全地图"章节（[模板](../templates/architecture-parallel-map.md)）
 2. 将 Issue 模板（[templates/issue-template.md](../templates/issue-template.md)）放入 `.github/ISSUE_TEMPLATE/`（可选但推荐）
 3. 全员遵守避免直接 push main 的运作方式（能设置 branch protection 的话就设置）
-4. 整备测试运行器 + CI workflow，并注册到 required status checks（[T-1](10-test-ci-baseline.md)；类型见 [templates/ci/](../templates/ci/README.md)。非代码仓库在 Issue 中记录一行理由付 N/A）
+4. 整备测试运行器 + CI workflow，并注册到 required status checks（[T-1](10-test-ci-baseline.md)；类型见 [templates/ci/](../../../templates/ci/README.md)。非代码仓库在 Issue 中记录一行理由付 N/A）
 5. 公开仓库时，以公开检查清单（[PB-1](11-publication.md)、[templates/publication-checklist.md](../templates/publication-checklist.md)）作为 lane 的门禁
 
 ## 角色分工由各 Agent 自行决定
