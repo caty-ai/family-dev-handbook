@@ -18,19 +18,32 @@ required status check に登録して初めて「保護済み」と扱う。
 | 個人 URL の registry allowlist | 台帳で公開対象と宣言した URL だけを個人用 URL 検査から免除すること | allowlist 検査を skip し、明示的な notice を出す |
 | 公開ラベル | 台帳の対象に公開ラベルが無い状態を残さないこと | 「ラベル欠落」検査を skip し、notice を出す |
 | SVG 状態 | README の表示と台帳の公開状態が食い違わないこと | 検査を skip し、notice を出す |
-| label whitelist の stale | 一時的な例外が台帳変更後も残らないこと | 検査を skip し、notice を出す |
+| label whitelist の stale | 一時的な例外が台帳変更後も残らないこと | whitelist が不在/空なら検査を skip して notice、1件以上なら赤 |
 
-`--registry` は任意。省略した場合も denylist と個人用 URL の検査は実行し、確認不能な
-4検査を黙って緑にせず、それぞれ skip notice を出す。corpus のアンカーは、レジストリ有りなら
-指定した JSON ファイル、無しなら `<root>/README.md` へ fallback する。カレントディレクトリ下の別 README を
-偶然拾って判定の起点にはしない。レジストリなしで `<root>/README.md` も無い場合は、corpus floor を
-確立できないため赤になる。
+通常検査では `--registry` か `--no-registry` のどちらかを明示する。両方を省略した場合と、両方を
+指定した場合は設定不備として赤になる。`--no-registry` を明示した場合も denylist と個人用 URL の
+検査は実行し、`<root>/registry/modules.json` と非空の `.publication-label-whitelist` のどちらも無い時に限り、
+確認不能な4検査を黙って緑にせず、それぞれ skip notice を出す。`<root>/registry/modules.json` が存在する、
+または非空の `.publication-label-whitelist` がある状態で `--no-registry` を指定した場合は赤になる。
+`registry/modules.json` と非空の label whitelist だけが checker が
+知り得る on-disk signal であり、custom path の registry は caller が `--registry` で渡す責任を負う。corpus の
+アンカーは、レジストリ有りなら指定した JSON ファイル、明示的なレジストリなしなら
+`<root>/README.md` へ fallback する。カレントディレクトリ下の別 README を偶然拾って判定の起点には
+しない。レジストリなしで `<root>/README.md` も無い場合は、corpus floor を確立できないため赤になる。
 
 個人用 URL は URL 候補を解析して host を正規化してから照合する。`github.com/<slug>` に加え、
 `github.com:443/<slug>`、`github.com./<slug>`、`gist.github.com/<slug>`、
 `<slug>.github.io` も対象になる。host の port は無視し、末尾の dot は1個だけ除く。
+URL 候補の path 内に `github.com/<slug>`・`gist.github.com/<slug>`・`<slug>.github.io` が現れる場合
+（`foo.bar/github.com/<slug>/<repo>`、`?u=github.com/<slug>/...`、`github.com\/<slug>\/...`）も
+personal-url として赤にする。`https://example.org/docs/github.com/<slug>/<repo>` のような無関係ホストの
+path に personal URL が現れる場合や、`<slug>.github.io` という segment があるだけでも赤になる fail-closed
+の設計であり、nested URL は次の `?`・`#`・`=`・`&` query/fragment field 境界までを照合する。該当テキストを
+修正するか registry allowlist へ追加して対処する。
 `--account-slug` は前後の空白を除いた後、GitHub slug 形の
 `^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37})$` に一致しなければ設定不備として赤になる。
+`@` の直前が英数字または `_` の word character でない場合は bare
+`@host/...` として URL 検査の対象になる。
 
 ## 展開手順（コピペ順）
 
@@ -44,15 +57,23 @@ required status check に登録して初めて「保護済み」と扱う。
    ```bash
    cp templates/publication-gate/fixtures/sample.publication-denylist <target-repo>/.publication-denylist
    ```
-3. CI に通常検査を配線する。レジストリを持つリポは `--registry` も渡す。
+3. CI に通常検査を配線する。レジストリを持つリポは `--registry` を渡す。
    ```bash
    python3 -B tools/check_publication_gate.py \
      --root . \
      --account-slug "$PUBLICATION_ACCOUNT_SLUG" \
      --registry path/to/modules.json
    ```
-   レジストリを使わないリポは最後の2引数を省略する。機微パターンを CI secret から
-   注入する場合は `--denylist "$PUBLICATION_DENYLIST_PATH"` も渡す。`--registry` を省略しても
+   レジストリを持たないリポは、代わりに opt-out を明示する。
+   ```bash
+   python3 -B tools/check_publication_gate.py \
+     --root . \
+     --account-slug "$PUBLICATION_ACCOUNT_SLUG" \
+     --no-registry
+   ```
+   `--registry` と `--no-registry` の両方を省略すると赤になる。また、
+   `<root>/registry/modules.json` が存在するリポで `--no-registry` を渡しても赤になる。機微パターンを
+   CI secret から注入する場合は `--denylist "$PUBLICATION_DENYLIST_PATH"` も渡す。
    `--account-slug` は省略できない。個人用 URL 検査は通常実行で常に有効で、slug 未指定は
    ゲートの設定不備として赤になる。
 4. checker の self-test と導入先のテストを同じ CI job か依存 job で実行し、その status
@@ -86,6 +107,10 @@ NAME<TAB>REGEX
   **malformed = 赤**。
 - `.publication-denylist` 自体の不在と、コメント/空行を除く有効ルール0件はどちらも**赤**。
 
+個人用 URL 検査は e-mail 形（`local@host/...`）を意図的に URL とみなさない。したがって採用リポの
+`.publication-denylist` は e-mail ルールを**必ず**含めること（sample には `email-address` ルールを同梱。
+sample を使わず自前 denylist を書く場合も同等のルールを載せる）。
+
 denylist は検出すべき禁止リテラルを必然的に含む。そのため checker は、スキャン対象から
 既定の `<root>/.publication-denylist`、または `--denylist` で明示したファイルが root 内にある場合は
 そのファイルを**パスで**自己除外する。この path-exclusion は、拡張子 allowlist を廃止して全 regular file を
@@ -117,15 +142,18 @@ PATH<TAB>EXACT_LINE
 `PATH` と、そのファイル内で許可する `EXACT_LINE` の完全一致だけを免除する。このファイルは
 **言い訳だけを追加する** allowlist であり、新しい問題を検出するポリシーではない。したがって不在時は
 fail-open（免除なしとして継続）でよい。denylist の不存を赤にするのとは非対称だが、意図的な設計である。
-`--registry` が無い場合は whitelist-staleness を判定できないため、その検査は notice 付きで skip する。
+`--no-registry` を明示した場合、whitelist が不在または空なら whitelist-staleness を判定できないため
+その検査は notice 付きで skip する。一方、1件以上の whitelist がある場合は staleness を検査できない
+状態を許可せず、fail-closed で赤になる。
 
 ## CLI
 
 | 引数 | 必須性 / 既定値 | 意味 |
 |---|---|---|
-| `--root PATH` | 任意、既定 `.` | 検査対象リポのルート。ポリシーファイルと、レジストリ省略時の `README.md` のアンカー |
+| `--root PATH` | 任意、既定 `.` | 検査対象リポのルート。ポリシーファイルと、`--no-registry` 時の `README.md` のアンカー |
 | `--account-slug SLUG` | 通常検査で必須、既定なし | 公開物に残してはいけない個人アカウントの slug。未指定は赤 |
-| `--registry PATH` | 任意、既定なし | 公開リポ台帳の JSON ファイル。無い場合は台帳依存の4検査だけを notice 付きで skip |
+| `--registry PATH` | `--no-registry` と二者択一 | 公開リポ台帳の JSON ファイル。相対パスは root 基準 |
+| `--no-registry` | `--registry` と二者択一、既定 `false` | 公開台帳を持たないリポであることを明示し、台帳依存の4検査を notice 付きで skip |
 | `--denylist PATH` | 任意、既定 `<root>/.publication-denylist` | 外部 denylist。相対パスは root 基準。root 内なら明示指定したファイルもスキャンから path-exclude |
 | `--selftest` | 任意、既定 `false` | 内蔵 fixture で parser・検出・fail posture を検査して終了 |
 
@@ -149,10 +177,25 @@ node_modules
 __pycache__
 ```
 
-列挙された regular file は suffix やファイル名で選別せず、`.env`、`LICENSE`、`Dockerfile`、`.txt`、
-拡張子なしもすべて UTF-8 decode を試す。decode できないファイルは binary としてスキャンを飛ばすが、
-`binary files skipped: N` に必ず集計する。Git mode の symlink は Git が公開する readlink text を検査する。
-`rglob-fallback` は symlink を follow せず、`symlinks skipped: N` に集計する。
+列挙された regular file は suffix やファイル名で選別せず、`.env.local`、`.cs`、`.csproj`、`.ipynb`、
+`.txt`、`.csv`、`LICENSE`、`Dockerfile`、拡張子なしもすべて先に UTF-8 decode を試す。decode
+できなかった場合だけ、明示した既知の binary suffix、exact filename `.DS_Store`、または先頭が
+`bplist00` で suffix が `.plist` / `.bplist` の binary plist を binary としてスキャン対象外にする。それ以外は未知の
+text-like file として
+`source-read: ... is not valid UTF-8 text (fail-closed)` で赤にする。binary と判定したファイルは
+`binary files skipped: N` に集計した直後へ
+`  skipped (binary): <relative path>` と1ファイル1行で名前も表示する。Git mode の symlink は Git が
+公開する readlink text を検査する。`rglob-fallback` は symlink を follow せず、
+`symlinks skipped: N` に集計する。
+
+binary suffix の例には `.png` と `.icns` が含まれる。`.plist` は binary set に入れず、UTF-8 XML plist は
+通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は `.plist` / `.bplist`
+の `bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
+
+`BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
+調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
+Git mode なら publishable corpus から untrack する、または suffix 追加の upstream PR を開く、のいずれかで
+対処する。
 
 summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と、
 `denylist rules loaded : N` を表示する。raw view の hit は raw text の行番号を使い、percent/HTML decode 後に
@@ -162,17 +205,41 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
 埋め込まれている。disk 上の `fixtures/` は人間向け資料であり selftest の依存ではないため、checker の
 `.py` だけを別ディレクトリへコピーしても `--selftest` は完走する。
 
+## 2026-09 改訂（#97 / #98）— 採用リポの再コピー差分
+
+`2d2d4b3` の byte-identical copy を保持している採用リポは、この変更を含む handbook release
+（この PR の merge 時に `v0.24.0` として切る）の checker を再コピーし、次の caller-visible な差分を取り込む。
+
+- 既知の binary suffix または exact filename `.DS_Store` 以外のファイルが UTF-8 でなければ、
+  `source-read: ... is not valid UTF-8 text (fail-closed)` で赤になる。既知の binary file は decode に
+  失敗した場合だけ skip し、`binary files skipped:` の直下へ相対パスを列挙する。caller 側の
+  `binary files skipped: 0` grep guard は追加の guard として引き続き有効である。
+- `--registry` の省略は赤になる。レジストリを持たない caller は `--no-registry` を追加する。
+  `registry/modules.json` が disk 上にある状態、または非空の `.publication-label-whitelist` がある状態での
+  `--no-registry` も赤になる。
+- bare `@github.com/<slug>/<repo>` と `@github.com/<slug>` も personal-url として検出する。
+  `+@github.com/<slug>/<repo>` と `%@github.com/<slug>/<repo>` も検出する一方、`@` の直前が英数字または
+  `_` の word character の e-mail 形は意図的に URL とみなさないため、採用リポの
+  `.publication-denylist` は e-mail ルールを**必ず**含めること。sample には `email-address` ルールを同梱し、
+  sample を使わず自前 denylist を書く場合も同等のルールを載せる。
+- nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
+- 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.24.0` として切る）。
+
 ## family-os / organization `.github` からの移行
 
 `family-os` と organization `.github` にある局所コピーは、この stencil の挙動を先に確定した後、
 後続の **B9 lane** で置き換える。このテンプレート導入と既存リポの移行を同じ diff で混ぜない。
 
-移行時の意図的な差分は2つ。
+移行時の意図的な差分は4つ。
 
 - 旧コピーの email masking のバグは修正済みで、新チェッカーの方が**厳格**。以前通っていた表記が
   新しく赤になった場合、検知退行ではなく bug fix の結果として対象テキストを直す。
 - 外部 `.publication-denylist` は必須。先にファイルを配置・カスタマイズせず checker だけを切り替えると、
   ゲートは意図的に赤のままになる。
+- 既知の binary suffix または exact filename `.DS_Store` 以外の decode failure は binary skip にせず赤にする。
+  これは旧コピーの fail-closed な挙動と一致し、template 化の途中で生じた検査姿勢の緩みを戻す差分である。
+- 通常実行では `--registry` か `--no-registry` の明示が必須。レジストリを持たない移行先は CI と
+  ローカルの呼び出しへ `--no-registry` を追加する。
 
 移行 PR では `--selftest`、対象リポの `make test`、通常 CLI の実行結果、CI status check の
 required 登録を証拠として残す。
