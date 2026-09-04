@@ -232,9 +232,13 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
 ## 2026-09 改訂（#150）— 再コピーは任意
 
 - この改訂は、この PR の merge 時に handbook release `v0.26.0` として切る。
-- red/green outcome は変わらない。caller-visible な差分は、repository name の直後が `&` / `?` / `#` / `=` の nested candidate（例: `github.com/<slug>/repo&x=1`）で、finding が `repo&x=1` ではなく field-cut した `repo` を報告することだけである。
-- Items 2–4 は上記「スキャン対象と Git の無い環境」に accepted posture として記録しただけで、出力変更はない。
-- `v0.24.0` に pinned の adopter も再コピーは任意であり、次の必須再コピー対象は次回の behavior-changing revision のままである。
+- `--no-registry` の caller では red/green は変わらず、finding だけが `&` / `=` の直後で
+  field-cut した名前（`repo&x=1` → `repo`）を報告する。`--registry` の caller では
+  `&` / `=` cut 名も `?` / `#` と同様に registry allowlist と照合されるため、登録済み repo
+  への `github.com/<slug>/<repo>&…` 参照は旧版の誤検知（赤）が解消して緑になり、未登録 repo は cut 名のまま赤である。GitHub の repository 名は `&` / `=` を含めないので真の違反が緑になることはなく、scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…`（gist 含む）は新たに personal account profile として赤になる（fail-closed 側の変更）。
+- 項目 2–4 は上記「スキャン対象と Git の無い環境」に accepted posture として記録した整理であり、この改訂の caller-visible な差分は前項の nested candidate まわりに限られる。
+- `v0.24.0` に pinned の adopter も再コピーは任意であり、真の違反の red/green は変わらないが、registry を使う CI では上記の誤検知解消と scheme 無し profile の追加赤が出うるため outcome-neutral ではない。
+  ただし、公開済みテキストに scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…` を含む adopter は、旧版では緑・再コピー後に赤になる形のため再コピーを推奨し、それ以外は引き続き任意とする。
 
 ## family-os / organization `.github` からの移行
 

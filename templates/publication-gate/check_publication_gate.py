@@ -1354,6 +1354,8 @@ def selftest_scanners():
         "https://example.org/?u=notgithub." "com/neutral-owner/nope",
         "https://example.org/?u=github." "com/neutral-owner/one&b=github." "com/neutral-owner/two",
         "github." "com/neutral-owner/repo&x=1",
+        "github." "com/neutral-owner&x=1",
+        "github." "com/neutral-owner=1",
         "github." "com/neutral-owner/Repo?x=github." "com/neutral-owner/repo",
     )
     for candidate in nested_reference_cases:
@@ -1370,6 +1372,45 @@ def selftest_scanners():
         )
         == {"repo"},
         "nested bare-ampersand repository name is field-cut",
+    )
+    _selftest_check(
+        set(
+            _nested_personal_urls(
+                "github." "com/neutral-owner&x=1", "neutral-owner"
+            )
+        )
+        == {None},
+        "nested bare-ampersand account profile is field-cut",
+    )
+    ampersand_registry = _fixture_registry()
+    ampersand_registry["modules"].append(
+        {"name": "Repo", "repo": "neutral-owner/repo", "status": "published"}
+    )
+    ampersand_allowlisted_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "github." "com/neutral-owner/repo&x=1\n"},
+            "neutral-owner",
+            ampersand_registry,
+            ampersand_allowlisted_failures,
+        )
+        == 1
+        and ampersand_allowlisted_failures == [],
+        "registry allowlist matches ampersand-cut repository name",
+    )
+    ampersand_unregistered_failures = []
+    _selftest_check(
+        check_personal_urls(
+            {"README.md": "github." "com/neutral-owner/other&x=1\n"},
+            "neutral-owner",
+            ampersand_registry,
+            ampersand_unregistered_failures,
+        )
+        == 1
+        and len(ampersand_unregistered_failures) == 1
+        and "unknown repository neutral-owner/other"
+        in ampersand_unregistered_failures[0],
+        "unregistered ampersand-cut repository stays red",
     )
     two_repo_registry = _fixture_registry()
     two_repo_registry["modules"].extend(
