@@ -417,7 +417,7 @@ The way in for proposals sits on the same rules.
 - CI: Local callers exercise the reusable `@ci-v1` set (five gates), including Test + Lint; suite-count reconciliation is enabled. Run the same CI entry points locally with `make test` and `make lint`.
 - 検証済み環境: `ubuntu-latest` and `macos-latest` are exercised in CI; macOS is also used for local development. WSL2 is in scope as well — it runs the same GNU path the `ubuntu-latest` lane verifies (clone inside the Linux filesystem, not `/mnt/c`).
 - maturity: `stable` — the normative canonical handbook.
-- 既知の制約: The statutes are docs-only. `templates/` bundles samples for adopters to copy into their own CI (gate templates, YAML + Python), while `scripts/` holds this repository's own check scripts. Two known links in the Thai mirror are tracked in [#89](https://github.com/caty-ai/family-dev-handbook/issues/89).
+- 既知の制約: The statutes are docs-only. `templates/` bundles samples for adopters to copy into their own CI (gate templates, YAML + Python), while `scripts/` holds this repository's own check scripts. Link integrity of the four README mirrors is checked by `make lint` in CI (Test + Lint).
 
 ---
 
