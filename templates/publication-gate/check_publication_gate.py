@@ -401,10 +401,7 @@ def _nested_personal_urls(candidate, account_slug):
             next_marker = next(marker_indexes, None)
         if character in split_characters:
             previous_split = index
-    repo_name = _personal_url(candidate, account_slug)
-    if repo_name is not False and unseen(repo_name):
-        yield repo_name
-    field_end = 0
+    field_end = -1
     for start in range(len(candidate)):
         if start not in starts:
             continue
@@ -909,6 +906,7 @@ def selftest_scanners():
         )
         field_end = -1
         matches = set()
+        reported = set()
         for start in sorted(starts):
             if field_end < start:
                 field_end = start
@@ -916,6 +914,14 @@ def selftest_scanners():
                     field_end += 1
             repo_name = _personal_url(candidate[start:field_end], account_slug)
             if repo_name is not False:
+                name = (
+                    account_slug
+                    if repo_name is None
+                    else account_slug + "/" + repo_name
+                ).casefold()
+                if name in reported:
+                    continue
+                reported.add(name)
                 matches.add(repo_name)
         return matches
 
@@ -1347,6 +1353,8 @@ def selftest_scanners():
         "https://example.org/?u=neutral-owner.github." "io/page",
         "https://example.org/?u=notgithub." "com/neutral-owner/nope",
         "https://example.org/?u=github." "com/neutral-owner/one&b=github." "com/neutral-owner/two",
+        "github." "com/neutral-owner/repo&x=1",
+        "github." "com/neutral-owner/Repo?x=github." "com/neutral-owner/repo",
     )
     for candidate in nested_reference_cases:
         _selftest_check(
@@ -1354,6 +1362,15 @@ def selftest_scanners():
             == reference_nested_personal_urls(candidate, "neutral-owner"),
             "nested boundary walk matches reference: %s" % candidate,
         )
+    _selftest_check(
+        set(
+            _nested_personal_urls(
+                "github." "com/neutral-owner/repo&x=1", "neutral-owner"
+            )
+        )
+        == {"repo"},
+        "nested bare-ampersand repository name is field-cut",
+    )
     two_repo_registry = _fixture_registry()
     two_repo_registry["modules"].extend(
         (

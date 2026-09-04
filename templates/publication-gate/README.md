@@ -192,6 +192,10 @@ binary suffix の例には `.png` と `.icns` が含まれる。`.plist` は bin
 通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は `.plist` / `.bplist`
 の `bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
 
+- binary skip の個別列挙は上限を設けない。1 skipped binary につき1行の名前が adopter の grep 用 audit trail であり、上限は名前を隠す一方、総数は既存の `binary files skipped: N` が示す。
+- `.eps` は `BINARY_SUFFIXES` に残す。decode-first のため ASCII EPS は text としてスキャンされ、非 UTF-8 の EPS だけが binary として skip される。`.fig` も同じ扱いである。
+- `.DS_Store` は exact case のまま扱う。macOS が書く名前は正確に `.DS_Store` であり、非 UTF-8 の `.ds_store` は意図どおり fail-closed で赤になる。
+
 `BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
 調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
 Git mode なら publishable corpus から untrack する、または suffix 追加の upstream PR を開く、のいずれかで
@@ -224,6 +228,13 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   sample を使わず自前 denylist を書く場合も同等のルールを載せる。
 - nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.24.0` として切る）。
+
+## 2026-09 改訂（#150）— 再コピーは任意
+
+- この改訂は、この PR の merge 時に handbook release `v0.26.0` として切る。
+- red/green outcome は変わらない。caller-visible な差分は、repository name の直後が `&` / `?` / `#` / `=` の nested candidate（例: `github.com/<slug>/repo&x=1`）で、finding が `repo&x=1` ではなく field-cut した `repo` を報告することだけである。
+- Items 2–4 は上記「スキャン対象と Git の無い環境」に accepted posture として記録しただけで、出力変更はない。
+- `v0.24.0` に pinned の adopter も再コピーは任意であり、次の必須再コピー対象は次回の behavior-changing revision のままである。
 
 ## family-os / organization `.github` からの移行
 
