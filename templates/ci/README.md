@@ -66,24 +66,29 @@ job 名の変更など required checks の再キーが必要になる変更）�
 update / deletion・enforcement active）が張られており、bypass actor は repository admin
 （`RepositoryRole` admin）だけである。意味は「**bypass でない主体 — write / maintain 権限の
 collaborator・GitHub App・workflow の `GITHUB_TOKEN` — は `ci-v*` を作れず、動かせず、消せない**」で
-あって、pin の凍結ではない。`ci-v1` は moving major のままで、前進はこれまでどおり owner GO 後に
-admin アカウントで行い [#116](https://github.com/caty-ai/family-dev-handbook/issues/116) に記録する。
-採用側が前提にしてよいのはここまでで、repository admin（現在の顔ぶれと bypass の実測は #116）と
-その運用記録への信頼は残る — admin は ruleset 自体も編集できる。ruleset の実測は一覧
-（`gh api repos/caty-ai/family-dev-handbook/rulesets`）では `conditions` / `rules` / `bypass_actors`
-が返らないため、`gh api repos/caty-ai/family-dev-handbook/rulesets/<id>` の全文を #116 に貼る。
+あって、pin の凍結ではない。`ci-v1` は moving major のままで、前進は owner GO 後に admin アカウントで
+行い [#116](https://github.com/caty-ai/family-dev-handbook/issues/116) に記録する。採用側が前提に
+してよいのはここまでで、repository admin（現在の顔ぶれと bypass の実測は #116。admin 権限を付与した
+GitHub App も bypass 側に入り得る）とその運用記録への信頼は残る — admin は ruleset 自体も編集できる。
+ruleset の実測は一覧（`gh api repos/caty-ai/family-dev-handbook/rulesets`）では `conditions` /
+`rules` / `bypass_actors` が返らないため、`gh api repos/caty-ai/family-dev-handbook/rulesets/<id>`
+の全文を #116 に貼る。
 
 **次のいずれかを含む改訂は `ci-v1` に流さず `ci-v2` を切る**（レビュアーは reusable の diff で照合し、
-該当すれば reject する）:
+1 つでも該当すれば reject する。上の段落の破壊的変更 — 入力の削除・意味変更、job 名の変更 — も従来どおり
+`ci-v2` であり、この 3 項目はそれに write-path の軸を足すもの）:
 
-1. 既存 reusable が caller に要求する `permissions:` を新規に追加する、または範囲を広げる
-   （`contents: write` を要求してよいのは `reusable-release-sync.yml` の Release 作成だけ）
-2. `reusable-release-sync.yml` が checkout する・tag 側のリポ内容を読み込み実行する・GitHub API での
-   Release 作成以外の書き込みを行う
-3. `contents: write` を要求する新しい reusable を `ci-v1` の pin 対象に加える
+1. 既存 reusable が caller に要求する `permissions:` に **write 系キーを追加する、または read → write に
+   広げる**（workflow 級・job 級を問わない。`permissions:` ブロックの削除で既定が広がる場合も含む。
+   `contents: write` を要求してよいのは `reusable-release-sync.yml` の Release 作成だけ）
+2. `reusable-release-sync.yml` が次のいずれかを行う — (a) `actions/checkout` / `git clone` /
+   同等の取得、(b) tag が指すツリーやファイルの取得・実行（tag object の message を notes に読むのは可）、
+   (c) Release 作成（`POST …/releases`）以外の GitHub への書き込み
+3. **何らかの write 系 `permissions:`・書き込み用 credential・外部状態への書き込み**を要求する新しい
+   reusable を追加し、`@ci-v1` から `uses:` できる状態にする（`contents: write` に限らない）
 
-`ci-v1` に流してよいのは、上記 3 点を保ったままの read-path の後方互換な改善と不具合修正だけである。
-`ci-v2` を切るときはリリースノート先頭に全採用リポの `uses:` 更新手順を載せる。
+`ci-v1` に流してよいのは、上記 3 項目のいずれにも該当しない read-path の後方互換な改善と不具合修正だけ
+である。`ci-v2` を切るときはリリースノート先頭に全採用リポの `uses:` 更新手順を載せる。
 
 ## release-sync — tag push 後の Release 履行
 
