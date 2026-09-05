@@ -204,6 +204,7 @@ Git mode なら publishable corpus から untrack する、または suffix 追�
 summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と、
 `denylist rules loaded : N` を表示する。raw view の hit は raw text の行番号を使い、percent/HTML decode 後に
 初めて見つかった hit は decoded text の行番号と `(decoded view)` marker を表示する。
+scan views は各 percent/HTML view から JSON/YAML string-escape decode（`\uXXXX` / `\UXXXXXXXX` / `\xHH` / `\/`、surrogate pair は結合し、lone/invalid escape は verbatim のまま）も最大 3 fixed-point rounds 導出し、3 rounds より深い nesting は documented boundary とする（出典: x-collector#77, v0.3.3）。
 
 `--selftest` の violating corpus、clean twin、sample denylist は checker 自体の string constants として
 埋め込まれている。disk 上の `fixtures/` は人間向け資料であり selftest の依存ではないため、checker の
