@@ -192,6 +192,10 @@ binary suffix の例には `.png` と `.icns` が含まれる。`.plist` は bin
 通常どおり全文を検査し、UTF-16 XML plist は source-read として赤にする。binary plist は `.plist` / `.bplist`
 の `bplist00` signature により skip する。鍵・証明書コンテナは意図的に binary set に入れない＝赤。
 
+- binary skip の個別列挙は上限を設けない。1 skipped binary につき1行の名前が adopter の grep 用 audit trail であり、上限は名前を隠す一方、総数は既存の `binary files skipped: N` が示す。
+- `.eps` は `BINARY_SUFFIXES` に残す。decode-first のため ASCII EPS は text としてスキャンされ、非 UTF-8 の EPS だけが binary として skip される。`.fig` も同じ扱いである。
+- `.DS_Store` は exact case のまま扱う。macOS が書く名前は正確に `.DS_Store` であり、非 UTF-8 の `.ds_store` は意図どおり fail-closed で赤になる。
+
 `BINARY_SUFFIXES` は stencil 上流の公開ポリシーであり、byte-identical copy を採用するリポが局所的に
 調整する対象ではない。未知の suffix が非 UTF-8 として赤になった場合は、ファイルを UTF-8 へ変換する、
 Git mode なら publishable corpus から untrack する、または suffix 追加の upstream PR を開く、のいずれかで
@@ -224,6 +228,23 @@ summary は必ず `enumeration: git` または `enumeration: rglob-fallback` と
   sample を使わず自前 denylist を書く場合も同等のルールを載せる。
 - nested host を含む URL 候補の personal-url 検査は、上記「個人用 URL」節を参照する。
 - 再コピー対象は、この変更を含む handbook release（この PR の merge 時に `v0.24.0` として切る）。
+
+## 2026-09 改訂（#150）— 再コピーは任意（1形状のみ推奨）
+
+- この改訂は、この PR の merge 時に handbook release `v0.26.0` として切る。
+- registry の有無によらず、scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…`
+  （`www.` 付き・大小文字違い・gist 含む）は新たに personal account profile として赤になる
+  （fail-closed 側の変更。scheme 付きの同形は旧版から赤）。それ以外の `--no-registry` の caller では
+  red/green は変わらず、finding だけが `&` / `=` の直後で field-cut した名前（`repo&x=1` → `repo`）を
+  報告する。`--registry` の caller では `&` / `=` cut 名も `?` / `#` と同様に registry allowlist と
+  照合されるため、登録済み repo への `github.com/<slug>/<repo>&…` 参照は旧版の誤検知（赤）が解消して
+  緑になり、未登録 repo は cut 名のまま赤である。GitHub の repository 名は `&` / `=` を含めないので、
+  真の違反が緑になることはない。
+- 項目 2–4 は上記「スキャン対象と Git の無い環境」に accepted posture として記録した整理であり、この改訂の caller-visible な差分は前項の nested candidate まわりに限られる。
+- `v0.24.0` に pinned の adopter も再コピーは任意であり、真の違反の red/green は変わらないが、
+  scheme 無し profile の追加赤（モード共通）と、registry を使う CI での上記の誤検知解消が出うるため
+  outcome-neutral ではない。
+  ただし、公開済みテキストに scheme 無しの `github.com/<slug>&…` / `github.com/<slug>=…` を含む adopter は、旧版では緑・再コピー後に赤になる形のため再コピーを推奨し、それ以外は引き続き任意とする。
 
 ## family-os / organization `.github` からの移行
 
