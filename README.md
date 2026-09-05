@@ -23,7 +23,7 @@ It addresses them by moving judgment out of human attentiveness and into a mecha
 
 </div>
 <!-- repo-state:begin (generated; do not edit) -->
-<p align="center"><sub>generation: <code>d79fd96</code> (2026-09-05T06:59:04Z) · verify: <a href="https://api.github.com/repos/caty-ai/family-dev-handbook/commits/main">API HEAD</a> · <a href="./status.json">status.json</a></sub></p>
+<p align="center"><sub>generation: <code>2f3782b</code> (2026-09-05T07:56:18Z) · verify: <a href="https://api.github.com/repos/caty-ai/family-dev-handbook/commits/main">API HEAD</a> · <a href="./status.json">status.json</a></sub></p>
 <!-- repo-state:end -->
 
 ---
