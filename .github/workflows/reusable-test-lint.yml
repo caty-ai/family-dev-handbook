@@ -39,7 +39,7 @@
 #   Makefile 側で `apt-get` を叩く回避策を置くと macOS レグと乖離するため、OS 別入力として型に置く。
 # - test_timeout_minutes (issue #160 / caty-agent-harness#261): test と test-macos の job 上限 (分)。
 #   既定 30 = 従来どおり。型は number (数値以外は workflow_call の型検査で赤 = fail-closed・node_version と
-#   同じ姿勢だが検証は GitHub 側の型で閉じる)。suite が成長して macOS レグが上限に触るようになった
+#   同じ姿勢) + test / test-macos の先頭ステップで正整数かつ 1..360 (hosted runner の上限) を検証 (0・負数・小数・過大値は赤)。suite が成長して macOS レグが上限に触るようになった
 #   caller だけが caller の with: で上げる (harness は Linux 21m / macOS 28-30m で 30 に張り付き、
 #   1日5回 cancel)。lint / test-macos-skip の上限は対象外 (固定のまま)。private リポで macOS 分を
 #   走らせている caller は上限 = 最大課金時間でもある点に注意して値を決める。
@@ -76,7 +76,7 @@ on:
         type: string
         default: ''
       test_timeout_minutes:
-        description: "test / test-macos の job 上限 (分)。既定 30 = 従来どおり。数値のみ (型 number — 文字列や空は caller の workflow 検証で赤)。suite が上限に触る caller だけが上げる (例: 45)。lint / test-macos-skip には効かない (issue #160)。"
+        description: "test / test-macos の job 上限 (分)。既定 30 = 従来どおり。正整数 1..360 のみ (型 number — 文字列や空は caller の workflow 検証で赤・0/負数/小数/361 以上は job 先頭の検証ステップで赤)。suite が上限に触る caller だけが上げる (例: 45)。lint / test-macos-skip には効かない (issue #160)。"
         type: number
         default: 30
 
@@ -93,6 +93,22 @@ jobs:
           set -euo pipefail
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - name: Validate test_timeout_minutes (positive integer, 1..360)
+        env:
+          TEST_TIMEOUT_MINUTES: ${{ inputs.test_timeout_minutes }}
+        run: |
+          set -euo pipefail
+          case "${TEST_TIMEOUT_MINUTES}" in
+            ''|*[!0-9]*|0*)
+              echo "::error::test_timeout_minutes must be a positive integer in minutes (1..360); received '${TEST_TIMEOUT_MINUTES}'. Fractions, zero, negatives and non-numbers are rejected (fail-closed) — the job-level timeout-minutes above was already rendered from this value, so an invalid value must not reach make test."
+              exit 1
+              ;;
+          esac
+          if [ "${TEST_TIMEOUT_MINUTES}" -gt 360 ]; then
+            echo "::error::test_timeout_minutes=${TEST_TIMEOUT_MINUTES} exceeds the policy ceiling of 360 minutes (the GitHub-hosted runner limit). A value above the runner limit is silently capped by the platform and discards the cost bound this input exists to keep explicit."
             exit 1
           fi
 
@@ -215,6 +231,22 @@ jobs:
           set -euo pipefail
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "::error::reusable gates must be called from a pull_request caller — this reusable's range logic depends on the PR event payload (fail-closed, FP-6). event was: ${{ github.event_name }}"
+            exit 1
+          fi
+
+      - name: Validate test_timeout_minutes (positive integer, 1..360)
+        env:
+          TEST_TIMEOUT_MINUTES: ${{ inputs.test_timeout_minutes }}
+        run: |
+          set -euo pipefail
+          case "${TEST_TIMEOUT_MINUTES}" in
+            ''|*[!0-9]*|0*)
+              echo "::error::test_timeout_minutes must be a positive integer in minutes (1..360); received '${TEST_TIMEOUT_MINUTES}'. Fractions, zero, negatives and non-numbers are rejected (fail-closed) — the job-level timeout-minutes above was already rendered from this value, so an invalid value must not reach make test."
+              exit 1
+              ;;
+          esac
+          if [ "${TEST_TIMEOUT_MINUTES}" -gt 360 ]; then
+            echo "::error::test_timeout_minutes=${TEST_TIMEOUT_MINUTES} exceeds the policy ceiling of 360 minutes (the GitHub-hosted runner limit). A value above the runner limit is silently capped by the platform and discards the cost bound this input exists to keep explicit."
             exit 1
           fi
 
