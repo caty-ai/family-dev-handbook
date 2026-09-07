@@ -111,6 +111,15 @@ NAME<TAB>REGEX
 `.publication-denylist` は e-mail ルールを**必ず**含めること（sample には `email-address` ルールを同梱。
 sample を使わず自前 denylist を書く場合も同等のルールを載せる）。
 
+個人パス（ホームディレクトリ）の検出は family 推奨セットとして 5 ルール
+（`local-user-path` / `windows-user-path` / `wsl-drvfs-user-path` / `wsl-unc-linux-home` / `host-mount-user-path`）を
+sample に同梱している。x-collector v0.3.4 の `.publication-denylist` から verbatim で、family-os / meetmate は先頭ルールを
+`absolute-personal-path` の名前で持つ（regex は同一）。形の要点は**先頭アンカーを置かない**こと（`^` や lookbehind は
+UNC・`vscode-remote://`・`file://localhost/`・相対パスの綴りで fail-open する）と、`local-user-path` だけが `(?-i:` で
+case-sensitive なこと（`api.github.com/users/...` の誤検知回避）。意図的に見送った 2 クラス（`/mnt` 以外のルートの
+`/c/users/<name>`、複数文字マウント名の `/mnt/cdrive/users/<name>`）とその理由は sample のコメントに記録してあり、
+採用リポは 5 行をそのままコピーし、変える場合は理由を決定として残す。
+
 denylist は検出すべき禁止リテラルを必然的に含む。そのため checker は、スキャン対象から
 既定の `<root>/.publication-denylist`、または `--denylist` で明示したファイルが root 内にある場合は
 そのファイルを**パスで**自己除外する。この path-exclusion は、拡張子 allowlist を廃止して全 regular file を
