@@ -813,6 +813,34 @@ SELFTEST_SAMPLE_DENYLIST = (
     "private-host\tprivate\\.example\\.invalid\n"
     "# Keep local@host/... coverage in denylist territory.\n"
     "email-address\t\\b[A-Z0-9._%+\\-]+@[A-Z0-9.\\-]+\\.[A-Z]{2,}\\b\n"
+    "# --- family 推奨: 個人パス 5 ルール（x-collector v0.3.4 の .publication-denylist から verbatim・#71→#75→#76→#78）---\n"
+    "# family shape（#76 の異種5席裁定・#78 で凍結）:\n"
+    "#   先頭アンカーなし。^ や lookbehind を付けると \\\\wsl.localhost\\<distro>\\..., vscode-remote://wsl+<distro>/...,\n"
+    "#   file://localhost/..., sftp://..., 相対の ../ や省略の .../ の綴りで fail-open する。\n"
+    "#   最初の区切りは [\\\\/] 1個、区切り間は [\\\\/]+（JSON の \\\\\\\\ と \\/ を吸収）。ドライブ文字は [A-Za-z] 1文字だけ。\n"
+    "#   (?![<{]) で <name> / {name} のプレースホルダを除外。名前は [\\w.-]+（re.ASCII なし・CJK 名も対象）。\n"
+    "#   ルールは re.IGNORECASE で照合されるが local-user-path だけ (?-i: で case-sensitive\n"
+    "#   （api.github.com/users/... の誤検知クラスを避ける）。family-os / meetmate は同じ regex を absolute-personal-path の名前で持つ。\n"
+    "# 見送り（won't-fix・理由ごと持ち運ぶ）:\n"
+    "#   /c/users/<name>（WSL automount.root=/ や Git-Bash MSYS など /mnt 以外のルート）: 裸の /<letter>/users/ アンカーは\n"
+    "#     family gate script 自身の selftest canary に 390 件自己検知して全ゲートが赤になる。先頭 lookbehind 版は corpus 0 件だが\n"
+    "#     vscode-remote://wsl+<distro>/c/users/<name>・sftp://<host>/c/users/<name>・https://<host>/c/users/<name>・\n"
+    "#     file://localhost/c/users/<name> の host 付き綴りで fail-open する。ツール出力の大文字綴り（/c/ の後に Users/<name>）は\n"
+    "#     local-user-path が拾う。\n"
+    "#   /mnt/cdrive/users/<name>（複数文字のマウント名）: ドライブ文字を [A-Za-z]+ に広げると /mnt/backup/users/shared や\n"
+    "#     /mnt/wsl/users/foo に当たる（#76 の trade）。\n"
+    "local-user-path\t(?-i:/Use" "rs/|/home/(?![<{])[A-Za-z0-9._-]+)\n"
+    "windows-user-path\t\\b[A-Za-z]:[\\\\/]+Users[\\\\/]+(?![<{])[\\w.-]+\n"
+    "wsl-drvfs-user-path\t[\\\\/]mnt[\\\\/]+[A-Za-z][\\\\/]+users[\\\\/]+(?![<{])[\\w.-]+\n"
+    "wsl-unc-linux-home\twsl(?:\\$|\\.localhost)[\\\\/]+[^\\\\/\\s]+[\\\\/]+home[\\\\/]+(?![<{])[\\w.-]+\n"
+    "host-mount-user-path\t[\\\\/](?:cygdrive|host_mnt|mnt[\\\\/]+[\\w.-]+)[\\\\/]+[A-Za-z][\\\\/]+users[\\\\/]+(?![<{])[\\w.-]+\n"
+)
+SELFTEST_SAMPLE_PATH_CANARIES = (
+    ("local-user-path", "/Use" "rs/alice"),
+    ("windows-user-path", "C:\\Use" "rs\\alice"),
+    ("wsl-drvfs-user-path", "/mnt/c/use" "rs/alice"),
+    ("wsl-unc-linux-home", "\\\\wsl$\\Ubuntu\\ho" "me\\alice"),
+    ("host-mount-user-path", "/cygdri" "ve/c/users/alice"),
 )
 SELFTEST_CLEAN_README = "# Public project\n\nPublication-safe example content.\n"
 SELFTEST_VIOLATING_README = (
@@ -917,6 +945,37 @@ def selftest_policy_parsers():
             _selftest_check(
                 shipped_sample.read_bytes() == SELFTEST_SAMPLE_DENYLIST.encode("utf-8"),
                 "shipped sample denylist stays byte-identical",
+            )
+        (root / DENYLIST_NAME).write_text(SELFTEST_SAMPLE_DENYLIST, encoding="utf-8")
+        sample_rules = load_denylist(root)
+        sample_patterns = dict(sample_rules)
+        for name, _ in SELFTEST_SAMPLE_PATH_CANARIES:
+            _selftest_check(
+                name in sample_patterns,
+                "shipped sample path canary rule loaded: %s" % name,
+            )
+        _selftest_check(len(sample_rules) == 8, "shipped sample denylist loads eight rules")
+        for name, canary in SELFTEST_SAMPLE_PATH_CANARIES:
+            _selftest_check(
+                sample_patterns[name].search(canary) is not None,
+                "shipped sample path canary hits %s" % name,
+            )
+        for clean in (
+            "/mnt/backup/users/shared",
+            "mailto:Users/alice",
+            "api.github." "com/users/alice",
+        ):
+            _selftest_check(
+                all(pattern.search(clean) is None for _, pattern in sample_rules),
+                "shipped sample path clean control: %s" % clean,
+            )
+        for name, canary in SELFTEST_SAMPLE_PATH_CANARIES:
+            remaining_rules = tuple(
+                rule for rule in sample_rules if rule[0] != name
+            )
+            _selftest_check(
+                all(pattern.search(canary) is None for _, pattern in remaining_rules),
+                "shipped sample path canary requires %s" % name,
             )
         _selftest_check(load_label_whitelist(root) == frozenset(), "absent whitelist")
         (root / WHITELIST_NAME).write_text("README.md\tapproved exact line\n", encoding="utf-8")
@@ -2244,10 +2303,28 @@ def selftest_end_to_end():
         )
         _selftest_check(
             status == 1
-            and "denylist rules loaded : 3" in output
+            and "denylist rules loaded : 8" in output
             and "denylist: README.md:1 contains email-address" in output,
             "shipped sample denylist catches slug-domain email fixture: %r" % output,
         )
+
+    for name, canary in SELFTEST_SAMPLE_PATH_CANARIES:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            _materialize_fixture(
+                root,
+                "See " + canary + "\n",
+                SELFTEST_SAMPLE_DENYLIST,
+            )
+            status, output = _capture_main(
+                ["--root", str(root), "--account-slug", "neutral-owner", "--no-registry"]
+            )
+            _selftest_check(
+                status == 1
+                and "denylist: README.md:1 contains " + name in output
+                and "denylist rules loaded : 8" in output,
+                "shipped sample path canary reaches main for %s: %r" % (name, output),
+            )
 
     with tempfile.TemporaryDirectory() as temporary:
         root = Path(temporary)
