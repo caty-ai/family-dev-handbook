@@ -37,6 +37,12 @@
 #   これは caller のリポが自分の CI に置くのと同じ信頼境界 (Makefile の test ターゲットと同じ) であり、
 #   reusable の権限 (contents: read) を広げない。空 = ステップ自体を置かない。非空で失敗 = 赤 (set -e)。
 #   Makefile 側で `apt-get` を叩く回避策を置くと macOS レグと乖離するため、OS 別入力として型に置く。
+# - test_timeout_minutes (issue #160 / caty-agent-harness#261): test と test-macos の job 上限 (分)。
+#   既定 30 = 従来どおり。型は number (数値以外は workflow_call の型検査で赤 = fail-closed・node_version と
+#   同じ姿勢だが検証は GitHub 側の型で閉じる)。suite が成長して macOS レグが上限に触るようになった
+#   caller だけが caller の with: で上げる (harness は Linux 21m / macOS 28-30m で 30 に張り付き、
+#   1日5回 cancel)。lint / test-macos-skip の上限は対象外 (固定のまま)。private リポで macOS 分を
+#   走らせている caller は上限 = 最大課金時間でもある点に注意して値を決める。
 
 on:
   workflow_call:
@@ -69,12 +75,16 @@ on:
         description: "macOS の test-macos job で make test の直前に走らせる shell (bash, set -euo pipefail)。例: brew install <pkg>。空 = ステップを置かない。失敗 = 赤。"
         type: string
         default: ''
+      test_timeout_minutes:
+        description: "test / test-macos の job 上限 (分)。既定 30 = 従来どおり。数値のみ (型 number — 文字列や空は caller の workflow 検証で赤)。suite が上限に触る caller だけが上げる (例: 45)。lint / test-macos-skip には効かない (issue #160)。"
+        type: number
+        default: 30
 
 jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ inputs.test_timeout_minutes }}
     permissions:
       contents: read
     steps:
@@ -196,7 +206,7 @@ jobs:
     name: test-macos
     if: ${{ inputs.run_macos }}
     runs-on: macos-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ inputs.test_timeout_minutes }}
     permissions:
       contents: read
     steps:
