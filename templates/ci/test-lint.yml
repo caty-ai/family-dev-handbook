@@ -9,3 +9,4 @@ jobs:
     permissions: {contents: read}
     with:
       run_macos: true
+      test_timeout_minutes: 30  # test / test-macos の job 上限 (分)。上限に触る suite だけ上げる (README 手順4)
